@@ -3,13 +3,9 @@
 
 ## Installation
 
-1. Clone this repository:
-   ```
-   git clone https://github.com/username/repo-name.git
-   cd repo-name
-   ```
+1. Clone this repository
 
-2. Install dependencies:
+1. Install dependencies:
    ```
    go mod tidy
    ```
