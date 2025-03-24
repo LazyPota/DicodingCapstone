@@ -29,7 +29,7 @@ func (r *userRepository) CreateUser(user *models.User) error {
 
 func (r *userRepository) GetAllUser() ([]models.User, error) {
 	var user []models.User
-	err := r.db.Order("created_at ASC").Find(&user).Error
+	err := r.db.Order("created_at DESC").Find(&user).Error
 	return user, err
 }
 

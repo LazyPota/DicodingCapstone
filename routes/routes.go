@@ -14,4 +14,6 @@ func InitAllRoutes(r *gin.Engine, db *gorm.DB) {
 	apiGroup := r.Group("/capstone")
 
 	InitUserRoutes(apiGroup, controller)
+	InitCategoryRoutes(apiGroup,controller)
+	InitWalletRoutes(apiGroup,controller)
 }
