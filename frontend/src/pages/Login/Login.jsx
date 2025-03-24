@@ -47,7 +47,7 @@ const Login = () => {
               </label>
               <button
                 type="button"
-                className="absolute z-10 top-1/2 pl-[360px] -translate-y-1/2 text-gray-500 cursor-pointer"
+                className="absolute z-10 top-1/2 ml-[360px] -translate-y-1/2 text-gray-500 cursor-pointer"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
