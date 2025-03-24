@@ -32,17 +32,17 @@ type updateUserRequest struct {
 	Password string `json:"password"`
 }
 
-func (m *UserController) CreateUser(ctx *gin.Context) {
+func (c *UserController) CreateUser(ctx *gin.Context) {
 	var req createUserRequest
 	if !utils.HandleValidation(ctx, &req, func(ctx *gin.Context, code string, err error) {
-		m.baseController.ResponseJSONError(ctx, Error_BadRequest, err.Error())
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, err.Error())
 	}) {
 		return
 	}
 
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
-		m.baseController.ResponseJSONError(ctx, Error_InternalServer, err.Error())
+		c.baseController.ResponseJSONError(ctx, Error_InternalServer, err.Error())
 		return
 	}
 
@@ -52,46 +52,46 @@ func (m *UserController) CreateUser(ctx *gin.Context) {
 		Password: string(hashedPassword),
 	}
 
-	if err := m.userRepo.CreateUser(&user); err != nil {
-		m.baseController.ResponseJSONError(ctx, Error_FailedToCreate, err.Error())
+	if err := c.userRepo.CreateUser(&user); err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_FailedToCreate, err.Error())
 		return
 	}
 
-	m.baseController.ResponseJSONCreated(ctx, user)
+	c.baseController.ResponseJSONCreated(ctx, user)
 }
 
-func (m *UserController) GetAllUser(ctx *gin.Context) {
-	users, err := m.userRepo.GetAllUser()
+func (c *UserController) GetAllUser(ctx *gin.Context) {
+	users, err := c.userRepo.GetAllUser()
 	if err != nil {
-		m.baseController.ResponseJSONError(ctx, Error_FailedToRetrieve, err.Error())
+		c.baseController.ResponseJSONError(ctx, Error_FailedToRetrieve, err.Error())
 		return
 	}
 
-	m.baseController.ResponseJSONRetrieved(ctx, users)
+	c.baseController.ResponseJSONRetrieved(ctx, users)
 }
 
-func (m *UserController) GetUserByID(ctx *gin.Context) {
+func (c *UserController) GetUserByID(ctx *gin.Context) {
 	userID := ctx.Param("id")
-	user, err := m.userRepo.GetUserByID(userID)
+	user, err := c.userRepo.GetUserByID(userID)
 	if err != nil {
-		m.baseController.ResponseJSONError(ctx, Error_NotFound, err.Error())
+		c.baseController.ResponseJSONError(ctx, Error_NotFound, err.Error())
 		return
 	}
 
-	m.baseController.ResponseJSONRetrieved(ctx, user)
+	c.baseController.ResponseJSONRetrieved(ctx, user)
 }
 
-func (m *UserController) UpdateUser(ctx *gin.Context) {
+func (c *UserController) UpdateUser(ctx *gin.Context) {
 	userID := ctx.Param("id")
-	user, err := m.userRepo.GetUserByID(userID)
+	user, err := c.userRepo.GetUserByID(userID)
 	if err != nil {
-		m.baseController.ResponseJSONError(ctx, Error_NotFound, err.Error())
+		c.baseController.ResponseJSONError(ctx, Error_NotFound, err.Error())
 		return
 	}
 
 	var req updateUserRequest
 	if !utils.HandleValidation(ctx, &req, func(ctx *gin.Context, code string, err error) {
-		m.baseController.ResponseJSONError(ctx, Error_BadRequest, err.Error())
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, err.Error())
 	}) {
 		return
 	}
@@ -108,20 +108,20 @@ func (m *UserController) UpdateUser(ctx *gin.Context) {
 		user.Password = req.Password
 	}
 
-	if err := m.userRepo.UpdateUser(userID, user); err != nil {
-		m.baseController.ResponseJSONError(ctx, Error_FailedToUpdate, err.Error())
+	if err := c.userRepo.UpdateUser(userID, user); err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_FailedToUpdate, err.Error())
 		return
 	}
 
-	m.baseController.ResponseJSONUpdated(ctx, user)
+	c.baseController.ResponseJSONUpdated(ctx, user)
 }
 
-func (m *UserController) DeleteUser(ctx *gin.Context) {
+func (c *UserController) DeleteUser(ctx *gin.Context) {
 	userID := ctx.Param("id")
-	if err := m.userRepo.DeleteUser(userID); err != nil {
-		m.baseController.ResponseJSONError(ctx, Error_FailedToDelete, err.Error())
+	if err := c.userRepo.DeleteUser(userID); err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_FailedToDelete, err.Error())
 		return
 	}
 
-	m.baseController.ResponseJSONDeleted(ctx, nil)
+	c.baseController.ResponseJSONDeleted(ctx, nil)
 }
