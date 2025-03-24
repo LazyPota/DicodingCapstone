@@ -13,8 +13,8 @@ const Login = () => {
       {/* Bagian kiri (form) */}
       <div className="flex flex-1 justify-center items-center">
         <div className="w-[400px]">
-          <h1 className="text-[40px] font-bold">Login</h1>
-          <p className="text-[18px] font-normal text-[#969696] mt-1">
+          <h1 className="text-[40px] font-bold font-inter">Login</h1>
+          <p className="text-[18px] font-normal font-inter text-[#969696] mt-1">
             Please login to continue to your account.
           </p>
           <form className="mt-3 flex flex-col space-y-[20px]">
@@ -27,7 +27,7 @@ const Login = () => {
               />
               <label
                 for="default_outlined"
-                className="absolute text-[18px] font-medium text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[14px]"
+                className="absolute text-[18px] font-medium font-inter text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[14px]"
               >
                 Email
               </label>
@@ -41,7 +41,7 @@ const Login = () => {
               />
               <label
                 htmlFor="password_input"
-                className="absolute text-[18px] font-medium text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[14px]"
+                className="absolute text-[18px] font-medium font-inter text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[14px]"
               >
                 Password
               </label>
@@ -65,25 +65,25 @@ const Login = () => {
               />
               <label
                 htmlFor="keep_logged_in"
-                className="text-[16px] font-medium text-gray-900"
+                className="text-[16px] font-medium text-gray-900 font-inter"
               >
                 Keep me logged in
               </label>
             </div>
             <div className="flex flex-col items-center space-y-4 w-[399px]">
-              <button className="w-full h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px]">
+              <button className="w-full h-[54px] font-inter bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px]">
                 Sign in
               </button>
 
               <div className="flex items-center w-full">
                 <div className="flex-grow border-t border-gray-300"></div>
-                <span className="px-3 text-gray-500 text-sm font-medium">
+                <span className="px-3 text-gray-500 text-sm font-medium font-inter">
                   or
                 </span>
                 <div className="flex-grow border-t border-gray-300"></div>
               </div>
 
-              <button className="w-full h-[54px] border border-[#E6E8E7] rounded-[10px] flex items-center justify-center space-x-2 text-lg font-medium text-gray-900">
+              <button className="w-full h-[54px] border border-[#E6E8E7] rounded-[10px] flex items-center justify-center space-x-2 text-lg font-medium font-inter text-gray-900">
                 <span>Sign in with Google</span>
                 <span className="text-xl">
                   <Icon icon="flat-color-icons:google" />
@@ -91,11 +91,11 @@ const Login = () => {
               </button>
             </div>
           </form>
-          <p className="text-gray-500 text-[16px] font-medium text-center mt-[32px]">
+          <p className="text-gray-500 text-[16px] font-medium font-inter text-center mt-[32px]">
             Need an account?{" "}
             <a
               href="/register"
-              className="text-blue-600 font-semibold underline"
+              className="text-blue-600 font-semibold font-inter underline"
             >
               Create one
             </a>
