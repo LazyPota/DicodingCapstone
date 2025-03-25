@@ -2,6 +2,8 @@ import React from "react";
 import Navbar from "../../components/Navbar";
 import Button from "../../components/Button";
 import bgImage from "../../assets/background.jpg";
+import bgImage2 from "../../assets/background2.png";
+import bgImage3 from "../../assets/background3.png";
 import FeatureCard from "../../components/FeatureCard";
 import iphones from "../../assets/iphones.png";
 
@@ -36,7 +38,7 @@ const Beranda = () => {
           <div className="hidden md:block absolute right-10 top-1/4"></div>
         </section>
       </article>
-      <article className="mt-[117px]">
+      <article className="mt-[118px]">
         <h1 className="text-black text-center font-extrabold text-[40px]">
           Advanced Features for Your Financial Future!
         </h1>
@@ -81,6 +83,33 @@ const Beranda = () => {
               icon="fa6-solid:rotate"
             />
           </div>
+        </div>
+      </article>
+      <article className="flex flex-row gap-[250px] items-center mt-[118px] p-8">
+        <div className="flex gap-4 relative">
+          <img
+            src={bgImage2}
+            alt="bgimage"
+            className="rounded-[40px] relative w-[292px] h-[622px]"
+          />
+          <img
+            src={bgImage3}
+            alt="bgimage"
+            className="rounded-[40px] relative top-36 w-[292px] h-[622px]"
+          />
+        </div>
+        <div className="md:ml-8 text-center md:text-left mt-6 md:mt-0">
+          <h2 className="text-[40px] font-extrabold text-black leading-tight">
+            Smart Financial Planning for a Secure Future
+          </h2>
+          <p className="text-gray-900 text-[18px] font-regular mt-4 max-w-md mb-[50px]">
+            Manage your finances more easily and effectively with Moneasy. We
+            believe that everyone deserves to have full control over their
+            finances. Our mission is to create smart, secure, and accessible
+            financial management solutions, so that anyone can achieve their
+            financial goals without stress.
+          </p>
+          <Button text="Lets Get Started" variant="primary" size="lg" />
         </div>
       </article>
     </main>
