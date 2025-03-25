@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import Navbar from "../../components/Navbar";
 import Button from "../../components/Button";
+import bgheader from "../../assets/bgheader.png";
 import bgImage from "../../assets/background.jpg";
 import bgImage2 from "../../assets/background2.png";
 import bgImage3 from "../../assets/background3.png";
+import bgImage4 from "../../assets/CTA.png";
+import icon from "../../assets/icon.png";
 import FeatureCard from "../../components/FeatureCard";
 import iphones from "../../assets/iphones.png";
 import Testimonials from "../../components/Testimonials";
+import Footer from "../../components/Footer";
 
 const Beranda = () => {
   return (
@@ -14,10 +18,9 @@ const Beranda = () => {
       <Navbar />
       <article className="p-2">
         <section
-          className="relative flex items-center justify-between w-full h-screen px-10 text-white rounded-2xl"
+          className="relative flex items-center justify-between w-full h-[822px] px-10 text-white rounded-2xl bg-cover bg-center"
           style={{
             backgroundImage: `url(${bgImage})`,
-            backgroundPosition: "center",
             borderRadius: "16px",
           }}
         >
@@ -36,7 +39,9 @@ const Beranda = () => {
               <Button text="Learn More" variant="secondary" />
             </div>
           </div>
-          <div className="hidden md:block absolute right-10 top-1/4"></div>
+          <div className="hidden md:block absolute right-10 h-[500px] w-[500px]">
+            <img src={bgheader} alt="bgheader" />
+          </div>
         </section>
       </article>
       <article className="mt-[118px]">
@@ -119,6 +124,39 @@ const Beranda = () => {
         </h2>
         <Testimonials />
       </article>
+      <article className="mt-[118px]">
+        <section
+          className="relative w-full h-[555px] px-10 text-white object-cover flex items-center justify-center"
+          style={{
+            backgroundImage: `url(${bgImage4})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="max-w-lg text-center space-y-[32px]">
+            <div className="flex justify-center">
+              <div
+                className="w-[64px] h-[64px] bg-blue-600 rounded-2xl flex items-center justify-center shadow-[#w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center 
+              shadow-[0_0_20px_#3b82f6] backdrop-blur-md]"
+              >
+                <img src={icon} />
+              </div>
+            </div>
+            <h1 className="text-5xl md:text-5xl font-bold leading-tight text-white">
+              Get Started with <br />
+              Moneasy Today
+            </h1>
+            <p className="text-lg font-semibold text-gray-200">
+              Join thousands of other users and start managing your finances
+              smarter!
+            </p>
+            <div className="flex justify-center space-x-4">
+              <Button text="Get Started Now" variant="secondary" size="lg" />
+            </div>
+          </div>
+        </section>
+      </article>
+      <Footer />
     </main>
   );
 };
