@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "../../components/Navbar";
 import Button from "../../components/Button";
 import bgImage from "../../assets/background.jpg";
@@ -6,6 +6,7 @@ import bgImage2 from "../../assets/background2.png";
 import bgImage3 from "../../assets/background3.png";
 import FeatureCard from "../../components/FeatureCard";
 import iphones from "../../assets/iphones.png";
+import Testimonials from "../../components/Testimonials";
 
 const Beranda = () => {
   return (
@@ -111,6 +112,12 @@ const Beranda = () => {
           </p>
           <Button text="Lets Get Started" variant="primary" size="lg" />
         </div>
+      </article>
+      <article className="flex flex-col items-center py-10 px-4 mt-[218px] overflow-hidden">
+        <h2 className="text-[40px] font-extrabold text-black mb-6">
+          Customer reviews about Moneasy
+        </h2>
+        <Testimonials />
       </article>
     </main>
   );
