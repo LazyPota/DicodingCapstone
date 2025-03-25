@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type TransactionType string
 type InputSourceType string
@@ -10,7 +14,7 @@ const (
 	TransactionExpense TransactionType = "Expense"
 
 	InputManual InputSourceType = "Manual"
-	InputScan    InputSourceType = "Scan"
+	InputScan   InputSourceType = "Scan"
 )
 
 type Transaction struct {
@@ -30,4 +34,5 @@ type Transaction struct {
 	Receipt         *ScanReceipt    `json:"receipt" gorm:"foreignKey:ReceiptID"`
 	CreatedAt       time.Time       `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt       time.Time       `json:"updated_at" gorm:"autoUpdateTime"`
+	DeletedAt       gorm.DeletedAt  `json:"deleted_at" gorm:"index"`
 }
