@@ -5,36 +5,46 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 
 const LoginView = ({ setShowPassword, showPassword }) => {
   return (
-    <div className="relative flex min-h-[140vh] p-2">
-      <img src={logo} alt="logo" className="absolute top-4 left-4 w-[70px]" />
+    <div className="relative flex min-h-[140vh] md:p-2">
+      {/* Logo */}
+      <img
+        src={logo}
+        alt="logo"
+        className="absolute top-4 left-4 w-[50px] md:w-[70px]"
+      />
 
       {/* Bagian kiri (form) */}
-      <div className="flex flex-1 justify-center items-center">
-        <div className="w-[400px]">
-          <h1 className="text-[40px] font-bold font-inter">Login</h1>
-          <p className="text-[18px] font-normal font-inter text-[#969696] mt-1">
+      <div className="flex flex-1 justify-center items-center w-full md:w-1/2 lg:w-1/2 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-[400px]">
+          <h1 className="text-3xl md:text-[40px] font-bold font-inter text-center lg:text-left">
+            Login
+          </h1>
+          <p className="text-[18px] font-normal font-inter text-[#969696] mt-2 text-center lg:text-left">
             Please login to continue to your account.
           </p>
           <form className="mt-3 flex flex-col space-y-[20px]">
+            {/* Input Email */}
             <div className="relative">
               <input
                 type="email"
                 id="default_outlined"
-                className="block px-2.5 pb-2.5 pt-4 w-[399px] h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                 placeholder=" "
               />
               <label
-                for="default_outlined"
-                className="absolute text-[18px] font-medium font-inter text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[14px]"
+                htmlFor="default_outlined"
+                className="absolute text-[18px] font-medium font-inter text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[14px]"
               >
                 Email
               </label>
             </div>
+
+            {/* Input Password */}
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 id="password_input"
-                className="block px-2.5 pb-2.5 pt-4 w-[399px] h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
+                className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
                 placeholder=" "
               />
               <label
@@ -45,7 +55,7 @@ const LoginView = ({ setShowPassword, showPassword }) => {
               </label>
               <button
                 type="button"
-                className="absolute z-10 top-1/2 ml-[360px] -translate-y-1/2 text-gray-500 cursor-pointer"
+                className="absolute z-10 top-1/2 right-3 -translate-y-1/2 text-gray-500 cursor-pointer"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -55,6 +65,8 @@ const LoginView = ({ setShowPassword, showPassword }) => {
                 )}
               </button>
             </div>
+
+            {/* Checkbox */}
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -68,9 +80,11 @@ const LoginView = ({ setShowPassword, showPassword }) => {
                 Keep me logged in
               </label>
             </div>
-            <div className="flex flex-col items-center space-y-4 w-[399px]">
-              <button className="w-full h-[54px] font-inter bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px]">
-                Sign in
+
+            {/* Buttons */}
+            <div className="flex flex-col items-center space-y-4 w-full">
+              <button className="w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px]">
+                Sign up
               </button>
 
               <div className="flex items-center w-full">
@@ -82,7 +96,7 @@ const LoginView = ({ setShowPassword, showPassword }) => {
               </div>
 
               <button className="w-full h-[54px] border border-[#E6E8E7] rounded-[10px] flex items-center justify-center space-x-2 text-lg font-medium font-inter text-gray-900">
-                <span>Sign in with Google</span>
+                <span>Continue with Google</span>
                 <span className="text-xl">
                   <Icon icon="flat-color-icons:google" />
                 </span>
@@ -102,8 +116,8 @@ const LoginView = ({ setShowPassword, showPassword }) => {
       </div>
 
       {/* Bagian kanan (gambar) */}
-      <div className="w-[50%]">
-        <img src={container} alt="container" className="w-full h-[140vh]" />
+      <div className="hidden lg:flex justify-center items-center w-1/2">
+        <img src={container} alt="container" className="w-full h-full" />
       </div>
     </div>
   );
