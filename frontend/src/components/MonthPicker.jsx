@@ -11,7 +11,7 @@ const MonthPicker = () => {
     <div className="relative inline-block">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 w-[189px] h-[48px] px-7 border rounded-lg bg-white text-black hover:bg-gray-100 transition-all"
+        className="flex items-center gap-3 w-[189px] h-[48px] px-7 border rounded-[16px] bg-white text-black hover:bg-gray-200 transition-all"
       >
         <FaRegCalendarAlt className="text-black text-lg" />
         <span className="font-regular text-black text-[16px]">

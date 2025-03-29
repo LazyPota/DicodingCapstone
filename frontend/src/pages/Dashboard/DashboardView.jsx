@@ -9,7 +9,7 @@ const DashboardView = () => {
       <Sidebar />
       <div className="flex-1 flex flex-col">
         <Header />
-        <div className="flex-1 bg-[#F3F4F7] p-4">
+        <div className="flex-1 bg-[#F3F4F7] p-5">
           <div className="p-1">
             <MonthPicker />
           </div>

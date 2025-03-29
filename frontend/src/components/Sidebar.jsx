@@ -18,7 +18,7 @@ const Sidebar = () => {
             <span>Dashboard</span>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
-            <Icon icon="mage:dashboard-fill" />
+            <Icon icon="tdesign:wallet" />
             <span>My Wallet</span>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 text-white rounded cursor-pointer">
@@ -30,7 +30,7 @@ const Sidebar = () => {
             <span>Transaksi</span>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
-            <Icon icon="tdesign:wallet" />
+            <Icon icon="mdi:piggy-bank-outline" />
             <span>Goal-Based Saving Plan</span>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">

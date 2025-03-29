@@ -2,33 +2,43 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { useState } from "react";
 
 const Header = () => {
-  const [notifications, setNotifications] = useState(5); // Contoh jumlah notifikasi
+  const [notifications, setNotifications] = useState(5);
 
   return (
-    <div className="flex justify-between items-center px-4 h-[70px] bg-white shadow-md border-b border-[#DCDCDC]">
-      <button className="p-2 rounded hover:bg-gray-200 text-[20px]">
-        <Icon icon="ci:hamburger-md" />
-      </button>
+    <div className="flex justify-between items-center px-8 h-[80px] bg-white shadow-md border-b border-[#DCDCDC]">
+      <div className="flex flex-col">
+        <h1 className="text-black font-bold text-[20px]">
+          Welcome Back, Avian
+        </h1>
+        <p className="font-semibold text-[#6B6B6B] text-[12px]">
+          Here’s what’s happening with your finance today.
+        </p>
+      </div>
 
-      <div className="flex items-center space-x-7">
+      <div className="flex items-center space-x-12">
         <div className="relative">
           <span className="text-[25px] cursor-pointer">
             <Icon icon="mingcute:notification-line" />
           </span>
           {notifications > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full">
+            <span className="absolute -top-1 -right-1 bg-[#1570EF] text-white text-xs px-1.5 py-0.5 rounded-full">
               {notifications}
             </span>
           )}
         </div>
 
-        <div className="flex items-center space-x-2 cursor-pointer">
+        <div className="flex items-center space-x-5 cursor-pointer">
           <img
             src="https://randomuser.me/api/portraits/men/1.jpg"
             alt="User"
             className="w-10 h-10 rounded-full"
           />
-          <span className="text-sm font-semibold">Jhon Doe</span>
+          <div className="flex flex-col">
+            <span className="text-[18px] font-semibold">Jhon Doe</span>
+            <span className="text-[12px] font-semibold text-[#6B6B6B]">
+              @JhonDoe11
+            </span>
+          </div>
           <span className="text-2xl">
             <Icon icon="iconamoon:arrow-down-2-light" />
           </span>
