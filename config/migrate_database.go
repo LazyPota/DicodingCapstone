@@ -13,7 +13,7 @@ func MigrateDatabase(db *gorm.DB) {
 		&models.Wallet{},
 		&models.Category{},
 		&models.Transaction{},
-		&models.Budgeting{},
+		&models.Budget{},
 		&models.GoalSaving{},
 		&models.ScanReceipt{},
 	); err != nil {

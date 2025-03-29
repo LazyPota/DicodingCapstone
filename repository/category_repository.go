@@ -11,6 +11,7 @@ type CategoryRepository interface {
 	GetCategoryByID(userID, categoryID uint) (*models.Category, error)
 	UpdateCategory(userID, categoryID uint, category *models.Category) error
 	DeleteCategory(userID, categoryID uint) error
+	ForceDeleteCategory(userID, categoryID uint) error
 }
 
 type categoryRepository struct {
@@ -50,4 +51,7 @@ func (r *categoryRepository) UpdateCategory(userID, categoryID uint, category *m
 
 func (r *categoryRepository) DeleteCategory(userID, categoryID uint) error {
 	return r.db.Where("id = ? AND user_id = ?", categoryID, userID).Delete(&models.Category{}).Error
+}
+func (r *categoryRepository) ForceDeleteCategory(userID, categoryID uint) error {
+	return r.db.Unscoped().Where("id = ? AND user_id = ?", categoryID, userID).Delete(&models.Category{}).Error
 }

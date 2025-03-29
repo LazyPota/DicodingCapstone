@@ -11,6 +11,7 @@ type WalletRepository interface {
 	GetWalletByID(userID, walletID uint) (*models.Wallet, error)
 	UpdateWallet(userID, walletID uint, wallet *models.Wallet) error
 	DeleteWallet(userID, walletID uint) error
+	ForceDeleteWallet(userID, walletID uint) error
 }
 
 type walletRepository struct {
@@ -50,4 +51,7 @@ func (r *walletRepository) UpdateWallet(userID, walletID uint, wallet *models.Wa
 
 func (r *walletRepository) DeleteWallet(userID, walletID uint) error {
 	return r.db.Where("id = ? AND user_id = ?", walletID, userID).Delete(&models.Wallet{}).Error
+}
+func (r *walletRepository) ForceDeleteWallet(userID, walletID uint) error {
+	return r.db.Unscoped().Where("id = ? AND user_id = ?", walletID, userID).Delete(&models.Wallet{}).Error
 }

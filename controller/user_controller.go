@@ -125,3 +125,13 @@ func (c *UserController) DeleteUser(ctx *gin.Context) {
 
 	c.baseController.ResponseJSONDeleted(ctx, nil)
 }
+
+func (c *UserController) ForceDeleteUser(ctx *gin.Context) {
+	userID := ctx.Param("id")
+	if err := c.userRepo.ForceDeleteUser(userID); err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_FailedToDelete, err.Error())
+		return
+	}
+
+	c.baseController.ResponseJSONDeleted(ctx, nil)
+}

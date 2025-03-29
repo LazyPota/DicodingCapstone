@@ -194,3 +194,27 @@ func (c *CategoryController) DeleteCategory(ctx *gin.Context) {
 
 	c.baseController.ResponseJSONDeleted(ctx, nil)
 }
+
+func (c *CategoryController) ForceDeleteCategory(ctx *gin.Context) {
+	userIDStr := ctx.Param("id")
+	categoryIDStr := ctx.Param("category_id")
+
+	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
+		return
+	}
+
+	categoryID, err := strconv.ParseUint(categoryIDStr, 10, 32)
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid Category ID")
+		return
+	}
+
+	if err := c.categoryRepo.ForceDeleteCategory(uint(userID), uint(categoryID)); err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_FailedToDelete, err.Error())
+		return
+	}
+
+	c.baseController.ResponseJSONDeleted(ctx, nil)
+}

@@ -6,6 +6,7 @@ type AllRepository struct {
 	UserRepository     UserRepository
 	CategoryRepository CategoryRepository
 	WalletRepository   WalletRepository
+	BudgetRepository   BudgetRepository
 }
 
 func NewAllRepository(db *gorm.DB) *AllRepository {
@@ -13,5 +14,6 @@ func NewAllRepository(db *gorm.DB) *AllRepository {
 		UserRepository:     NewUserRepository(db),
 		CategoryRepository: NewCategoryRepository(db),
 		WalletRepository:   NewWalletRepository(db),
+		BudgetRepository:   NewBudgetRepository(db),
 	}
 }

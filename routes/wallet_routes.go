@@ -13,5 +13,6 @@ func InitWalletRoutes(r *gin.RouterGroup, ctrl *controller.AllController) {
 		walletGroup.POST("/", ctrl.WalletController.CreateWallet)
 		walletGroup.PUT("/:wallet_id", ctrl.WalletController.UpdateWallet)
 		walletGroup.DELETE("/:wallet_id", ctrl.WalletController.DeleteWallet)
+		walletGroup.DELETE("/:wallet_id/force", ctrl.WalletController.ForceDeleteWallet)
 	}
 }

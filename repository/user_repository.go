@@ -12,6 +12,7 @@ type UserRepository interface {
 	GetUserByID(id string) (*models.User, error)
 	UpdateUser(id string, user *models.User) error
 	DeleteUser(id string) error
+	ForceDeleteUser(id string) error
 	GetUserByEmail(email string) (*models.User, error)
 }
 
@@ -45,6 +46,9 @@ func (r *userRepository) UpdateUser(id string, user *models.User) error {
 
 func (r *userRepository) DeleteUser(id string) error {
 	return r.db.Delete(&models.User{}, "id = ?", id).Error
+}
+func (r *userRepository) ForceDeleteUser(id string) error {
+	return r.db.Unscoped().Delete(&models.User{}, "id = ?", id).Error
 }
 
 func (r *userRepository) GetUserByEmail(email string) (*models.User, error) {
