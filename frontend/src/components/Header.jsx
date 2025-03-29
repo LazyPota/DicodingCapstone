@@ -8,7 +8,7 @@ const Header = () => {
     <div className="flex justify-between items-center px-8 h-[80px] bg-white shadow-md border-b border-[#DCDCDC]">
       <div className="flex flex-col">
         <h1 className="text-black font-bold text-[20px]">
-          Welcome Back, Avian
+          Welcome Back, Fahmi
         </h1>
         <p className="font-semibold text-[#6B6B6B] text-[12px]">
           Here’s what’s happening with your finance today.
@@ -34,9 +34,9 @@ const Header = () => {
             className="w-10 h-10 rounded-full"
           />
           <div className="flex flex-col">
-            <span className="text-[18px] font-semibold">Jhon Doe</span>
+            <span className="text-[18px] font-semibold">Fahmi</span>
             <span className="text-[12px] font-semibold text-[#6B6B6B]">
-              @JhonDoe11
+              @fahminur11
             </span>
           </div>
           <span className="text-2xl">
