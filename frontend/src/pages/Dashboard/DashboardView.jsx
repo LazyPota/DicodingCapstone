@@ -190,6 +190,7 @@ const DashboardView = () => {
                 <table className="w-full h-[191px] mt-4">
                   <thead>
                     <tr className="text-left text-[12px] text-[#2B2B2B]">
+                      <th>Nama Dompet</th>
                       <th className="pb-2">Nama</th>
                       <th className="pb-2">Tanggal</th>
                       <th className="pb-2">Total</th>
@@ -197,6 +198,7 @@ const DashboardView = () => {
                   </thead>
                   <tbody className="text-[14px]">
                     <tr>
+                      <td>Shopee</td>
                       <td className="flex space-x-2 items-center">
                         <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
                           <Icon icon="solar:arrow-left-down-linear" />
@@ -207,6 +209,7 @@ const DashboardView = () => {
                       <td className="text-green-500">Rp. 8jt</td>
                     </tr>
                     <tr>
+                      <td>Shopee</td>
                       <td className="flex space-x-2 items-center">
                         <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
                           <Icon icon="solar:arrow-left-down-linear" />
@@ -217,6 +220,7 @@ const DashboardView = () => {
                       <td className="text-green-500">Rp. 8jt</td>
                     </tr>
                     <tr>
+                      <td>Shopee</td>
                       <td className="flex space-x-2 items-center">
                         <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
                           <Icon icon="solar:arrow-left-down-linear" />
