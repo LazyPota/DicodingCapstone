@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type BudgetPeriod string
@@ -35,5 +33,4 @@ type Budget struct {
 	Period     BudgetPeriod `json:"period" gorm:"type:ENUM('Daily', 'Weekly', 'Monthly', 'Annual');not null"`
 	CreatedAt  time.Time       `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt  time.Time       `json:"updated_at" gorm:"autoUpdateTime"`
-	DeletedAt  gorm.DeletedAt  `json:"deleted_at" gorm:"index"`
 }

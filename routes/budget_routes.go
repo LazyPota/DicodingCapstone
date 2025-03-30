@@ -14,6 +14,5 @@ func InitBudgetRoutes(r *gin.RouterGroup, ctrl *controller.AllController) {
 		budgetGroup.POST("/", ctrl.BudgetController.CreateBudget)
 		budgetGroup.PUT("/:budget_id", ctrl.BudgetController.UpdateBudget)
 		budgetGroup.DELETE("/:budget_id", ctrl.BudgetController.DeleteBudget)
-		budgetGroup.DELETE("/:budget_id/force", ctrl.BudgetController.ForceDeleteBudget)
 	}
 }

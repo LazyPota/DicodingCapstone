@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type TransactionType string
@@ -34,5 +32,4 @@ type Transaction struct {
 	Receipt         *ScanReceipt    `json:"receipt" gorm:"foreignKey:ReceiptID"`
 	CreatedAt       time.Time       `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt       time.Time       `json:"updated_at" gorm:"autoUpdateTime"`
-	DeletedAt       gorm.DeletedAt  `json:"deleted_at" gorm:"index"`
 }

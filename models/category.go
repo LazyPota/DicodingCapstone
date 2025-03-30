@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type CategoryType string
@@ -21,5 +19,4 @@ type Category struct {
 	CategoryType CategoryType   `json:"category_type" gorm:"type:ENUM('Income','Expense');not null"`
 	CreatedAt    time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt    time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
-	DeletedAt    gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 }

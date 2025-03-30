@@ -190,27 +190,3 @@ func (c *BudgetController) DeleteBudget(ctx *gin.Context) {
 
 	c.baseController.ResponseJSONDeleted(ctx, nil)
 }
-
-func (c *BudgetController) ForceDeleteBudget(ctx *gin.Context) {
-	userIDStr := ctx.Param("id")
-	budgetIDStr := ctx.Param("budget_id")
-
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
-	if err != nil {
-		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
-		return
-	}
-
-	budgetID, err := strconv.ParseUint(budgetIDStr, 10, 32)
-	if err != nil {
-		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid Budget ID")
-		return
-	}
-
-	if err := c.budgetRepo.ForceDeleteBudget(uint(userID), uint(budgetID)); err != nil {
-		c.baseController.ResponseJSONError(ctx, Error_FailedToDelete, err.Error())
-		return
-	}
-
-	c.baseController.ResponseJSONDeleted(ctx, nil)
-}

@@ -217,27 +217,3 @@ func (c *WalletController) DeleteWallet(ctx *gin.Context) {
 
 	c.baseController.ResponseJSONDeleted(ctx, nil)
 }
-
-func (c *WalletController) ForceDeleteWallet(ctx *gin.Context) {
-	userIDStr := ctx.Param("id")
-	walletIDStr := ctx.Param("wallet_id")
-
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
-	if err != nil {
-		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
-		return
-	}
-
-	walletID, err := strconv.ParseUint(walletIDStr, 10, 32)
-	if err != nil {
-		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid Wallet ID")
-		return
-	}
-
-	if err := c.walletRepo.ForceDeleteWallet(uint(userID), uint(walletID)); err != nil {
-		c.baseController.ResponseJSONError(ctx, Error_FailedToDelete, err.Error())
-		return
-	}
-
-	c.baseController.ResponseJSONDeleted(ctx, nil)
-}

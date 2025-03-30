@@ -13,7 +13,6 @@ type BudgetRepository interface {
 	GetBudgetByID(userID, budgetID uint) (*models.Budget, error)
 	UpdateBudget(userID, budgetID uint, budget *models.Budget) error
 	DeleteBudget(userID, budgetID uint) error
-	ForceDeleteBudget(userID, budgetID uint) error
 }
 
 type budgetRepository struct {
@@ -56,8 +55,4 @@ func (r *budgetRepository) UpdateBudget(userID, budgetID uint, budget *models.Bu
 
 func (r *budgetRepository) DeleteBudget(userID, budgetID uint) error {
 	return r.db.Where("id = ? AND user_id = ?", budgetID, userID).Delete(&models.Budget{}).Error
-}
-
-func (r *budgetRepository) ForceDeleteBudget(userID, budgetID uint) error {
-	return r.db.Unscoped().Where("id = ? AND user_id = ?", budgetID, userID).Delete(&models.Budget{}).Error
 }

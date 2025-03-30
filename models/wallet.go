@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type WalletType string
@@ -26,5 +24,4 @@ type Wallet struct {
 	Amount     float64        `json:"amount" gorm:"not null"`
 	CreatedAt  time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt  time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
-	DeletedAt  gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 }

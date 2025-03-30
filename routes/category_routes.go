@@ -14,6 +14,5 @@ func InitCategoryRoutes(r *gin.RouterGroup, ctrl *controller.AllController) {
 		categoryGroup.POST("/", ctrl.CategoryController.CreateCategory)
 		categoryGroup.PUT("/:category_id", ctrl.CategoryController.UpdateCategory)
 		categoryGroup.DELETE("/:category_id", ctrl.CategoryController.DeleteCategory)
-		categoryGroup.DELETE("/:category_id/force", ctrl.CategoryController.ForceDeleteCategory)
 	}
 }
