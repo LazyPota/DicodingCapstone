@@ -7,6 +7,7 @@ type AllController struct {
 	CategoryController *CategoryController
 	WalletController   *WalletController
 	BudgetController   *BudgetController
+	GoalSavingController   *GoalSavingController
 }
 
 func NewAllController(repo *repository.AllRepository) *AllController {
@@ -15,5 +16,6 @@ func NewAllController(repo *repository.AllRepository) *AllController {
 		CategoryController: NewCategoryController(repo.CategoryRepository),
 		WalletController:   NewWalletController(repo.WalletRepository),
 		BudgetController:   NewBudgetController(repo.BudgetRepository),
+		GoalSavingController:   NewGoalSavingController(repo.GoalSavingRepository),
 	}
 }
