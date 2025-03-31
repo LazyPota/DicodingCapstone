@@ -22,7 +22,6 @@ func NewBudgetController(budgetRepo repository.BudgetRepository) *BudgetControll
 }
 
 type createBudgetRequest struct {
-	UserID     uint                `json:"user_id" binding:"required"`
 	WalletID   uint                `json:"wallet_id" binding:"required"`
 	CategoryID uint                `json:"category_id" binding:"required"`
 	Amount     float64             `json:"amount" binding:"required"`
@@ -49,18 +48,13 @@ func (c *BudgetController) CreateBudget(ctx *gin.Context) {
 		return
 	}
 
-	if req.UserID != uint(userID) {
-		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "User ID mismatch")
-		return
-	}
-
 	if !req.Period.IsValid() {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid budget period")
 		return
 	}
 
 	budget := models.Budget{
-		UserID:     req.UserID,
+		UserID:     uint(userID),
 		WalletID:   req.WalletID,
 		CategoryID: req.CategoryID,
 		Amount:     req.Amount,
