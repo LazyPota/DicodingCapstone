@@ -8,6 +8,7 @@ type AllRepository struct {
 	WalletRepository   WalletRepository
 	BudgetRepository   BudgetRepository
 	GoalSavingRepository   GoalSavingRepository
+	TransactionRepository TransactionRepository
 }
 
 func NewAllRepository(db *gorm.DB) *AllRepository {
@@ -17,5 +18,6 @@ func NewAllRepository(db *gorm.DB) *AllRepository {
 		WalletRepository:   NewWalletRepository(db),
 		BudgetRepository:   NewBudgetRepository(db),
 		GoalSavingRepository:   NewGoalSavingRepository(db),
+		TransactionRepository: NewTransactionRepository(db),
 	}
 }

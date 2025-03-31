@@ -6,6 +6,7 @@ import (
 
 type BudgetPeriod string
 
+
 const (
 	Daily   BudgetPeriod = "Daily"
 	Weekly  BudgetPeriod = "Weekly"

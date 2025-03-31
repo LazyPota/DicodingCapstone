@@ -8,6 +8,7 @@ type AllController struct {
 	WalletController   *WalletController
 	BudgetController   *BudgetController
 	GoalSavingController   *GoalSavingController
+	TransactionController *TransactionController
 }
 
 func NewAllController(repo *repository.AllRepository) *AllController {
@@ -17,5 +18,6 @@ func NewAllController(repo *repository.AllRepository) *AllController {
 		WalletController:   NewWalletController(repo.WalletRepository),
 		BudgetController:   NewBudgetController(repo.BudgetRepository),
 		GoalSavingController:   NewGoalSavingController(repo.GoalSavingRepository),
+		TransactionController: NewTransactionController(repo.TransactionRepository),
 	}
 }
