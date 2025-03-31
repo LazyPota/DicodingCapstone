@@ -22,23 +22,17 @@ func NewCategoryController(categoryRepo repository.CategoryRepository) *Category
 }
 
 type createCategoryRequest struct {
-	CategoryName string `json:"category_name" binding:"required"`
-	CategoryType string `json:"category_type" binding:"required"`
+	CategoryName string            `json:"category_name" binding:"required"`
+	CategoryType models.CategoryType `json:"category_type" binding:"required"`
 }
 
 type updateCategoryRequest struct {
-	CategoryName string `json:"category_name"`
-	CategoryType string `json:"category_type"`
+	CategoryName string            `json:"category_name"`
+	CategoryType models.CategoryType `json:"category_type"`
 }
 
 func (c *CategoryController) GetAllCategories(ctx *gin.Context) {
-	userIDStr := ctx.Param("id") 
-	if userIDStr == "" {
-		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "User ID is required")
-		return
-	}
-
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
 		return
@@ -54,16 +48,13 @@ func (c *CategoryController) GetAllCategories(ctx *gin.Context) {
 }
 
 func (c *CategoryController) GetCategoryByID(ctx *gin.Context) {
-	userIDStr := ctx.Param("id") 
-	categoryIDStr := ctx.Param("category_id")
-
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
 		return
 	}
 
-	categoryID, err := strconv.ParseUint(categoryIDStr, 10, 32)
+	categoryID, err := strconv.ParseUint(ctx.Param("category_id"), 10, 32)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid Category ID")
 		return
@@ -86,20 +77,13 @@ func (c *CategoryController) CreateCategory(ctx *gin.Context) {
 		return
 	}
 
-	userIDStr := ctx.Param("id")
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
 		return
 	}
 
-	var categoryType models.CategoryType
-	switch req.CategoryType {
-	case "Income":
-		categoryType = models.Income
-	case "Expense":
-		categoryType = models.Expense
-	default:
+	if req.CategoryType != models.Income && req.CategoryType != models.Expense {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid Category Type")
 		return
 	}
@@ -107,7 +91,7 @@ func (c *CategoryController) CreateCategory(ctx *gin.Context) {
 	category := models.Category{
 		UserID:       uint(userID),
 		CategoryName: req.CategoryName,
-		CategoryType: categoryType,
+		CategoryType: req.CategoryType,
 	}
 
 	if err := c.categoryRepo.CreateCategory(&category); err != nil {
@@ -119,16 +103,13 @@ func (c *CategoryController) CreateCategory(ctx *gin.Context) {
 }
 
 func (c *CategoryController) UpdateCategory(ctx *gin.Context) {
-	userIDStr := ctx.Param("id")
-	categoryIDStr := ctx.Param("category_id")
-
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
 		return
 	}
 
-	categoryID, err := strconv.ParseUint(categoryIDStr, 10, 32)
+	categoryID, err := strconv.ParseUint(ctx.Param("category_id"), 10, 32)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid Category ID")
 		return
@@ -147,20 +128,17 @@ func (c *CategoryController) UpdateCategory(ctx *gin.Context) {
 		return
 	}
 
+	// Update hanya jika field dikirim (tidak kosong)
 	if req.CategoryName != "" {
 		category.CategoryName = req.CategoryName
 	}
 
 	if req.CategoryType != "" {
-		switch req.CategoryType {
-		case "Income":
-			category.CategoryType = models.Income
-		case "Expense":
-			category.CategoryType = models.Expense
-		default:
+		if req.CategoryType != models.Income && req.CategoryType != models.Expense {
 			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid Category Type")
 			return
 		}
+		category.CategoryType = req.CategoryType
 	}
 
 	if err := c.categoryRepo.UpdateCategory(uint(userID), uint(categoryID), category); err != nil {
@@ -172,16 +150,13 @@ func (c *CategoryController) UpdateCategory(ctx *gin.Context) {
 }
 
 func (c *CategoryController) DeleteCategory(ctx *gin.Context) {
-	userIDStr := ctx.Param("id")
-	categoryIDStr := ctx.Param("category_id")
-
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
 		return
 	}
 
-	categoryID, err := strconv.ParseUint(categoryIDStr, 10, 32)
+	categoryID, err := strconv.ParseUint(ctx.Param("category_id"), 10, 32)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid Category ID")
 		return

@@ -10,8 +10,8 @@ import (
 )
 
 type WalletController struct {
-	walletRepo      repository.WalletRepository
-	baseController  IBaseController
+	walletRepo     repository.WalletRepository
+	baseController IBaseController
 }
 
 func NewWalletController(walletRepo repository.WalletRepository) *WalletController {
@@ -22,15 +22,15 @@ func NewWalletController(walletRepo repository.WalletRepository) *WalletControll
 }
 
 type createWalletRequest struct {
-	WalletName string `json:"wallet_name" binding:"required"`
-	WalletType string `json:"wallet_type" binding:"required"`
-	Amount     float64 `json:"amount" binding:"required"`
+	WalletName string            `json:"wallet_name" binding:"required"`
+	WalletType models.WalletType `json:"wallet_type" binding:"required"`
+	Amount     float64           `json:"amount" binding:"required"`
 }
 
 type updateWalletRequest struct {
-	WalletName string  `json:"wallet_name"`
-	WalletType string  `json:"wallet_type"`
-	Amount     float64 `json:"amount"`
+	WalletName string            `json:"wallet_name"`
+	WalletType models.WalletType `json:"wallet_type"`
+	Amount     float64           `json:"amount"`
 }
 
 func (c *WalletController) GetAllWallets(ctx *gin.Context) {
@@ -88,36 +88,16 @@ func (c *WalletController) CreateWallet(ctx *gin.Context) {
 		return
 	}
 
-	userIDStr := ctx.Param("id")
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
-		return
-	}
-
-	var walletType models.WalletType
-	switch req.WalletType {
-	case "Cash":
-		walletType = models.Cash
-	case "Credit":
-		walletType = models.Credit
-	case "E-Money":
-		walletType = models.EMoney
-	case "Loan":
-		walletType = models.Loan
-	case "Investment":
-		walletType = models.Investment
-	case "Other":
-		walletType = models.Other
-	default:
-		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid Wallet Type")
 		return
 	}
 
 	wallet := models.Wallet{
 		UserID:     uint(userID),
 		WalletName: req.WalletName,
-		WalletType: walletType,
+		WalletType: req.WalletType,
 		Amount:     req.Amount,
 	}
 
@@ -130,25 +110,21 @@ func (c *WalletController) CreateWallet(ctx *gin.Context) {
 }
 
 func (c *WalletController) UpdateWallet(ctx *gin.Context) {
-	userIDStr := ctx.Param("id")
-	walletIDStr := ctx.Param("wallet_id")
-
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
 		return
 	}
 
-	walletID, err := strconv.ParseUint(walletIDStr, 10, 32)
+	walletID, err := strconv.ParseUint(ctx.Param("wallet_id"), 10, 32)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid Wallet ID")
 		return
 	}
 
 	var req updateWalletRequest
-	if !utils.HandleValidation(ctx, &req, func(ctx *gin.Context, code string, err error) {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, err.Error())
-	}) {
 		return
 	}
 
@@ -163,23 +139,7 @@ func (c *WalletController) UpdateWallet(ctx *gin.Context) {
 	}
 
 	if req.WalletType != "" {
-		switch req.WalletType {
-		case "Cash":
-			wallet.WalletType = models.Cash
-		case "Credit":
-			wallet.WalletType = models.Credit
-		case "E-Money":
-			wallet.WalletType = models.EMoney
-		case "Loan":
-			wallet.WalletType = models.Loan
-		case "Investment":
-			wallet.WalletType = models.Investment
-		case "Other":
-			wallet.WalletType = models.Other
-		default:
-			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid Wallet Type")
-			return
-		}
+		wallet.WalletType = req.WalletType
 	}
 
 	if req.Amount != 0 {
@@ -193,6 +153,7 @@ func (c *WalletController) UpdateWallet(ctx *gin.Context) {
 
 	c.baseController.ResponseJSONUpdated(ctx, wallet)
 }
+
 
 func (c *WalletController) DeleteWallet(ctx *gin.Context) {
 	userIDStr := ctx.Param("id")

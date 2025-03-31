@@ -25,7 +25,7 @@ type Transaction struct {
 	Category        Category        `json:"category" gorm:"foreignKey:CategoryID"`
 	TransactionType TransactionType `json:"transaction_type" gorm:"type:ENUM('Income','Expense');not null"`
 	Amount          float64         `json:"amount" gorm:"not null"`
-	TransactionDate time.Time       `json:"transaction_date" gorm:"not null"`
+	TransactionDate CustomTime       `json:"transaction_date" gorm:"not null"`
 	Note            string          `json:"note"`
 	InputSource     InputSourceType `json:"input_source" gorm:"type:ENUM('Manual','Scan');not null"`
 	ReceiptID       *uint           `json:"receipt_id"`
