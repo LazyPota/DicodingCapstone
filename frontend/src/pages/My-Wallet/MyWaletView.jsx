@@ -8,20 +8,7 @@ import DatePicker from "react-datepicker";
 import { FaCalendarAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-const MyWaletView = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-
-  // Fungsi untuk membuka modal
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  // Fungsi untuk menutup modal
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
+const MyWaletView = ({ selectedDate, setSelectedDate, openModal, closeModal, isModalOpen, setIsModalOpen  }) => {
   return (
     <div className="flex h-screen">
       <Sidebar />

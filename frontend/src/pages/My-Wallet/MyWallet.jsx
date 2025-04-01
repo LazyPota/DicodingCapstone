@@ -1,10 +1,30 @@
-import React from 'react'
-import MyWaletView from './MyWaletView'
+import React, { useState } from "react";
+import MyWaletView from "./MyWaletView";
 
 const MyWallet = () => {
-  return (
-    <div><MyWaletView /></div>
-  )
-}
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
-export default MyWallet
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  return (
+    <div>
+      <MyWaletView
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        openModal={openModal}
+        closeModal={closeModal}
+      />
+    </div>
+  );
+};
+
+export default MyWallet;
