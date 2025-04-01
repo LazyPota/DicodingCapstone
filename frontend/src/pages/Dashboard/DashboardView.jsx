@@ -178,10 +178,7 @@ const DashboardView = () => {
                   >
                     {/* Info Tabungan */}
                     <div className="flex-col flex justify-center flex-1 h-[136px]">
-                      <div className="flex flex-row space-x-2">
-                        <div className="text-2xl">{item.icon}</div>
-                        <p className="font-semibold text-[16px]">{item.name}</p>
-                      </div>
+                      <p className="font-semibold text-[16px]">{item.name}</p>
                       <div className="flex flex-row items-center justify-between mt-[18px]">
                         <p className="text-sm text-gray-500">
                           <span className="text-blue-600 font-semibold text-[18px]">
