@@ -12,7 +12,7 @@ const SmartBudgetingView = () => {
       <Sidebar />
       <div className="flex-1 flex flex-col">
         <Header />
-        <div className="flex-1 bg-gray-50 p-7 overflow-auto">
+        <div className="flex-1 bg-[#F3F4F7] p-7 overflow-auto">
           <div className="flex flex-row justify-between">
             <div className="flex space-x-4 items-center">
               <MonthPicker />
