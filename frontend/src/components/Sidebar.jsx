@@ -1,8 +1,11 @@
 import React from "react";
 import icon from "./../assets/whiteicon.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { Link, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="w-[240px] bg-blue-700 text-white h-screen p-5 flex flex-col justify-between">
       <div>
@@ -15,11 +18,11 @@ const Sidebar = () => {
         <ul className="space-y-[15px] mt-[43px] text-[14px] font-medium">
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="mage:dashboard-fill" />
-            <span>Dashboard</span>
+            <Link to="/dashboard">Dashboard</Link>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="tdesign:wallet" />
-            <span>My Wallet</span>
+            <Link to="/mywallet">My Wallet</Link>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 text-white rounded cursor-pointer">
             <Icon icon="cuida:lamp-on-outline" />

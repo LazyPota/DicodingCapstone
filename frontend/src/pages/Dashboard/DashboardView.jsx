@@ -2,13 +2,14 @@ import React from "react";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import MonthPicker from "../../components/MonthPicker";
-import icon from "../../assets/whiteicon.png";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { LinearProgress } from "@mui/material";
 import { FaHome, FaMotorcycle, FaMobileAlt, FaKaaba } from "react-icons/fa";
+import CardWallet from "../../components/CardWallet";
+import RecentTransactions from "../../components/RecentTransactions";
 
 const DashboardView = () => {
   const financialHealth = 30;
@@ -71,37 +72,7 @@ const DashboardView = () => {
               </div>
 
               {/* Kartu Saldo */}
-              <div className="bg-gradient-to-br from-[#3973FF] to-[#224599] py-7 px-5 h-[231px] rounded-xl text-white shadow-lg relative">
-                <div className="absolute top-3 right-3">
-                  <img
-                    src={icon}
-                    alt="white-icon"
-                    className="w-[26px] h-[26px]"
-                  />
-                </div>
-                <p className="text-[20px] font-medium">Total Saldo</p>
-                <h2 className="text-[35px] font-semibold">Rp. 320.200.000</h2>
-                <div className="flex flex-row justify-between">
-                  <div className="flex space-x-5 mt-[55px] text-sm">
-                    <p>
-                      <span className="text-[14px]">Jenis Dompet</span>
-                      <br />
-                      <b className="text-[18px]">Tunai</b>
-                    </p>
-                    <p>
-                      <span className="text-[14px]">Dibuat</span>
-                      <br />
-                      <b className="text-[18px]">20/25</b>
-                    </p>
-                  </div>
-
-                  {/* Dua Lingkaran di Pojok Kanan Bawah */}
-                  <div className="absolute bottom-6 right-3 flex">
-                    <div className="w-[30px] h-[30px] bg-[#0D2459] opacity-[50%] rounded-full"></div>
-                    <div className="w-[30px] h-[30px] bg-[#0D2459] rounded-full"></div>
-                  </div>
-                </div>
-              </div>
+              <CardWallet />
             </div>
 
             {/* Total Pemasukan & Pengeluaran */}
@@ -185,87 +156,7 @@ const DashboardView = () => {
               </div>
 
               {/* Transaksi Terbaru */}
-              <div className="bg-white rounded-[16px] p-4">
-                <h2 className="text-[20px] font-bold">Transaksi Terbaru</h2>
-                <table className="w-full h-[360px] mt-4">
-                  <thead>
-                    <tr className="text-left text-[12px] text-[#2B2B2B]">
-                      <th>Nama Dompet</th>
-                      <th className="pb-2">Nama</th>
-                      <th className="pb-2">Tanggal</th>
-                      <th className="pb-2">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-[14px]">
-                    <tr>
-                      <td>Shopee</td>
-                      <td className="flex space-x-2 items-center">
-                        <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
-                          <Icon icon="solar:arrow-left-down-linear" />
-                        </span>
-                        <span>Gaji Perbulan</span>
-                      </td>
-                      <td>20 Apr 2020</td>
-                      <td className="text-green-500">Rp. 8jt</td>
-                    </tr>
-                    <tr>
-                      <td>Shopee</td>
-                      <td className="flex space-x-2 items-center">
-                        <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
-                          <Icon icon="solar:arrow-left-down-linear" />
-                        </span>
-                        <span>Gaji Perbulan</span>
-                      </td>
-                      <td>20 Apr 2020</td>
-                      <td className="text-green-500">Rp. 8jt</td>
-                    </tr>
-                    <tr>
-                      <td>Shopee</td>
-                      <td className="flex space-x-2 items-center">
-                        <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
-                          <Icon icon="solar:arrow-left-down-linear" />
-                        </span>
-                        <span>Gaji Perbulan</span>
-                      </td>
-                      <td>20 Apr 2020</td>
-                      <td className="text-green-500">Rp. 8jt</td>
-                    </tr>
-                    <tr>
-                      <td>Shopee</td>
-                      <td className="flex space-x-2 items-center">
-                        <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
-                          <Icon icon="solar:arrow-left-down-linear" />
-                        </span>
-                        <span>Gaji Perbulan</span>
-                      </td>
-                      <td>20 Apr 2020</td>
-                      <td className="text-green-500">Rp. 8jt</td>
-                    </tr>
-                    <tr>
-                      <td>Shopee</td>
-                      <td className="flex space-x-2 items-center">
-                        <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
-                          <Icon icon="solar:arrow-left-down-linear" />
-                        </span>
-                        <span>Gaji Perbulan</span>
-                      </td>
-                      <td>20 Apr 2020</td>
-                      <td className="text-green-500">Rp. 8jt</td>
-                    </tr>
-                    <tr>
-                      <td>Shopee</td>
-                      <td className="flex space-x-2 items-center">
-                        <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
-                          <Icon icon="solar:arrow-left-down-linear" />
-                        </span>
-                        <span>Gaji Perbulan</span>
-                      </td>
-                      <td>20 Apr 2020</td>
-                      <td className="text-green-500">Rp. 8jt</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <RecentTransactions />
             </div>
 
             {/* Kolom Kanan (Rencana Tabungan) */}
@@ -273,7 +164,7 @@ const DashboardView = () => {
               {/* Header */}
               <div className="flex justify-between items-center">
                 <h2 className="text-[20px] font-bold">Rencana Tabungan</h2>
-                <a href="#" className="text-[14px] text-blue-500">
+                <a href="#" className="text-[14px] text-gray-500">
                   Lihat semua
                 </a>
               </div>

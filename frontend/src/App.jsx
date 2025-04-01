@@ -6,6 +6,8 @@ import Register from "./pages/Register/Register";
 import Beranda from "./pages/Beranda/Beranda";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import MyWallet from "./pages/My-Wallet/MyWallet";
+import WalletDetail from "./pages/WalletDetails/WalletDetail";
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<Beranda />}/>
         <Route path="/dashboard" element={<Dashboard />}/>
+        <Route path="/mywallet" element={<MyWallet />}/>
+        <Route path="/mywallet/detail" element={<WalletDetail />}/>
       </Routes>
     </BrowserRouter>
   );
