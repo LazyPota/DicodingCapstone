@@ -161,9 +161,9 @@ const DashboardView = () => {
           </div>
           <div className="p-2 grid grid-cols-1 md:grid-cols-[265px,1.1fr,1fr] gap-4">
             {/* Kolom Kiri (Analitik & Transaksi Terbaru) */}
-            <div className="md:col-span-2 grid grid-col gap-2">
+            <div className="md:col-span-2 grid grid-col gap-2 h-[357px]">
               <div className="bg-white rounded-[16px] p-[17px]">
-                <h2 className="text-[20px] font-bold">Analitik</h2>
+                <h2 className="text-[22px] font-bold">Analitik</h2>
                 <BarChart
                   dataset={data}
                   xAxis={[{ scaleType: "band", dataKey: "minggu" }]}
@@ -187,7 +187,7 @@ const DashboardView = () => {
               {/* Transaksi Terbaru */}
               <div className="bg-white rounded-[16px] p-4">
                 <h2 className="text-[20px] font-bold">Transaksi Terbaru</h2>
-                <table className="w-full h-[191px] mt-4">
+                <table className="w-full h-[360px] mt-4">
                   <thead>
                     <tr className="text-left text-[12px] text-[#2B2B2B]">
                       <th>Nama Dompet</th>
@@ -205,7 +205,7 @@ const DashboardView = () => {
                         </span>
                         <span>Gaji Perbulan</span>
                       </td>
-                      <td>Sat, 20 Apr 2020</td>
+                      <td>20 Apr 2020</td>
                       <td className="text-green-500">Rp. 8jt</td>
                     </tr>
                     <tr>
@@ -216,7 +216,7 @@ const DashboardView = () => {
                         </span>
                         <span>Gaji Perbulan</span>
                       </td>
-                      <td>Sat, 20 Apr 2020</td>
+                      <td>20 Apr 2020</td>
                       <td className="text-green-500">Rp. 8jt</td>
                     </tr>
                     <tr>
@@ -227,7 +227,40 @@ const DashboardView = () => {
                         </span>
                         <span>Gaji Perbulan</span>
                       </td>
-                      <td>Sat, 20 Apr 2020</td>
+                      <td>20 Apr 2020</td>
+                      <td className="text-green-500">Rp. 8jt</td>
+                    </tr>
+                    <tr>
+                      <td>Shopee</td>
+                      <td className="flex space-x-2 items-center">
+                        <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
+                          <Icon icon="solar:arrow-left-down-linear" />
+                        </span>
+                        <span>Gaji Perbulan</span>
+                      </td>
+                      <td>20 Apr 2020</td>
+                      <td className="text-green-500">Rp. 8jt</td>
+                    </tr>
+                    <tr>
+                      <td>Shopee</td>
+                      <td className="flex space-x-2 items-center">
+                        <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
+                          <Icon icon="solar:arrow-left-down-linear" />
+                        </span>
+                        <span>Gaji Perbulan</span>
+                      </td>
+                      <td>20 Apr 2020</td>
+                      <td className="text-green-500">Rp. 8jt</td>
+                    </tr>
+                    <tr>
+                      <td>Shopee</td>
+                      <td className="flex space-x-2 items-center">
+                        <span className="bg-[#2667FF] text-white w-[37px] h-[37px] flex justify-center items-center rounded-full text-[21px]">
+                          <Icon icon="solar:arrow-left-down-linear" />
+                        </span>
+                        <span>Gaji Perbulan</span>
+                      </td>
+                      <td>20 Apr 2020</td>
                       <td className="text-green-500">Rp. 8jt</td>
                     </tr>
                   </tbody>
