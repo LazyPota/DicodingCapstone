@@ -24,9 +24,9 @@ const Sidebar = () => {
             <Icon icon="tdesign:wallet" />
             <Link to="/mywallet">My Wallet</Link>
           </li>
-          <li className="flex items-center space-x-[15px] p-2 py-2 text-white rounded cursor-pointer">
+          <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="cuida:lamp-on-outline" />
-            <span>Smart Budgeting</span>
+            <Link to="/smartbudgeting">Smart Budgeting</Link>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="ph:money-wavy-bold" />
