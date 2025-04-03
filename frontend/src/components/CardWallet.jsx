@@ -21,14 +21,16 @@ const CardWallet = ({ size = "large" }) => {
         Total Saldo
       </p>
       <h2
-        className={`${isSmall ? "text-[25px]" : "text-[35px]"} font-semibold`}
+        className={`${
+          isSmall ? "text-[25px] mt-[13px]" : "text-[35px]"
+        } font-semibold`}
       >
         Rp. 320.200.000
       </h2>
       <div className="flex flex-row justify-between">
         <div
           className={`flex space-x-3 ${
-            isSmall ? "mt-[33px] text-xs" : "mt-[55px] text-sm"
+            isSmall ? "text-xs mt-[15px]" : "mt-[55px] text-sm"
           }`}
         >
           <p>
