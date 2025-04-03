@@ -3,7 +3,7 @@ import React from "react";
 
 const FeatureCard = ({ title, description, icon }) => {
   return (
-    <div className="bg-[#DEE8FF] w-[391px] px-6 h-[285px] rounded-[40px] flex flex-col items-start justify-center">
+    <div className="bg-[#DEE8FF] w-[361px] px-6 h-[295px] rounded-[40px] flex flex-col items-start justify-center">
       <div className="bg-blue-600 p-2 rounded-xl flex items-center justify-center">
         <Icon icon={icon} className="text-white text-[43px]" />
       </div>
