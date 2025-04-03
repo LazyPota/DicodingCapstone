@@ -8,10 +8,10 @@ const Header = () => {
     <div className="flex justify-between items-center px-8 h-[80px] bg-white shadow-md border-b border-[#DCDCDC]">
       <div className="flex flex-col">
         <h1 className="text-black font-bold text-[20px]">
-          Welcome Back, Fahmi
+          Selamat Datang, Fahmi
         </h1>
         <p className="font-semibold text-[#6B6B6B] text-[12px]">
-          Here’s what’s happening with your finance today.
+          Inilah yang terjadi dengan keuangan Anda hari ini.
         </p>
       </div>
 

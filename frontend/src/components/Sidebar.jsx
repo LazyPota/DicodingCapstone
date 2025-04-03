@@ -18,15 +18,15 @@ const Sidebar = () => {
         <ul className="space-y-[15px] mt-[43px] text-[14px] font-medium">
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="mage:dashboard-fill" />
-            <Link to="/dashboard">Dashboard</Link>
+            <Link to="/dashboard">Beranda</Link>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="tdesign:wallet" />
-            <Link to="/mywallet">My Wallet</Link>
+            <Link to="/mywallet">Dompet</Link>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="cuida:lamp-on-outline" />
-            <Link to="/smartbudgeting">Smart Budgeting</Link>
+            <Link to="/smartbudgeting">Anggaran</Link>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="ph:money-wavy-bold" />
@@ -34,11 +34,11 @@ const Sidebar = () => {
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="mdi:piggy-bank-outline" />
-            <span>Goal-Based Saving Plan</span>
+            <span>Rencana Tabungan</span>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
-            <Icon icon="ph:robot" />
-            <span>AI Chatbot Keuangan</span>
+            <Icon icon="uil:sliders-v" />
+            <span>Kategori</span>
           </li>
         </ul>
       </div>
