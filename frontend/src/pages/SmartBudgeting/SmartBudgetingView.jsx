@@ -88,7 +88,9 @@ const SmartBudgetingView = ({
                 </div>
                 <p className="text-sm text-gray-500">Menabung Rp. 2jt/bulan</p>
                 <div className="pt-3">
-                  <p className="text-lg font-bold">Rp. 20jt / Rp. 24jt</p>
+                  <p className="text-lg font-bold text-blue-500">
+                    Rp. 20jt / Rp. 24jt
+                  </p>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
                     <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
                       <div

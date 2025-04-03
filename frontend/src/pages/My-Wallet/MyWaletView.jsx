@@ -8,7 +8,14 @@ import DatePicker from "react-datepicker";
 import { FaCalendarAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-const MyWaletView = ({ selectedDate, setSelectedDate, openModal, closeModal, isModalOpen, setIsModalOpen  }) => {
+const MyWaletView = ({
+  selectedDate,
+  setSelectedDate,
+  openModal,
+  closeModal,
+  isModalOpen,
+  setIsModalOpen,
+}) => {
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -29,7 +36,7 @@ const MyWaletView = ({ selectedDate, setSelectedDate, openModal, closeModal, isM
               <div className="mt-4 flex justify-end">
                 <Button
                   as={Link}
-                  to={"/mywallet/detail"}
+                  to={"/dompet/detail"}
                   text="Rincian"
                   size="ms"
                   icon="basil:caret-right-solid"
@@ -47,7 +54,7 @@ const MyWaletView = ({ selectedDate, setSelectedDate, openModal, closeModal, isM
               <div className="mt-4 flex justify-end">
                 <Button
                   as={Link}
-                  to={"/mywallet/detail"}
+                  to={"/dompet/detail"}
                   text="Rincian"
                   size="ms"
                   icon="basil:caret-right-solid"
