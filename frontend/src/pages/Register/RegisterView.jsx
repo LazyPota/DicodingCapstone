@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logoFIX.png";
 import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import DatePicker from "react-datepicker";
