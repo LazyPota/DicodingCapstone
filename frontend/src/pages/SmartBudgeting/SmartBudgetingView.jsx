@@ -4,9 +4,16 @@ import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import MonthPicker from "../../components/MonthPicker";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { FaMedal } from "react-icons/fa";
+import { FaChevronDown, FaMedal } from "react-icons/fa";
+import Modal from "../../components/Modal";
 
-const SmartBudgetingView = () => {
+const SmartBudgetingView = ({
+  isModalOpen,
+  closeModal,
+  openModal,
+  tipeKartu,
+  setTipeKartu,
+}) => {
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -20,7 +27,10 @@ const SmartBudgetingView = () => {
                 Anggaran
               </h1>
             </div>
-            <button className="px-4 space-x-2 bg-blue-600 text-white rounded-[16px] font-semibold flex flex-row items-center">
+            <button
+              className="px-4 space-x-2 bg-blue-600 text-white rounded-[16px] font-semibold flex flex-row items-center"
+              onClick={openModal}
+            >
               <Icon icon="ic:outline-plus" />
               <span>Tambah Rencana</span>
             </button>
@@ -65,7 +75,7 @@ const SmartBudgetingView = () => {
             ].map((item, index) => (
               <div
                 key={index}
-                className="bg-white p-5 h-[182px] rounded-[16px] border border-[#E2E8F0] space-y-2"
+                className="bg-white p-5 h-[192px] rounded-[16px] border border-[#E2E8F0] space-y-1"
               >
                 <div className="flex justify-between items-center">
                   <h3 className="font-semibold">{item}</h3>
@@ -77,26 +87,68 @@ const SmartBudgetingView = () => {
                   </button>
                 </div>
                 <p className="text-sm text-gray-500">Menabung Rp. 2jt/bulan</p>
-                <p className="text-lg font-bold">Rp. 20jt / Rp. 24jt</p>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                  <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
-                    <div
-                      className="bg-blue-500 h-3 rounded-full"
-                      style={{ width: "80%" }}
-                    ></div>
-                    <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
-                      90%
-                    </span>
+                <div className="pt-3">
+                  <p className="text-lg font-bold">Rp. 20jt / Rp. 24jt</p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
+                      <div
+                        className="bg-blue-500 h-3 rounded-full"
+                        style={{ width: "80%" }}
+                      ></div>
+                      <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
+                        90%
+                      </span>
+                    </div>
                   </div>
+                  <p className="text-sm text-gray-500 mt-1 text-right">
+                    Sisa: Rp 4.000.000
+                  </p>
                 </div>
-                <p className="text-sm text-gray-500 mt-1 text-right">
-                  Sisa: Rp 4.000.000
-                </p>
               </div>
             ))}
           </div>
         </div>
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title="Tambah Rencana Anggaran"
+      >
+        <form className="flex flex-col space-y-[20px]">
+          <div className="mb-2 relative">
+            <select
+              id="tipeKartu"
+              value={tipeKartu}
+              onChange={(e) => setTipeKartu(e.target.value)}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 appearance-none pr-8 bg-white ${
+                tipeKartu === "" ? "text-gray-400" : "text-gray-900"
+              }`}
+            >
+              <option value="" disabled>
+                Kategori
+              </option>
+              <option value="Debit">Freelance</option>
+              <option value="Kredit">Makan</option>
+              <option value="Prabayar">Gaji Perbulan</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+              <FaChevronDown className="text-gray-500 h-4 w-4" />
+            </div>
+          </div>
+          <div className="mb-2">
+            <label htmlFor="saldo" className="block text-sm font-medium">
+              Jumlah Anggaran
+            </label>
+            <input
+              type="number"
+              id="saldo"
+              placeholder="Rp 0.00"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+            />
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

@@ -18,15 +18,15 @@ const Sidebar = () => {
         <ul className="space-y-[15px] mt-[43px] text-[14px] font-medium">
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="mage:dashboard-fill" />
-            <Link to="/dashboard">Beranda</Link>
+            <Link to="/beranda">Beranda</Link>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="tdesign:wallet" />
-            <Link to="/mywallet">Dompet</Link>
+            <Link to="/dompet">Dompet</Link>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="cuida:lamp-on-outline" />
-            <Link to="/smartbudgeting">Anggaran</Link>
+            <Link to="/anggaran">Anggaran</Link>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="ph:money-wavy-bold" />

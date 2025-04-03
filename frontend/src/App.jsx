@@ -16,11 +16,11 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/" element={<Beranda />}/>
-        <Route path="/dashboard" element={<Dashboard />}/>
-        <Route path="/mywallet" element={<MyWallet />}/>
-        <Route path="/mywallet/detail" element={<WalletDetail />}/>
-        <Route path="/smartbudgeting" element={<SmartBudgeting />}/>
+        <Route path="/" element={<Beranda />} />
+        <Route path="/beranda" element={<Dashboard />} />
+        <Route path="/dompet" element={<MyWallet />} />
+        <Route path="/dompet/detail" element={<WalletDetail />} />
+        <Route path="/anggaran" element={<SmartBudgeting />} />
       </Routes>
     </BrowserRouter>
   );
