@@ -40,7 +40,7 @@ const BerandaView = () => {
           data-aos="fade-in"
         >
           <div
-            className="max-w-lg space-y-[24px] z-10 p-1"
+            className="max-w-lg space-y-[28px] z-1 p-5"
             data-aos="fade-right"
             data-aos-delay="200"
           >
@@ -48,17 +48,17 @@ const BerandaView = () => {
               id="hero-heading"
               className="text-4xl sm:text-5xl font-bold leading-tight text-white"
             >
-              Smart Solutions for <br />
-              Healthier Finances💰
+              Solusi Cerdas Untuk <br />
+              Keuangan Sehat💰
             </h1>
             <p className="text-lg font-semibold text-gray-200">
-              AI-based Financial Planner that helps you manage your income,
-              expenses, and savings automatically. Save more, achieve your
-              financial goals faster!
+            Perencana keuangan pintar untuk membantu Anda mengelola 
+            pendapatan, pengeluaran, dan tabungan dengan mudah. 
+            Kelola keuangan lebih baik, capai tujuan lebih cepat!
             </p>
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-              <Button text="Get Started" variant="primary" />
-              <Button text="Learn More" variant="secondary" />
+              <Button text="Mulai Sekarang" variant="primary" />
+              <Button text="Baca Lengkap" variant="secondary" />
             </div>
           </div>
           <div
@@ -94,14 +94,14 @@ const BerandaView = () => {
             className="text-black text-center font-extrabold text-3xl md:text-[40px] leading-tight"
             data-aos="fade-up"
           >
-            Advanced Features for Your Financial Future!
+            Fitur Canggih untuk Masa Depan Finansial Anda!
           </h2>
           <p
             className="text-black font-medium text-center mt-[15px] text-base md:text-[18px] max-w-xl mx-auto"
             data-aos="fade-up"
             data-aos-delay="100"
           >
-            Realize a brighter financial future with our innovative features!{" "}
+            Wujudkan masa depan finansial yang lebih cerah dengan fitur inovatif kami!{" "}
           </p>
           <div className="mt-[60px] grid grid-cols-1 md:grid-cols-3">
             <article
@@ -111,10 +111,10 @@ const BerandaView = () => {
             >
               <div className="p-6 md:p-8">
                 <h3 className="text-[18px] md:text-[20px] font-extrabold uppercase tracking-wide">
-                  GOAL-BASED SAVING PLAN
+                perencanaan tujuan
                 </h3>
                 <p className="text-[15px] md:text-[16px] mt-3 md:mt-4 font-medium">
-                  Achieve your financial goals faster with goal-based savings!
+                Capai tujuan finansial Anda lebih cepat dengan tabungan berbasis tujuan!
                 </p>
               </div>
               <div className="mt-auto flex justify-center">
@@ -131,13 +131,13 @@ const BerandaView = () => {
               data-aos-delay="300"
             >
               <FeatureCard
-                title="FINANCIAL HEALTH SCORE"
-                description="Keep track of your finances with an easy-to-understand financial health score."
+                title="SKOR KESEHATAN FINANSIAL"
+                description="Pantau kondisi keuangan Anda dengan skor kesehatan finansial yang mudah dipahami."
                 icon="solar:wallet-bold-duotone"
               />
               <FeatureCard
-                title="SMART BUDGETING ASSISTANT"
-                description="Set a budget according to your income automatically & avoid overspending."
+                title="ASISTEN PENGANGGARAN "
+                description="Atur anggaran secara otomatis berdasarkan pemasukan Anda dan hindari pengeluaran berlebih."
                 icon="bx:transfer"
               />
             </div>
@@ -148,15 +148,15 @@ const BerandaView = () => {
             >
               <div className="p-6 md:p-8">
                 <h3 className="text-[18px] md:text-[20px] font-extrabold uppercase tracking-wide">
-                  GOAL-BASED SAVING PLAN
+                Pelacak Pengeluaran
                 </h3>
                 <p className="text-[15px] md:text-[16px] mt-3 md:mt-4 font-medium">
-                  Achieve your financial goals faster with goal-based savings!
+                Cek pengeluaran dengan cepat menggunakan pemindaian struk atau input manual.
                 </p>
               </div>
               <div className="mt-auto flex justify-center">
                 <img
-                  src={iphoneSavings}
+                  src={iphoneExpenses}
                   alt="Moneasy app showing goal-based saving plan interface on an iPhone"
                   className="max-w-[85%] h-auto"
                 />
@@ -214,7 +214,7 @@ const BerandaView = () => {
           className="text-3xl md:text-[40px] font-extrabold text-black mb-6 text-center" /* Text center */
           data-aos="fade-up"
         >
-          Customer reviews about Moneasy
+          Ulasan pelanggan tentang Moneasy
         </h2>
         <div
           data-aos="fade-up"
@@ -264,23 +264,22 @@ const BerandaView = () => {
           >
             {" "}
             {/* Ganti ke H2 */}
-            Get Started with <br />
-            Moneasy Today
+            Mulailah Dengan <br />
+            Moneasy Hari Ini
           </h2>
           <p
             className="text-lg font-semibold text-gray-200"
             data-aos="fade-up"
             data-aos-delay="400"
           >
-            Join thousands of other users and start managing your finances
-            smarter!
+          Bergabunglah dengan ribuan pengguna lain dan mulailah mengelola keuangan dengan lebih cerdas!
           </p>
           <div
             className="flex justify-center space-x-4"
             data-aos="fade-up"
             data-aos-delay="500"
           >
-            <Button text="Get Started Now" variant="secondary" size="lg" />
+            <Button text="Mulai Sekarang" variant="secondary" size="lg" />
           </div>
         </div>
       </section>
