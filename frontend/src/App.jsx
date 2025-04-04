@@ -9,6 +9,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import MyWallet from "./pages/My-Wallet/MyWallet";
 import WalletDetail from "./pages/WalletDetails/WalletDetail";
 import SmartBudgeting from "./pages/SmartBudgeting/SmartBudgeting";
+import ExpenseTracker from "./pages/ExpenseTracker/ExpenseTracker";
+import Kategori from "./pages/Kategori/Kategori";
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
         <Route path="/dompet" element={<MyWallet />} />
         <Route path="/dompet/detail" element={<WalletDetail />} />
         <Route path="/anggaran" element={<SmartBudgeting />} />
+        <Route path="/transaksi" element={<ExpenseTracker />} />
+        <Route path="/kategori" element={<Kategori />} />
       </Routes>
     </BrowserRouter>
   );

@@ -30,7 +30,7 @@ const Sidebar = () => {
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="ph:money-wavy-bold" />
-            <span>Transaksi</span>
+            <Link to="/transaksi">Transaksi</Link>
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="mdi:piggy-bank-outline" />
@@ -38,7 +38,7 @@ const Sidebar = () => {
           </li>
           <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="uil:sliders-v" />
-            <span>Kategori</span>
+            <Link to="/kategori">Kategori</Link>
           </li>
         </ul>
       </div>
