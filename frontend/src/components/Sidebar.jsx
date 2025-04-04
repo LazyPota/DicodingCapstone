@@ -46,7 +46,7 @@ const Sidebar = () => {
         <ul className="space-y-2 text-[12px]">
           <li className="flex items-center space-x-2 p-2 hover:bg-blue-600 rounded cursor-pointer">
             <Icon icon="uil:setting" />
-            <span>Settings</span>
+            <Link to="/settings">Settings</Link>
           </li>
           <li className="flex items-center space-x-2 p-2 text-red-500 hover:bg-red-600 hover:text-white rounded cursor-pointer">
             <Icon icon="material-symbols:logout" />

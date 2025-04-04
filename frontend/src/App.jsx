@@ -11,6 +11,7 @@ import WalletDetail from "./pages/WalletDetails/WalletDetail";
 import SmartBudgeting from "./pages/SmartBudgeting/SmartBudgeting";
 import ExpenseTracker from "./pages/ExpenseTracker/ExpenseTracker";
 import Kategori from "./pages/Kategori/Kategori";
+import Settings from "./pages/Settings/Settings";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/anggaran" element={<SmartBudgeting />} />
         <Route path="/transaksi" element={<ExpenseTracker />} />
         <Route path="/kategori" element={<Kategori />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </BrowserRouter>
   );
