@@ -12,6 +12,7 @@ import SmartBudgeting from "./pages/SmartBudgeting/SmartBudgeting";
 import ExpenseTracker from "./pages/ExpenseTracker/ExpenseTracker";
 import Kategori from "./pages/Kategori/Kategori";
 import Settings from "./pages/Settings/Settings";
+import GoalSaving from "./pages/GoalSaving/GoalSaving";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/dompet/detail" element={<WalletDetail />} />
         <Route path="/anggaran" element={<SmartBudgeting />} />
         <Route path="/transaksi" element={<ExpenseTracker />} />
+        <Route path="/goal" element={<GoalSaving />} />
         <Route path="/kategori" element={<Kategori />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>

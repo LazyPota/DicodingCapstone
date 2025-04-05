@@ -4,19 +4,7 @@ import Header from "../../components/Header";
 import Modal from "../../components/Modal"; // Import Modal
 import { Icon } from "@iconify/react";
 
-/*************  ✨ Codeium Command ⭐  *************/
-/**
- * Komponen untuk menampilkan daftar kategori di halaman Kategori.
- * 
- * Komponen ini menerima 5 properti:
- * - `categories`: array yang berisi objek-objek kategori
- * - `filter`: string yang berisi tipe kategori yang ingin ditampilkan. Nilai default adalah "Semua"
- * - `setFilter`: fungsi yang digunakan untuk mengubah nilai `filter`
- * - `isModalOpen`: boolean yang menentukan apakah modal tambah kategori dibuka atau tidak
- * - `setIsModalOpen`: fungsi yang digunakan untuk mengubah nilai `isModalOpen`
- */
-
-/******  4fa1008f-d361-4e9d-be92-e33961195781  *******/const KategoriView = ({ categories, filter, setFilter, isModalOpen, setIsModalOpen }) => {
+const KategoriView = ({ categories, filter, setFilter, isModalOpen, setIsModalOpen }) => {
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -110,5 +98,7 @@ import { Icon } from "@iconify/react";
     </div>
   );
 };
+
+
 
 export default KategoriView;
