@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import SmartBudgeting from "./SmartBudgeting";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
@@ -6,6 +6,7 @@ import MonthPicker from "../../components/MonthPicker";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { FaChevronDown, FaMedal } from "react-icons/fa";
 import Modal from "../../components/Modal";
+import Pagination from "../../components/Pagination";
 
 const SmartBudgetingView = ({
   isModalOpen,
@@ -14,6 +15,25 @@ const SmartBudgetingView = ({
   tipeKartu,
   setTipeKartu,
 }) => {
+  // Dummy data target
+  const allTargets = [
+    "Umrah Sekeluarga",
+    "Beli Rumah 3 Tingkat",
+    "Beli HP 16 Promax",
+    "Liburan ke Jogja",
+    "Beli Motor CRF",
+    "Renovasi Rumah",
+    "Laptop Baru",
+  ];
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = allTargets.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(allTargets.length / itemsPerPage);
+
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -35,7 +55,9 @@ const SmartBudgetingView = ({
               <span>Tambah Rencana</span>
             </button>
           </div>
-          <div className="bg-white p-6 h-[] rounded-lg mt-5">
+
+          {/* Ringkasan */}
+          <div className="bg-white p-6 rounded-lg mt-5">
             <h2 className="text-[22px] font-extrabold">
               Ringkasan total anggaran
             </h2>
@@ -62,17 +84,11 @@ const SmartBudgetingView = ({
               </p>
             </div>
           </div>
-          <h2 className="mt-6 text-[20px] font-semibold">
-            Target Tiap Kategori
-          </h2>
+
+          {/* Target tiap kategori */}
+          <h2 className="mt-6 text-[20px] font-semibold">Target Tiap Kategori</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            {[
-              "Umrah Sekeluarga",
-              "Beli Rumah 3 Tingkat",
-              "Beli HP 16 Promax",
-              "Liburan ke Jogja",
-              "Beli Motor CRF",
-            ].map((item, index) => (
+            {currentItems.map((item, index) => (
               <div
                 key={index}
                 className="bg-white p-5 h-[192px] rounded-[16px] border border-[#E2E8F0] space-y-1"
@@ -86,21 +102,19 @@ const SmartBudgetingView = ({
                     <span>Edit</span>
                   </button>
                 </div>
-                <p className="text-sm text-gray-500">Menabung Rp. 2jt/bulan</p>
+                {/* <p className="text-sm text-gray-500">Menabung Rp. 2jt/bulan</p> */}
                 <div className="pt-3">
                   <p className="text-lg font-bold text-blue-500">
                     Rp. 20jt / Rp. 24jt
                   </p>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                    <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
-                      <div
-                        className="bg-blue-500 h-3 rounded-full"
-                        style={{ width: "80%" }}
-                      ></div>
-                      <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
-                        90%
-                      </span>
-                    </div>
+                  <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
+                    <div
+                      className="bg-blue-500 h-3 rounded-full"
+                      style={{ width: "80%" }}
+                    ></div>
+                    <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
+                      90%
+                    </span>
                   </div>
                   <p className="text-sm text-gray-500 mt-1 text-right">
                     Sisa: Rp 4.000.000
@@ -109,8 +123,19 @@ const SmartBudgetingView = ({
               </div>
             ))}
           </div>
+
+          {/* Pagination */}
+          <div className="mt-6 flex justify-center">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         </div>
       </div>
+
+      {/* Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
