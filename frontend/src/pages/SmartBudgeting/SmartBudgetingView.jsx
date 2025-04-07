@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import SmartBudgeting from "./SmartBudgeting";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
@@ -14,24 +14,16 @@ const SmartBudgetingView = ({
   openModal,
   tipeKartu,
   setTipeKartu,
+  currentItems,
+  formatCurrencyShort,
+  currentPage,
+  totalPages,
+  handlePageChange,
+  totalAnggaran,
+  totalTercapai,
+  sisaAnggaran,
+  persentaseAnggaran,
 }) => {
-  const allTargets = [
-    "Umrah Sekeluarga",
-    "Beli Rumah 3 Tingkat",
-    "Beli HP 16 Promax",
-    "Liburan ke Jogja",
-    "Beli Motor CRF",
-    "Renovasi Rumah",
-    "Laptop Baru",
-  ];
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = allTargets.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(allTargets.length / itemsPerPage);
-
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -54,31 +46,30 @@ const SmartBudgetingView = ({
             </button>
           </div>
 
-          {/* Ringkasan */}
           <div className="bg-white p-6 rounded-lg mt-5">
             <h2 className="text-[22px] font-extrabold">
               Ringkasan total anggaran
             </h2>
             <p className="text-[18px] font-semibold mt-[16px]">Sisa</p>
             <p className="text-[50px] font-bold flex items-center mt-[16px]">
-              Rp. 10.000.000{" "}
+              {formatCurrencyShort(sisaAnggaran)}
               <span className="text-blue-500 text-[20px] ml-4">
-                Dari total: Rp 50.000.000
+                Dari total: {formatCurrencyShort(totalAnggaran)}
               </span>
             </p>
             <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
               <div
                 className="bg-blue-500 h-3 rounded-full"
-                style={{ width: "90%" }}
+                style={{ width: `${persentaseAnggaran}%` }}
               ></div>
               <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
-                90%
+                {persentaseAnggaran}%
               </span>
             </div>
             <div className="flex items-center mt-[26px]">
               <FaMedal className="text-blue-500 text-[44px] mr-2" />
               <p className="font-semibold text-[20px]">
-                Tercapai: Rp 40.000.000
+                Tercapai:{formatCurrencyShort(totalTercapai)}
               </p>
             </div>
           </div>
@@ -88,49 +79,56 @@ const SmartBudgetingView = ({
             Target Tiap Kategori
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            {currentItems.map((item, index) => (
-              <div
-                key={index}
-                className="bg-white p-5 h-[192px] rounded-[16px] border border-[#E2E8F0] space-y-1"
-              >
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold">{item}</h3>
-                  <button className="text-blue-500 px-2 py-1 flex space-x-2 border border-blue-500 rounded-[16px] items-center">
-                    <span className="text-base">
-                      <Icon icon="ph:pencil-simple-line" />
-                    </span>
-                    <span>Edit</span>
-                  </button>
-                </div>
-                <div className="pt-3">
-                  <p className="text-lg font-bold text-blue-500">
-                    Rp. 20jt / Rp. 24jt
-                  </p>
-                  <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
-                    <div
-                      className="bg-blue-500 h-3 rounded-full"
-                      style={{ width: "80%" }}
-                    ></div>
-                    <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
-                      90%
-                    </span>
+            {currentItems.map((goal, index) => {
+              const percentage = Math.round((goal.current / goal.target) * 100);
+              return (
+                <div
+                  key={index}
+                  className="bg-white p-5 rounded-[16px] border border-[#E2E8F0] space-y-1"
+                >
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-semibold">{goal.title}</h3>
+                    <button
+                      className="text-blue-500 px-2 py-1 flex space-x-2 border border-blue-500 rounded-[16px] items-center"
+                      onClick={() => {
+                        console.log(`Edit goal: ${goal.title}`);
+                      }}
+                    >
+                      <span className="text-base">
+                        <Icon icon="ph:pencil-line-fill" />
+                      </span>
+                      <span>Edit</span>
+                    </button>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1 text-right">
-                    Sisa: Rp 4.000.000
-                  </p>
+                  <p className="text-sm text-gray-500">{goal.monthlySaving}</p>
+                  <div className="pt-3">
+                    <p className="text-lg font-bold text-blue-500">
+                      {formatCurrencyShort(goal.current)} /{" "}
+                      {formatCurrencyShort(goal.target)}
+                    </p>
+                    <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
+                      <div
+                        className="bg-blue-500 h-3 rounded-full"
+                        style={{ width: `${percentage}%` }}
+                      ></div>
+                      <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
+                        {percentage}%
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1 text-right">
+                      Sisa: Rp {(goal.target - goal.current).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          {/* Pagination */}
-          <div className="mt-6">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
 
