@@ -890,6 +890,24 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Financial Health",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/ml/financial-health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ml",
+						"financial-health"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
