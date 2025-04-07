@@ -5,7 +5,7 @@
 
 1. Clone this repository
 
-1. Install dependencies:
+2. Install dependencies:
    ```
    go mod tidy
    ```

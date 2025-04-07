@@ -10,7 +10,9 @@ import (
 
 func InitAllRoutes(r *gin.Engine, db *gorm.DB) {
 	repository := repository.NewAllRepository(db)
-	controller := controller.NewAllController(repository)
+	baseController := controller.NewBaseController()
+	controller := controller.NewAllController(repository, db, baseController)
+
 	apiGroup := r.Group("/capstone")
 
 	InitUserRoutes(apiGroup, controller)
@@ -19,4 +21,6 @@ func InitAllRoutes(r *gin.Engine, db *gorm.DB) {
 	InitTransactionRoutes(apiGroup,controller)
 	InitBudgetRoutes(apiGroup, controller)
 	InitGoalSavingRoutes(apiGroup, controller)
+	InitFinancialHealthRoutes(apiGroup, controller)
+
 }
