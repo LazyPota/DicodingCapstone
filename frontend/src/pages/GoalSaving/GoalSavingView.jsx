@@ -10,10 +10,6 @@ import { BarChart } from "@mui/x-charts/BarChart";
 const GoalSavingView = ({
   setIsModalOpen,
   isModalOpen,
-  selectedDate,
-  setSelectedDate,
-  selectedWallet,
-  setSelectedWallet,
   data,
   currentItems,
   formatCurrencyShort,
@@ -51,52 +47,22 @@ const GoalSavingView = ({
             >
               <form>
                 <div className="mb-3">
-                  <label className="block font-semibold">Nama Rencana</label>
                   <input
                     type="text"
                     className="w-full border p-2 rounded-md"
-                    placeholder="Contoh: Beli Laptop"
+                    placeholder="Nama Tabungan"
                   />
                 </div>
-                <div className="mb-3">
-                  <label className="block font-semibold">Target Tabungan</label>
-                  <input
-                    type="number"
-                    className="w-full border p-2 rounded-md"
-                    placeholder="Masukkan target (Rp)"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="block font-semibold">
-                    Tabungan Bulanan
+                <div className="mb-2">
+                  <label htmlFor="saldo" className="block text-sm font-medium">
+                    Jumlah Target
                   </label>
                   <input
                     type="number"
-                    className="w-full border p-2 rounded-md"
-                    placeholder="Masukkan jumlah (Rp)"
+                    id="saldo"
+                    placeholder="Rp 0.00"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
                   />
-                </div>
-                <div className="mb-3">
-                  <label className="block font-semibold">Tanggal Target</label>
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="w-full border p-2 rounded-md"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="block font-semibold">Pilih Dompet</label>
-                  <select
-                    value={selectedWallet}
-                    onChange={(e) => setSelectedWallet(e.target.value)}
-                    className="w-full border p-2 rounded-md"
-                  >
-                    <option value="">Pilih Dompet</option>
-                    <option value="Bank">Bank</option>
-                    <option value="E-Wallet">E-Wallet</option>
-                    <option value="Cash">Cash</option>
-                  </select>
                 </div>
               </form>
             </Modal>
@@ -177,9 +143,6 @@ const GoalSavingView = ({
                         <span>Hapus</span>
                       </button>
                     </div>
-                    <p className="text-sm text-gray-500">
-                      {goal.monthlySaving}
-                    </p>
                     <div className="pt-3">
                       <p className="text-lg font-bold text-blue-500">
                         {formatCurrencyShort(goal.current)} /{" "}
