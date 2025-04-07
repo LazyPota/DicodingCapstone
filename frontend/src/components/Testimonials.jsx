@@ -49,11 +49,11 @@ const Testimonials = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const prevTestimonial = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
-    );
-  };
+  // const prevTestimonial = () => {
+  //   setCurrentIndex((prevIndex) =>
+  //     prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
+  //   );
+  // };
 
   const nextTestimonial = () => {
     setCurrentIndex((prevIndex) =>

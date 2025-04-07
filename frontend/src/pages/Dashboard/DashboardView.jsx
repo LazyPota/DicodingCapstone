@@ -2,7 +2,7 @@ import React from "react";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import MonthPicker from "../../components/MonthPicker";
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { BarChart } from "@mui/x-charts/BarChart";

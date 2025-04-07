@@ -5,7 +5,7 @@ import CardWallet from "../../components/CardWallet";
 import RecentTransactions from "../../components/RecentTransactions";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
-const WalletDetailView = ({ wallet }) => {
+const WalletDetailView = () => {
   return (
     <div className="flex h-screen">
       <Sidebar />

@@ -1,11 +1,9 @@
 import React from "react";
 import icon from "./../assets/whiteicon.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Sidebar = () => {
-  const navigate = useNavigate();
-
   return (
     <div className="w-[240px] bg-blue-700 text-white h-screen p-5 flex flex-col justify-between">
       <div>

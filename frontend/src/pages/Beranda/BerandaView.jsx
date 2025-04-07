@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import Button from "../../components/Button";
-import bgheader from "../../assets/bgheader.png";
 import bgImage from "../../assets/background.jpg";
 import bgImage2 from "../../assets/background2.png";
 import bgImage3 from "../../assets/background3.png";

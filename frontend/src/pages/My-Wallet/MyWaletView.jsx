@@ -12,7 +12,6 @@ import { Icon } from "@iconify/react";
 const MyWaletView = ({
   selectedDate,
   setSelectedDate,
-  openModal,
   closeModal,
   isModalOpen,
   setIsModalOpen,
