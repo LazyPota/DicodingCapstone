@@ -75,23 +75,21 @@ const SmartBudgetingView = ({
           </div>
 
           {/* Target tiap kategori */}
-          <h2 className="mt-6 text-[20px] font-semibold">
-            Target Tiap Kategori
-          </h2>
+          <h2 className="mt-6 text-[20px] font-semibold">Anggaran</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            {currentItems.map((goal, index) => {
-              const percentage = Math.round((goal.current / goal.target) * 100);
+            {currentItems.map((budget, index) => {
+              const percentage = Math.round((budget.current / budget.target) * 100);
               return (
                 <div
                   key={index}
                   className="bg-white p-5 rounded-[16px] border border-[#E2E8F0] space-y-1"
                 >
                   <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">{goal.title}</h3>
+                    <h3 className="font-semibold">{budget.title}</h3>
                     <button
                       className="text-blue-500 px-2 py-1 flex space-x-2 border border-blue-500 rounded-[16px] items-center"
                       onClick={() => {
-                        console.log(`Edit goal: ${goal.title}`);
+                        console.log(`Edit goal: ${budget.title}`);
                       }}
                     >
                       <span className="text-base">
@@ -102,8 +100,8 @@ const SmartBudgetingView = ({
                   </div>
                   <div className="pt-3">
                     <p className="text-lg font-bold text-blue-500">
-                      {formatCurrencyShort(goal.current)} /{" "}
-                      {formatCurrencyShort(goal.target)}
+                      {formatCurrencyShort(budget.current)} /{" "}
+                      {formatCurrencyShort(budget.target)}
                     </p>
                     <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
                       <div
@@ -115,7 +113,7 @@ const SmartBudgetingView = ({
                       </span>
                     </div>
                     <p className="text-sm text-gray-500 mt-1 text-right">
-                      Sisa: Rp {(goal.target - goal.current).toLocaleString()}
+                      Sisa: Rp {(budget.target - budget.current).toLocaleString()}
                     </p>
                   </div>
                 </div>

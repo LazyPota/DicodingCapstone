@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import SmartBudgetingView from "./SmartBudgetingView";
 
-const savingsGoals = [
+const savingsBudgeting = [
   {
     title: "Umrah Sekeluarga",
     current: 20000000,
@@ -22,46 +22,6 @@ const savingsGoals = [
     current: 4500000,
     target: 6000000,
   },
-  {
-    title: "Beli Motor CRF",
-    current: 30000000,
-    target: 40000000,
-  },
-  {
-    title: "Investasi Saham",
-    current: 10000000,
-    target: 15000000,
-  },
-  {
-    title: "Beli Motor CRF",
-    current: 30000000,
-    target: 40000000,
-  },
-  {
-    title: "Investasi Saham",
-    current: 10000000,
-    target: 15000000,
-  },
-  {
-    title: "Beli Motor CRF",
-    current: 30000000,
-    target: 40000000,
-  },
-  {
-    title: "Investasi Saham",
-    current: 10000000,
-    target: 15000000,
-  },
-  {
-    title: "Beli Motor CRF",
-    current: 30000000,
-    target: 40000000,
-  },
-  {
-    title: "Investasi Saham",
-    current: 10000000,
-    target: 15000000,
-  },
 ];
 
 const SmartBudgeting = () => {
@@ -71,15 +31,18 @@ const SmartBudgeting = () => {
   const itemsPerPage = 6;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = savingsGoals.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(savingsGoals.length / itemsPerPage);
+  const currentItems = savingsBudgeting.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  const totalPages = Math.ceil(savingsBudgeting.length / itemsPerPage);
 
   const budgetSummary = useMemo(() => {
-    const totalTarget = savingsGoals.reduce(
+    const totalTarget = savingsBudgeting.reduce(
       (sum, goal) => sum + goal.target,
       0
     );
-    const totalCurrent = savingsGoals.reduce(
+    const totalCurrent = savingsBudgeting.reduce(
       (sum, goal) => sum + goal.current,
       0
     );
@@ -93,7 +56,7 @@ const SmartBudgeting = () => {
       sisaAnggaran: sisa,
       persentase: percentage,
     };
-  }, [savingsGoals]);
+  }, [savingsBudgeting]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -139,7 +102,7 @@ const SmartBudgeting = () => {
         currentItems={currentItems}
         totalPages={totalPages}
         formatCurrencyShort={formatCurrencyShort}
-        savingsGoals={savingsGoals}
+        savingsGoals={savingsBudgeting}
         currentPage={currentPage}
         handlePageChange={handlePageChange}
         totalAnggaran={budgetSummary.totalAnggaran}
