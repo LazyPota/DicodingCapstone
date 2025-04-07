@@ -105,7 +105,7 @@ const GoalSavingView = ({
           {/* Statistik */}
           <div className="grid grid-cols-3 gap-5">
             <div className="flex flex-col gap-5 h-full">
-              <div className="bg-white p-5 rounded-[16px] shadow-md flex items-center w-full h-full">
+              <div className="bg-white p-5 rounded-[16px] flex items-center w-full h-full">
                 <div className="bg-[#2667FF] text-white w-[52px] h-[52px] flex justify-center items-center rounded-lg text-[32px]">
                   <Icon icon="ph:medal" />
                 </div>
@@ -114,7 +114,7 @@ const GoalSavingView = ({
                   <h3 className="text-[24px] font-bold">Rp. 10jt</h3>
                 </div>
               </div>
-              <div className="bg-white p-5 rounded-[16px] shadow-md flex items-center w-full h-full">
+              <div className="bg-white p-5 rounded-[16px] flex items-center w-full h-full">
                 <div className="bg-[#112E73] text-white w-[52px] h-[52px] flex justify-center items-center rounded-lg text-[32px]">
                   <Icon icon="mdi:target" />
                 </div>
@@ -127,7 +127,7 @@ const GoalSavingView = ({
               </div>
             </div>
 
-            <div className="md:col-span-2 bg-white rounded-[16px] p-[17px] shadow-md h-full">
+            <div className="md:col-span-2 bg-white rounded-[16px] p-[17px] h-full">
               <h2 className="text-[22px] font-bold">Analitik</h2>
               <BarChart
                 dataset={data}
