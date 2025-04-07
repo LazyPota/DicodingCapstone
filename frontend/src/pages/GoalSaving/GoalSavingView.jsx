@@ -51,30 +51,54 @@ const savingsGoals = [
     current: 10000000,
     target: 15000000,
   },
+  {
+    title: "Beli Motor CRF",
+    monthlySaving: "Rp. 3jt/bulan",
+    current: 30000000,
+    target: 40000000,
+  },
+  {
+    title: "Investasi Saham",
+    monthlySaving: "Rp. 1jt/bulan",
+    current: 10000000,
+    target: 15000000,
+  },
+  {
+    title: "Beli Motor CRF",
+    monthlySaving: "Rp. 3jt/bulan",
+    current: 30000000,
+    target: 40000000,
+  },
+  {
+    title: "Investasi Saham",
+    monthlySaving: "Rp. 1jt/bulan",
+    current: 10000000,
+    target: 15000000,
+  },
+  {
+    title: "Beli Motor CRF",
+    monthlySaving: "Rp. 3jt/bulan",
+    current: 30000000,
+    target: 40000000,
+  },
+  {
+    title: "Investasi Saham",
+    monthlySaving: "Rp. 1jt/bulan",
+    current: 10000000,
+    target: 15000000,
+  },
 ];
 
 const GoalSavingView = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedWallet, setSelectedWallet] = useState("");
-
-  // ✅ State untuk pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const goalsPerPage = 4;
-
-  // ✅ Logic untuk pagination
-  const indexOfLastGoal = currentPage * goalsPerPage;
-  const indexOfFirstGoal = indexOfLastGoal - goalsPerPage;
-  const currentGoals = savingsGoals.slice(indexOfFirstGoal, indexOfLastGoal);
-  const totalPages = Math.ceil(savingsGoals.length / goalsPerPage);
-
-  const nextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
-  const prevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
+  const itemsPerPage = 6;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = savingsGoals.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(savingsGoals.length / itemsPerPage);
 
   return (
     <div className="flex h-screen">
@@ -122,7 +146,9 @@ const GoalSavingView = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="block font-semibold">Tabungan Bulanan</label>
+                  <label className="block font-semibold">
+                    Tabungan Bulanan
+                  </label>
                   <input
                     type="number"
                     className="w-full border p-2 rounded-md"
@@ -173,7 +199,9 @@ const GoalSavingView = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-[16px] text-[#6B6B6B]">Target Bulan Ini</p>
-                  <h3 className="text-[24px] font-bold text-black">Rp. 5.5jt</h3>
+                  <h3 className="text-[24px] font-bold text-black">
+                    Rp. 5.5jt
+                  </h3>
                 </div>
               </div>
             </div>
@@ -205,10 +233,15 @@ const GoalSavingView = () => {
           <div className="mt-6">
             <h2 className="text-[20px] font-semibold">Target Tiap Kategori</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-              {currentGoals.map((goal, index) => {
-                const percentage = Math.round((goal.current / goal.target) * 100);
+              {currentItems.map((goal, index) => {
+                const percentage = Math.round(
+                  (goal.current / goal.target) * 100
+                );
                 return (
-                  <div key={index} className="bg-white p-5 rounded-[16px] border border-[#E2E8F0] space-y-1">
+                  <div
+                    key={index}
+                    className="bg-white p-5 rounded-[16px] border border-[#E2E8F0] space-y-1"
+                  >
                     <div className="flex justify-between items-center">
                       <h3 className="font-semibold">{goal.title}</h3>
                       <button
@@ -223,13 +256,19 @@ const GoalSavingView = () => {
                         <span>Hapus</span>
                       </button>
                     </div>
-                    <p className="text-sm text-gray-500">{goal.monthlySaving}</p>
+                    <p className="text-sm text-gray-500">
+                      {goal.monthlySaving}
+                    </p>
                     <div className="pt-3">
                       <p className="text-lg font-bold text-blue-500">
-                        Rp. {goal.current.toLocaleString()} / Rp. {goal.target.toLocaleString()}
+                        Rp. {goal.current.toLocaleString()} / Rp.{" "}
+                        {goal.target.toLocaleString()}
                       </p>
                       <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
-                        <div className="bg-blue-500 h-3 rounded-full" style={{ width: `${percentage}%` }}></div>
+                        <div
+                          className="bg-blue-500 h-3 rounded-full"
+                          style={{ width: `${percentage}%` }}
+                        ></div>
                         <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
                           {percentage}%
                         </span>
@@ -243,12 +282,10 @@ const GoalSavingView = () => {
               })}
             </div>
 
-            {/* ✅ Pagination Buttons */}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              onNext={nextPage}
-              onPrev={prevPage}
+              onPageChange={setCurrentPage}
             />
           </div>
         </div>

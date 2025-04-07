@@ -15,7 +15,6 @@ const SmartBudgetingView = ({
   tipeKartu,
   setTipeKartu,
 }) => {
-  // Dummy data target
   const allTargets = [
     "Umrah Sekeluarga",
     "Beli Rumah 3 Tingkat",
@@ -26,9 +25,8 @@ const SmartBudgetingView = ({
     "Laptop Baru",
   ];
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 6;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = allTargets.slice(indexOfFirstItem, indexOfLastItem);
@@ -86,7 +84,9 @@ const SmartBudgetingView = ({
           </div>
 
           {/* Target tiap kategori */}
-          <h2 className="mt-6 text-[20px] font-semibold">Target Tiap Kategori</h2>
+          <h2 className="mt-6 text-[20px] font-semibold">
+            Target Tiap Kategori
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
             {currentItems.map((item, index) => (
               <div
@@ -102,7 +102,6 @@ const SmartBudgetingView = ({
                     <span>Edit</span>
                   </button>
                 </div>
-                {/* <p className="text-sm text-gray-500">Menabung Rp. 2jt/bulan</p> */}
                 <div className="pt-3">
                   <p className="text-lg font-bold text-blue-500">
                     Rp. 20jt / Rp. 24jt
@@ -125,7 +124,7 @@ const SmartBudgetingView = ({
           </div>
 
           {/* Pagination */}
-          <div className="mt-6 flex justify-center">
+          <div className="mt-6">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
