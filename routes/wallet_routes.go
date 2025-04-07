@@ -2,11 +2,16 @@ package routes
 
 import (
 	"backend-capstone/controller"
+	"backend-capstone/middleware"
+
 	"github.com/gin-gonic/gin"
 )
 
 func InitWalletRoutes(r *gin.RouterGroup, ctrl *controller.AllController) {
-	walletGroup := r.Group("/user/:id/wallets")
+	
+	authMiddleware := middleware.NewMiddleware()
+
+	walletGroup := r.Group("/user/:id/wallets", authMiddleware.AuthMiddleware())
 	{
 		walletGroup.GET("/", ctrl.WalletController.GetAllWallets)
 		walletGroup.GET("/:wallet_id", ctrl.WalletController.GetWalletByID)

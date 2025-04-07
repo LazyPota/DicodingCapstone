@@ -171,6 +171,12 @@ func (c *WalletController) DeleteWallet(ctx *gin.Context) {
 		return
 	}
 
+	wallet, err := c.walletRepo.GetWalletByID(uint(userID), uint(walletID))
+	if err != nil || wallet == nil {
+		c.baseController.ResponseJSONError(ctx, Error_NotFound, "Wallet not found")
+		return
+	}
+
 	if err := c.walletRepo.DeleteWallet(uint(userID), uint(walletID)); err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_FailedToDelete, err.Error())
 		return

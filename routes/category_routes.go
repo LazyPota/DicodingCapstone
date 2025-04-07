@@ -2,12 +2,15 @@ package routes
 
 import (
 	"backend-capstone/controller"
+	"backend-capstone/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func InitCategoryRoutes(r *gin.RouterGroup, ctrl *controller.AllController) {
-	categoryGroup := r.Group("/user/:id/categories") 
+	authMiddleware := middleware.NewMiddleware()
+
+	categoryGroup := r.Group("/user/:id/categories", authMiddleware.AuthMiddleware()) 
 	{
 		categoryGroup.GET("/", ctrl.CategoryController.GetAllCategories)
 		categoryGroup.GET("/:category_id", ctrl.CategoryController.GetCategoryByID)

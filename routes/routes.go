@@ -17,4 +17,6 @@ func InitAllRoutes(r *gin.Engine, db *gorm.DB) {
 	InitCategoryRoutes(apiGroup,controller)
 	InitWalletRoutes(apiGroup,controller)
 	InitTransactionRoutes(apiGroup,controller)
+	InitBudgetRoutes(apiGroup, controller)
+	InitGoalSavingRoutes(apiGroup, controller)
 }

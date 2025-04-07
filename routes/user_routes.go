@@ -2,12 +2,18 @@ package routes
 
 import (
 	"backend-capstone/controller"
+	"backend-capstone/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func InitUserRoutes(r *gin.RouterGroup, ctrl *controller.AllController) {
-	userGroup := r.Group("/user")
+
+	authMiddleware := middleware.NewMiddleware()
+
+	r.POST("/user/login", ctrl.UserController.Login)
+
+	userGroup := r.Group("/user",  authMiddleware.AuthMiddleware())
 	{
 		userGroup.GET("/", ctrl.UserController.GetAllUser)
 		userGroup.GET("/:id", ctrl.UserController.GetUserByID)

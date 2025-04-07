@@ -24,3 +24,7 @@ func HandleValidation[T any](ctx *gin.Context, req *T, responseFunc func(*gin.Co
 	}
 	return true
 }
+
+func CheckPasswordHash(password, hashed string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashed), []byte(password))
+}

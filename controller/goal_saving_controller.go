@@ -22,13 +22,11 @@ func NewGoalSavingController(goalSavingRepo repository.GoalSavingRepository) *Go
 }
 
 type createGoalSavingRequest struct {
-	WalletID     uint    `json:"wallet_id" binding:"required"`
 	GoalName     string  `json:"goal_name" binding:"required"`
 	TargetAmount float64 `json:"target_amount" binding:"required"`
 }
 
 type updateGoalSavingRequest struct {
-	WalletID      uint    `json:"wallet_id"`
 	GoalName      string  `json:"goal_name"`
 	TargetAmount  float64 `json:"target_amount"`
 	CurrentAmount float64 `json:"current_amount"`
@@ -103,7 +101,6 @@ func (c *GoalSavingController) CreateGoalSaving(ctx *gin.Context) {
 
 	goalSaving := models.GoalSaving{
 		UserID:       uint(userID),
-		WalletID:     req.WalletID,
 		GoalName:     req.GoalName,
 		TargetAmount: req.TargetAmount,
 	}
@@ -148,10 +145,6 @@ func (c *GoalSavingController) UpdateGoalSaving(ctx *gin.Context) {
 	if goalSaving.UserID != uint(userID) {
 		c.baseController.ResponseJSONError(ctx, Error_NotFound, "Goal saving not found")
 		return
-	}
-
-	if req.WalletID != 0 {
-		goalSaving.WalletID = req.WalletID
 	}
 	if req.GoalName != "" {
 		goalSaving.GoalName = req.GoalName

@@ -11,6 +11,8 @@ type TransactionRepository interface {
 	GetTransactionByID(userID, transactionID uint) (*models.Transaction, error)
 	UpdateTransaction(userID, transactionID uint, transaction *models.Transaction) error
 	DeleteTransaction(userID, transactionID uint) error
+	GetTransactionsByDateAndCategory(userID uint, categoryID uint, date string) ([]models.Transaction, error)
+	GetTransactionsByDateRangeAndCategory(userID uint, categoryID uint, startDate string, endDate string) ([]models.Transaction, error)
 }
 
 type transactionRepository struct {
@@ -27,14 +29,14 @@ func (r *transactionRepository) CreateTransaction(transaction *models.Transactio
 		return err
 	}
 	return r.db.
-		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").Preload("Receipt").
+		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").
 		First(transaction, transaction.ID).Error
 }
 
 func (r *transactionRepository) GetAllTransactions(userID uint) ([]models.Transaction, error) {
 	var transactions []models.Transaction
 	err := r.db.
-		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").Preload("Receipt").Where("user_id = ?", userID).Order("created_at DESC").
+		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").Where("user_id = ?", userID).Order("created_at DESC").
 		Find(&transactions).Error
 	return transactions, err
 }
@@ -42,7 +44,7 @@ func (r *transactionRepository) GetAllTransactions(userID uint) ([]models.Transa
 func (r *transactionRepository) GetTransactionByID(userID, transactionID uint) (*models.Transaction, error) {
 	var transaction models.Transaction
 	err := r.db.
-		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").Preload("Receipt").Where("id = ? AND user_id = ?", transactionID, userID).First(&transaction).Error
+		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").Where("id = ? AND user_id = ?", transactionID, userID).First(&transaction).Error
 	if err != nil {
 		return nil, err
 	}
@@ -57,4 +59,42 @@ func (r *transactionRepository) UpdateTransaction(userID, transactionID uint, tr
 
 func (r *transactionRepository) DeleteTransaction(userID, transactionID uint) error {
 	return r.db.Where("id = ? AND user_id = ?", transactionID, userID).Delete(&models.Transaction{}).Error
+}
+
+func (r *transactionRepository) GetTransactionsByDateAndCategory(userID uint, categoryID uint, date string) ([]models.Transaction, error) {
+	var transactions []models.Transaction
+	
+	customTime := &models.CustomTime{}
+	if err := customTime.UnmarshalJSON([]byte(`"` + date + `"`)); err != nil {
+		return nil, err
+	}
+	
+	err := r.db.
+		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").
+		Where("user_id = ? AND category_id = ? AND DATE(transaction_date) = DATE(?)", userID, categoryID, customTime.Time).
+		Find(&transactions).Error
+		
+	return transactions, err
+}
+
+func (r *transactionRepository) GetTransactionsByDateRangeAndCategory(userID uint, categoryID uint, startDate string, endDate string) ([]models.Transaction, error) {
+	var transactions []models.Transaction
+	
+	startCustomTime := &models.CustomTime{}
+	if err := startCustomTime.UnmarshalJSON([]byte(`"` + startDate + `"`)); err != nil {
+		return nil, err
+	}
+	
+	endCustomTime := &models.CustomTime{}
+	if err := endCustomTime.UnmarshalJSON([]byte(`"` + endDate + `"`)); err != nil {
+		return nil, err
+	}
+	
+	err := r.db.
+		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").
+		Where("user_id = ? AND category_id = ? AND DATE(transaction_date) BETWEEN DATE(?) AND DATE(?)", 
+			userID, categoryID, startCustomTime.Time, endCustomTime.Time).
+		Find(&transactions).Error
+		
+	return transactions, err
 }

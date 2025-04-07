@@ -4,18 +4,33 @@ import (
 	"backend-capstone/models"
 	"backend-capstone/repository"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 type TransactionController struct {
 	transactionRepo repository.TransactionRepository
+	transferRepo    repository.TransferRepository
+	walletRepo      repository.WalletRepository
+	goalSavingRepo  repository.GoalSavingRepository
+	budgetRepo      repository.BudgetRepository
 	baseController  IBaseController
 }
 
-func NewTransactionController(transactionRepo repository.TransactionRepository) *TransactionController {
+func NewTransactionController(
+	transactionRepo repository.TransactionRepository,
+	transferRepo repository.TransferRepository,
+	walletRepo repository.WalletRepository,
+	goalSavingRepo repository.GoalSavingRepository,
+	budgetRepo repository.BudgetRepository,
+) *TransactionController {
 	return &TransactionController{
 		transactionRepo: transactionRepo,
+		transferRepo:    transferRepo,
+		walletRepo:      walletRepo,
+		goalSavingRepo:  goalSavingRepo,
+		budgetRepo:      budgetRepo,
 		baseController:  NewBaseController(),
 	}
 }
@@ -26,9 +41,7 @@ type createTransactionRequest struct {
 	TransactionType models.TransactionType `json:"transaction_type" binding:"required"`
 	Amount          float64                `json:"amount" binding:"required"`
 	TransactionDate models.CustomTime      `json:"transaction_date" binding:"required"`
-	Note            string                 `json:"note"`
-	InputSource     models.InputSourceType `json:"input_source" binding:"required"`
-	ReceiptID       *uint                  `json:"receipt_id"`
+	Note            *string                `json:"note"` 
 }
 
 type updateTransactionRequest struct {
@@ -37,9 +50,17 @@ type updateTransactionRequest struct {
 	TransactionType models.TransactionType `json:"transaction_type"`
 	Amount          float64                `json:"amount"`
 	TransactionDate models.CustomTime      `json:"transaction_date"`
-	Note            string                 `json:"note"`
-	InputSource     models.InputSourceType `json:"input_source"`
-	ReceiptID       *uint                  `json:"receipt_id"`
+	Note            *string                `json:"note"`
+}
+
+type createTransferRequest struct {
+	FromWalletID *uint             `json:"from_wallet_id"`
+	FromGoalID   *uint             `json:"from_goal_id"`
+	ToWalletID   *uint             `json:"to_wallet_id"`
+	ToGoalID     *uint             `json:"to_goal_id"`
+	Amount       float64           `json:"amount" binding:"required"`
+	TransferDate models.CustomTime `json:"transfer_date" binding:"required"`
+	Note         *string           `json:"note"`
 }
 
 func (c *TransactionController) CreateTransaction(ctx *gin.Context) {
@@ -59,8 +80,6 @@ func (c *TransactionController) CreateTransaction(ctx *gin.Context) {
 		Amount:          req.Amount,
 		TransactionDate: req.TransactionDate,
 		Note:            req.Note,
-		InputSource:     req.InputSource,
-		ReceiptID:       req.ReceiptID,
 	}
 
 	if err := c.transactionRepo.CreateTransaction(&transaction); err != nil {
@@ -68,7 +87,56 @@ func (c *TransactionController) CreateTransaction(ctx *gin.Context) {
 		return
 	}
 
+	wallet, err := c.walletRepo.GetWalletByID(uint(userID), req.WalletID)
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_NotFound, "Wallet not found")
+		return
+	}
+
+	if transaction.TransactionType == models.TransactionExpense {
+		if wallet.Amount < transaction.Amount {
+			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Insufficient wallet amount")
+			return
+		}
+		wallet.Amount -= transaction.Amount
+	} else if transaction.TransactionType == models.TransactionIncome {
+		wallet.Amount += transaction.Amount
+	}
+
+	if err := c.walletRepo.UpdateWallet(uint(userID), req.WalletID, wallet); err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_FailedToUpdate, "Failed to update wallet")
+		return
+	}
+
+	if transaction.TransactionType == models.TransactionExpense {
+		budgets, err := c.budgetRepo.GetBudgetsByCategoryID(uint(userID), transaction.CategoryID)
+		if err == nil && len(budgets) > 0 {
+			for _, budget := range budgets {
+				if isTransactionInBudgetPeriod(&transaction, &budget) {
+					break
+				}
+			}
+		}
+	}
+
 	c.baseController.ResponseJSONCreated(ctx, transaction)
+}
+
+
+func isTransactionInBudgetPeriod(transaction *models.Transaction, budget *models.Budget) bool {
+	if budget.Period == models.Daily {
+		transactionDate := transaction.TransactionDate.Time
+		today := time.Now()
+		return transactionDate.Day() == today.Day() &&
+			transactionDate.Month() == today.Month() &&
+			transactionDate.Year() == today.Year()
+	}
+
+	transactionDate := transaction.TransactionDate.Time
+	return transactionDate.After(budget.StartDate.Time) && 
+		   transactionDate.Before(budget.EndDate.Time) || 
+		   transactionDate.Equal(budget.StartDate.Time) || 
+		   transactionDate.Equal(budget.EndDate.Time)
 }
 
 func (c *TransactionController) GetAllTransactions(ctx *gin.Context) {
@@ -112,6 +180,11 @@ func (c *TransactionController) UpdateTransaction(ctx *gin.Context) {
 		return
 	}
 
+	oldCategoryID := transaction.CategoryID
+	oldTransactionType := transaction.TransactionType
+	oldAmount := transaction.Amount
+	oldTransactionDate := transaction.TransactionDate
+
 	if req.WalletID != 0 {
 		transaction.WalletID = req.WalletID
 	}
@@ -127,19 +200,19 @@ func (c *TransactionController) UpdateTransaction(ctx *gin.Context) {
 	if !req.TransactionDate.Time.IsZero() {
 		transaction.TransactionDate = req.TransactionDate
 	}
-	if req.Note != "" {
+	if req.Note != nil {
 		transaction.Note = req.Note
-	}
-	if req.InputSource != "" {
-		transaction.InputSource = req.InputSource
-	}
-	if req.ReceiptID != nil {
-		transaction.ReceiptID = req.ReceiptID
 	}
 
 	if err := c.transactionRepo.UpdateTransaction(uint(userID), uint(transactionID), transaction); err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_FailedToUpdate, err.Error())
 		return
+	}
+
+	if transaction.CategoryID != oldCategoryID || 
+	   transaction.TransactionType != oldTransactionType || 
+	   transaction.Amount != oldAmount ||
+	   transaction.TransactionDate.Time != oldTransactionDate.Time {
 	}
 
 	c.baseController.ResponseJSONUpdated(ctx, transaction)
@@ -149,7 +222,230 @@ func (c *TransactionController) DeleteTransaction(ctx *gin.Context) {
 	userID, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	transactionID, _ := strconv.ParseUint(ctx.Param("transaction_id"), 10, 64)
 
+	transaction, err := c.transactionRepo.GetTransactionByID(uint(userID), uint(transactionID))
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_NotFound, "Transaction not found")
+		return
+	}
+
 	if err := c.transactionRepo.DeleteTransaction(uint(userID), uint(transactionID)); err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_FailedToDelete, err.Error())
+		return
+	}
+
+	if transaction.TransactionType == models.TransactionExpense {
+	}
+
+	c.baseController.ResponseJSONDeleted(ctx, nil)
+}
+
+
+//TRANSFER SECTION
+
+func (c *TransactionController) CreateTransfer(ctx *gin.Context) {
+	userID, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
+
+	var req createTransferRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, err.Error())
+		return
+	}
+
+	if (req.FromWalletID == nil && req.FromGoalID == nil) || (req.ToWalletID == nil && req.ToGoalID == nil) {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Harus ada sumber dan tujuan transfer")
+		return
+	}
+
+	if (req.FromWalletID != nil && req.FromGoalID != nil) || (req.ToWalletID != nil && req.ToGoalID != nil) {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Tidak bisa menggunakan wallet dan goal sekaligus sebagai sumber atau tujuan")
+		return
+	}
+
+	var transferType models.TransferType
+
+	if req.FromWalletID != nil && req.ToWalletID != nil {
+		if *req.FromWalletID == *req.ToWalletID {
+			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Tidak bisa transfer ke wallet yang sama")
+			return
+		}
+
+		transferType = models.TransferWalletToWallet
+
+		fromWallet, err := c.walletRepo.GetWalletByID(uint(userID), *req.FromWalletID)
+		if err != nil {
+			c.baseController.ResponseJSONError(ctx, Error_NotFound, "Wallet sumber tidak ditemukan")
+			return
+		}
+
+		if fromWallet.Amount < req.Amount {
+			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Saldo wallet tidak cukup")
+			return
+		}
+
+		toWallet, err := c.walletRepo.GetWalletByID(uint(userID), *req.ToWalletID)
+		if err != nil {
+			c.baseController.ResponseJSONError(ctx, Error_NotFound, "Wallet tujuan tidak ditemukan")
+			return
+		}
+
+		fromWallet.Amount -= req.Amount
+		if err := c.walletRepo.UpdateWallet(uint(userID), fromWallet.ID, fromWallet); err != nil {
+			c.baseController.ResponseJSONError(ctx, Error_FailedToUpdate, "Gagal mengupdate wallet sumber")
+			return
+		}
+
+		toWallet.Amount += req.Amount
+		if err := c.walletRepo.UpdateWallet(uint(userID), toWallet.ID, toWallet); err != nil {
+			fromWallet.Amount += req.Amount
+			c.walletRepo.UpdateWallet(uint(userID), fromWallet.ID, fromWallet)
+			c.baseController.ResponseJSONError(ctx, Error_FailedToUpdate, "Gagal mengupdate wallet tujuan")
+			return
+		}
+
+	} else if req.FromWalletID != nil && req.ToGoalID != nil {
+		transferType = models.TransferWalletToGoal
+
+		fromWallet, err := c.walletRepo.GetWalletByID(uint(userID), *req.FromWalletID)
+		if err != nil {
+			c.baseController.ResponseJSONError(ctx, Error_NotFound, "Wallet sumber tidak ditemukan")
+			return
+		}
+
+		if fromWallet.Amount < req.Amount {
+			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Saldo wallet tidak cukup")
+			return
+		}
+
+		toGoal, err := c.goalSavingRepo.GetByID(*req.ToGoalID)
+		if err != nil || toGoal.UserID != uint(userID) {
+			c.baseController.ResponseJSONError(ctx, Error_NotFound, "Goal saving tidak ditemukan")
+			return
+		}
+
+		if toGoal.CurrentAmount >= toGoal.TargetAmount {
+			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Goal saving sudah mencapai target")
+			return
+		}
+
+		if toGoal.CurrentAmount+req.Amount > toGoal.TargetAmount {
+			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Jumlah transfer melebihi target goal saving")
+			return
+		}
+
+		fromWallet.Amount -= req.Amount
+		if err := c.walletRepo.UpdateWallet(uint(userID), fromWallet.ID, fromWallet); err != nil {
+			c.baseController.ResponseJSONError(ctx, Error_FailedToUpdate, "Gagal mengupdate wallet")
+			return
+		}
+
+		toGoal.CurrentAmount += req.Amount
+		if err := c.goalSavingRepo.Update(toGoal); err != nil {
+			fromWallet.Amount += req.Amount
+			c.walletRepo.UpdateWallet(uint(userID), fromWallet.ID, fromWallet)
+			c.baseController.ResponseJSONError(ctx, Error_FailedToUpdate, "Gagal mengupdate goal saving")
+			return
+		}
+
+	} else if req.FromGoalID != nil && req.ToWalletID != nil {
+		transferType = models.TransferGoalToWallet
+
+		fromGoal, err := c.goalSavingRepo.GetByID(*req.FromGoalID)
+		if err != nil || fromGoal.UserID != uint(userID) {
+			c.baseController.ResponseJSONError(ctx, Error_NotFound, "Goal saving tidak ditemukan")
+			return
+		}
+
+		if fromGoal.CurrentAmount < fromGoal.TargetAmount {
+			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Goal saving belum mencapai target, tidak bisa ditransfer")
+			return
+		}
+
+		if fromGoal.CurrentAmount < req.Amount {
+			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Saldo goal tidak cukup")
+			return
+		}
+
+		toWallet, err := c.walletRepo.GetWalletByID(uint(userID), *req.ToWalletID)
+		if err != nil {
+			c.baseController.ResponseJSONError(ctx, Error_NotFound, "Wallet tujuan tidak ditemukan")
+			return
+		}
+
+		fromGoal.CurrentAmount -= req.Amount
+		if err := c.goalSavingRepo.Update(fromGoal); err != nil {
+			c.baseController.ResponseJSONError(ctx, Error_FailedToUpdate, "Gagal mengupdate goal saving")
+			return
+		}
+
+		toWallet.Amount += req.Amount
+		if err := c.walletRepo.UpdateWallet(uint(userID), toWallet.ID, toWallet); err != nil {
+			fromGoal.CurrentAmount += req.Amount
+			c.goalSavingRepo.Update(fromGoal)
+			c.baseController.ResponseJSONError(ctx, Error_FailedToUpdate, "Gagal mengupdate wallet tujuan")
+			return
+		}
+	} else {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "sumber dan tujuan transfer tidak valid")
+		return
+	}
+
+	transfer := models.Transfer{
+		UserID:       uint(userID),
+		FromWalletID: req.FromWalletID,
+		FromGoalID:   req.FromGoalID,
+		ToWalletID:   req.ToWalletID,
+		ToGoalID:     req.ToGoalID,
+		TransferType: transferType,
+		Amount:       req.Amount,
+		TransferDate: req.TransferDate,
+		Note:         req.Note,
+	}
+
+	if err := c.transferRepo.CreateTransfer(&transfer); err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_FailedToCreate, err.Error())
+		return
+	}
+
+	c.baseController.ResponseJSONCreated(ctx, transfer)
+}
+
+
+
+func (c *TransactionController) GetAllTransfers(ctx *gin.Context) {
+	userID, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
+
+	transfers, err := c.transferRepo.GetAllTransfers(uint(userID))
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_FailedToRetrieve, err.Error())
+		return
+	}
+
+	c.baseController.ResponseJSONRetrieved(ctx, transfers)
+}
+
+func (c *TransactionController) GetTransferByID(ctx *gin.Context) {
+	userID, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	transferID, _ := strconv.ParseUint(ctx.Param("transfer_id"), 10, 64)
+
+	transfer, err := c.transferRepo.GetTransferByID(uint(userID), uint(transferID))
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_NotFound, "Transfer tidak ditemukan")
+		return
+	}
+
+	c.baseController.ResponseJSONRetrieved(ctx, transfer)
+}
+
+func (c *TransactionController) DeleteTransfer(ctx *gin.Context) {
+	userID, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	transferID, _ := strconv.ParseUint(ctx.Param("transfer_id"), 10, 64)
+
+	if _, err := c.transferRepo.GetTransferByID(uint(userID), uint(transferID)); err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_NotFound, "Transfer tidak ditemukan")
+		return
+	}
+
+	if err := c.transferRepo.DeleteTransfer(uint(userID), uint(transferID)); err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_FailedToDelete, err.Error())
 		return
 	}

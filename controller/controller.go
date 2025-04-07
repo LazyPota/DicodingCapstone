@@ -16,8 +16,8 @@ func NewAllController(repo *repository.AllRepository) *AllController {
 		UserController:     NewUserController(repo.UserRepository),
 		CategoryController: NewCategoryController(repo.CategoryRepository),
 		WalletController:   NewWalletController(repo.WalletRepository),
-		BudgetController:   NewBudgetController(repo.BudgetRepository),
+		BudgetController:   NewBudgetController(repo.BudgetRepository, repo.TransactionRepository),
 		GoalSavingController:   NewGoalSavingController(repo.GoalSavingRepository),
-		TransactionController: NewTransactionController(repo.TransactionRepository),
+		TransactionController: NewTransactionController(repo.TransactionRepository, repo.TransferRepository, repo.WalletRepository, repo.GoalSavingRepository, repo.BudgetRepository),
 	}
 }

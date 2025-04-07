@@ -32,6 +32,49 @@ type updateUserRequest struct {
 	Password string `json:"password"`
 }
 
+type loginRequest struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+func (c *UserController) Login(ctx *gin.Context) {
+	var req loginRequest
+	if !utils.HandleValidation(ctx, &req, func(ctx *gin.Context, code string, err error) {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, err.Error())
+	}) {
+		return
+	}
+
+	user, err := c.userRepo.GetUserByEmail(req.Email)
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_NotFound, "Email not registered")
+		return
+	}
+
+	if err := utils.CheckPasswordHash(req.Password, user.Password); err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_InvalidCreds, "Incorrect password")
+		return
+	}
+
+	token, err := utils.GenerateToken(user.ID, user.Username)
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_InternalServer, "Failed to generate token")
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"message": "Login successful",
+		"token":   token,
+		"user": gin.H{
+			"id":       user.ID,
+			"username": user.Username,
+			"email":    user.Email,
+		},
+	})
+}
+
+
+
 func (c *UserController) CreateUser(ctx *gin.Context) {
 	var req createUserRequest
 	if !utils.HandleValidation(ctx, &req, func(ctx *gin.Context, code string, err error) {

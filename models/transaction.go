@@ -5,14 +5,11 @@ import (
 )
 
 type TransactionType string
-type InputSourceType string
 
 const (
-	TransactionIncome  TransactionType = "Income"
-	TransactionExpense TransactionType = "Expense"
-
-	InputManual InputSourceType = "Manual"
-	InputScan   InputSourceType = "Scan"
+	TransactionIncome   TransactionType = "Income"
+	TransactionExpense  TransactionType = "Expense"
+	TransactionTransfer TransactionType = "Transfer"
 )
 
 type Transaction struct {
@@ -23,13 +20,10 @@ type Transaction struct {
 	Wallet          Wallet          `json:"wallet" gorm:"foreignKey:WalletID"`
 	CategoryID      uint            `json:"category_id" gorm:"index;not null"`
 	Category        Category        `json:"category" gorm:"foreignKey:CategoryID"`
-	TransactionType TransactionType `json:"transaction_type" gorm:"type:ENUM('Income','Expense');not null"`
+	TransactionType TransactionType `json:"transaction_type" gorm:"type:ENUM('Income','Expense','Transfer');not null"`
 	Amount          float64         `json:"amount" gorm:"not null"`
-	TransactionDate CustomTime       `json:"transaction_date" gorm:"not null"`
-	Note            string          `json:"note"`
-	InputSource     InputSourceType `json:"input_source" gorm:"type:ENUM('Manual','Scan');not null"`
-	ReceiptID       *uint           `json:"receipt_id"`
-	Receipt         *ScanReceipt    `json:"receipt" gorm:"foreignKey:ReceiptID"`
+	TransactionDate CustomTime      `json:"transaction_date" gorm:"not null"`
+	Note            *string         `json:"note"`
 	CreatedAt       time.Time       `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt       time.Time       `json:"updated_at" gorm:"autoUpdateTime"`
 }
