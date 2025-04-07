@@ -4,73 +4,61 @@ import SmartBudgetingView from "./SmartBudgetingView";
 const savingsGoals = [
   {
     title: "Umrah Sekeluarga",
-    monthlySaving: "Rp. 2jt/bulan",
     current: 20000000,
     target: 24000000,
   },
   {
     title: "Beli Rumah 3 Tingkat",
-    monthlySaving: "Rp. 5jt/bulan",
     current: 50000000,
     target: 200000000,
   },
   {
     title: "Beli HP 16 Promax",
-    monthlySaving: "Rp. 1,5jt/bulan",
     current: 15000000,
     target: 25000000,
   },
   {
     title: "Liburan ke Jogja",
-    monthlySaving: "Rp. 500rb/bulan",
     current: 4500000,
     target: 6000000,
   },
   {
     title: "Beli Motor CRF",
-    monthlySaving: "Rp. 3jt/bulan",
     current: 30000000,
     target: 40000000,
   },
   {
     title: "Investasi Saham",
-    monthlySaving: "Rp. 1jt/bulan",
     current: 10000000,
     target: 15000000,
   },
   {
     title: "Beli Motor CRF",
-    monthlySaving: "Rp. 3jt/bulan",
     current: 30000000,
     target: 40000000,
   },
   {
     title: "Investasi Saham",
-    monthlySaving: "Rp. 1jt/bulan",
     current: 10000000,
     target: 15000000,
   },
   {
     title: "Beli Motor CRF",
-    monthlySaving: "Rp. 3jt/bulan",
     current: 30000000,
     target: 40000000,
   },
   {
     title: "Investasi Saham",
-    monthlySaving: "Rp. 1jt/bulan",
     current: 10000000,
     target: 15000000,
   },
   {
     title: "Beli Motor CRF",
-    monthlySaving: "Rp. 3jt/bulan",
     current: 30000000,
     target: 40000000,
   },
   {
     title: "Investasi Saham",
-    monthlySaving: "Rp. 1jt/bulan",
     current: 10000000,
     target: 15000000,
   },

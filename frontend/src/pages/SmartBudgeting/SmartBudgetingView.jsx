@@ -100,7 +100,6 @@ const SmartBudgetingView = ({
                       <span>Edit</span>
                     </button>
                   </div>
-                  <p className="text-sm text-gray-500">{goal.monthlySaving}</p>
                   <div className="pt-3">
                     <p className="text-lg font-bold text-blue-500">
                       {formatCurrencyShort(goal.current)} /{" "}
