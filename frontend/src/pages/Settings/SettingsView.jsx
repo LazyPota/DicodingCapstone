@@ -1,37 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 
-const SettingsView = () => {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    phone: "",
-    birthDate: "",
-  });
-
-  const profileImageUrl = "https://randomuser.me/api/portraits/men/1.jpg"; // Foto Profil dari Header
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
+const SettingsView = ({handleChange, profileImageUrl, formData}) => {
   return (
     <div className="flex h-screen">
       <Sidebar />
-
       <div className="flex-1 flex flex-col">
         <Header />
-        {/* Content Wrapper */}
-        <div className="flex flex-col p-10 overflow-auto">
+        <div className="flex-1 p-7 overflow-auto bg-[#F3F4F7]">
           <h2 className="text-3xl font-bold text-gray-900">Akun Pengguna</h2>
           <p className="text-gray-600 text-lg mb-6">
             Kelola informasi dan keamanan akun Anda.
           </p>
 
           {/* Card Settings */}
-          <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-3xl">
+          <div className="bg-white p-8 rounded-xl w-full border border-[#C5C5C5]">
             <div className="flex gap-6">
               {/* Profile Picture */}
               <div className="flex flex-col items-center">
@@ -91,7 +75,9 @@ const SettingsView = () => {
                 <div>
                   <label className="text-sm font-semibold">Phone No.</label>
                   <div className="relative flex items-center">
-                    <span className="absolute left-3 text-gray-600">+62 (ID)</span>
+                    <span className="absolute left-3 text-gray-600">
+                      +62 (ID)
+                    </span>
                     <input
                       type="text"
                       name="phone"
