@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../assets/logoFIX.png";
 import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useNavigate } from "react-router-dom";
+import api from "../../instance/api";
 
 const RegisterView = ({
   setShowPassword,
@@ -11,6 +13,32 @@ const RegisterView = ({
   setSelectedDate,
   selectedDate,
 }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const navigate = useNavigate();
+  useEffect(() => {
+    return () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        navigate("/beranda");
+      }
+    };
+  }, [navigate]);
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+    api.post('/register', {
+      name: name,
+      email: email,
+      password: password,
+    })
+    .then((response) => {
+      console.log(response.data);
+      localStorage.setItem("token", response.data.token);
+      navigate("/beranda");
+    })
+  }
   return (
     <main className="relative flex min-h-[140vh] p-2 md:p-4 ">
       <header className="absolute top-4 left-4">
@@ -45,6 +73,8 @@ const RegisterView = ({
                 placeholder=" "
                 required
                 aria-required="true"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
               <label
                 htmlFor="name_input"
@@ -91,6 +121,8 @@ const RegisterView = ({
                 placeholder=" "
                 required
                 aria-required="true"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <label
                 htmlFor="email_input"
@@ -108,6 +140,8 @@ const RegisterView = ({
                 placeholder=" "
                 required
                 aria-required="true"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <label
                 htmlFor="password_input"
@@ -132,6 +166,7 @@ const RegisterView = ({
             <div className="flex flex-col items-center space-y-4 w-full pt-4">
               <button
                 type="submit"
+                onClick={handleRegister}
                 className="w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
               >
                 Sign Up
