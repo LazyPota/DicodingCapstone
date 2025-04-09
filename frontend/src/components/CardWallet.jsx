@@ -1,7 +1,7 @@
 import React from "react";
 import icon from "./../assets/whiteicon.png";
 
-const CardWallet = ({ size = "large" }) => {
+const CardWallet = ({ size = "large", amount = 0, name = "null", type = "null"}) => {
   const isSmall = size === "small";
 
   return (
@@ -25,7 +25,7 @@ const CardWallet = ({ size = "large" }) => {
           isSmall ? "text-[25px] mt-[13px]" : "text-[35px]"
         } font-semibold`}
       >
-        Rp. 320.200.000
+        Rp. {amount.toLocaleString("id-ID")}
       </h2>
       <div className="flex flex-row justify-between">
         <div
@@ -38,12 +38,12 @@ const CardWallet = ({ size = "large" }) => {
               Nama Dompet
             </span>
             <br />
-            <b className={isSmall ? "text-sm" : "text-[18px]"}>Mandiri</b>
+            <b className={isSmall ? "text-sm" : "text-[18px]"}>{name}</b>
           </p>
           <p>
             <span className={isSmall ? "text-xs" : "text-[14px]"}>Jenis</span>
             <br />
-            <b className={isSmall ? "text-sm" : "text-[18px]"}>Debit</b>
+            <b className={isSmall ? "text-sm" : "text-[18px]"}>{type}</b>
           </p>
         </div>
 

@@ -4,7 +4,6 @@ import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useNavigate } from "react-router-dom";
 import api from "../../instance/api";
 
 const RegisterView = ({
@@ -16,15 +15,14 @@ const RegisterView = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const navigate = useNavigate();
   useEffect(() => {
     return () => {
       const token = localStorage.getItem("token");
       if (token) {
-        navigate("/beranda");
+        window.location.href = "/dashboard";
       }
     };
-  }, [navigate]);
+  }, []);
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -36,7 +34,8 @@ const RegisterView = ({
     .then((response) => {
       console.log(response.data);
       localStorage.setItem("token", response.data.token);
-      navigate("/beranda");
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      window.location.href = "/beranda";
     })
   }
   return (

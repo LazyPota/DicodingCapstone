@@ -3,31 +3,30 @@ import logo from "../../assets/logoFIX.png";
 import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import api from "../../instance/api";
-import { useNavigate } from "react-router";
 
 const LoginView = ({ setShowPassword, showPassword }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
   useEffect(() => {
     return () => {
       const token = localStorage.getItem("token");
       if (token) {
-        navigate("/beranda");
+        window.location.href = "/dashboard";
       }
     };
-  }, [navigate]);
+  }, []);
 
   const handleLogin = (e) => {
     e.preventDefault();
-    api.post('/login', {
+    api.post('/user/login', {
       email: email,
       password: password
     })
     .then((response) => {
       console.log(response.data);
       localStorage.setItem("token", response.data.token);
-      window.location.href = "/dashboard";
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      window.location.href = "/beranda";
     })
     .catch((error) => {
       console.error("Login failed:", error);

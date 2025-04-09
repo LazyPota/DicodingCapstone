@@ -130,12 +130,12 @@ const SmartBudgetingView = ({
       </div>
 
       {/* Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        title="Tambah Rencana Anggaran"
-      >
-        <form className="flex flex-col space-y-[20px]">
+      <div className="flex flex-col space-y-[20px]">
+        <Modal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          title="Tambah Rencana Anggaran"
+        >
           <div className="mb-2 relative">
             <select
               id="tipeKartu"
@@ -168,8 +168,8 @@ const SmartBudgetingView = ({
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
             />
           </div>
-        </form>
-      </Modal>
+        </Modal>
+      </div>
     </div>
   );
 };
