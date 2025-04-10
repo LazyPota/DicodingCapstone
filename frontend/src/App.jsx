@@ -10,6 +10,7 @@ import ExpenseTracker from "./pages/ExpenseTracker/ExpenseTracker";
 import Kategori from "./pages/Kategori/Kategori";
 import Settings from "./pages/Settings/Settings";
 import GoalSaving from "./pages/GoalSaving/GoalSaving";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/goal" element={<GoalSaving />} />
         <Route path="/kategori" element={<Kategori />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
     </BrowserRouter>
   );
