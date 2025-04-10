@@ -1,13 +1,11 @@
 import logo from "../../assets/logoFIX.png";
 import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const RegisterView = ({
   setShowPassword,
   showPassword,
-  errors,
   email,
   password,
   setEmail,
@@ -51,51 +49,23 @@ const RegisterView = ({
                 type="text"
                 id="name"
                 name="name"
-                className={`block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border ${
-                  errors.password
-                    ? "border-red-500 focus:border-red-500 "
-                    : "border-[#D9D9D9]"
-                } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10`}
+                className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
                 placeholder=" "
                 required
                 aria-required="true"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
-              <label
-                className={`
-                  absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto
-                  ${
-                    errors.name
-                      ? "-translate-y-4 scale-75 top-2"
-                      : "peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2"
-                  }
-                  peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px]
-                  ${
-                    errors.name
-                      ? "text-red-600 peer-focus:text-red-600"
-                      : "text-gray-500 peer-focus:text-blue-600"
-                  }
-                `}
-              >
+              <label className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600">
                 Nama Lengkap
               </label>
-              {errors.name && (
-                <p id="email-error" className="mt-1 text-xs text-red-500">
-                  {errors.name}
-                </p>
-              )}
             </div>
             <div className="relative">
               <input
                 type="email"
                 id="email"
                 name="email"
-                className={`block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border ${
-                  errors.email
-                    ? "border-red-500 focus:border-red-500"
-                    : "border-[D9D9D9]"
-                } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
+                className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
                 placeholder=" "
                 value={email}
                 required
@@ -104,39 +74,17 @@ const RegisterView = ({
               />
               <label
                 htmlFor="email"
-                className={`
-                  absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto
-                  ${
-                    errors.email
-                      ? "-translate-y-4 scale-75 top-2"
-                      : "peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2"
-                  }
-                  peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px]
-                  ${
-                    errors.email
-                      ? "text-red-600 peer-focus:text-red-600"
-                      : "text-gray-500 peer-focus:text-blue-600"
-                  }
-                `}
+                className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600"
               >
                 Email
               </label>
-              {errors.email && (
-                <p id="email-error" className="mt-1 text-xs text-red-500">
-                  {errors.email}
-                </p>
-              )}
             </div>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
-                className={`block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border ${
-                  errors.password
-                    ? "border-red-500 focus:border-red-500 "
-                    : "border-[#D9D9D9]"
-                } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10`}
+                className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
                 placeholder=" "
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -145,19 +93,7 @@ const RegisterView = ({
               />
               <label
                 htmlFor="password"
-                className={`absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto
-                ${
-                  errors.password
-                    ? "-translate-y-4 scale-75 top-2"
-                    : "peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2"
-                }
-                peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px]
-                ${
-                  errors.password
-                    ? "text-red-600 peer-focus:text-red-600"
-                    : "text-gray-500 peer-focus:text-blue-600"
-                }
-                `}
+                className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600"
               >
                 Password
               </label>
@@ -177,11 +113,6 @@ const RegisterView = ({
                   <Icon icon="mdi:eye" className="w-5 h-5" aria-hidden="true" />
                 )}
               </button>
-              {errors.password && (
-                <p id="email-error" className="mt-1 text-xs text-red-500">
-                  {errors.password}
-                </p>
-              )}
             </div>
 
             <div className="flex flex-col items-center space-y-4 w-full pt-4">

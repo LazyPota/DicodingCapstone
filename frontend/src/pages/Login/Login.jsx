@@ -1,47 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import LoginView from "./LoginView";
+import api from "../../instance/api";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({});
 
-  const validateForm = () => {
-    const newErrors = {};
-    const emailRegex =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  useEffect(() => {
+    return () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        window.location.href = "/dashboard";
+      }
+    };
+  }, []);
 
-    if (!email) {
-      newErrors.email = "Email wajib diisi";
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = "Format email tidak valid";
-    }
-
-    if (!password) {
-      newErrors.password = "Password wajib diisi";
-    } else if (password.length < 8) {
-      newErrors.password = "Password minimal harus 8 karakter";
-    }
-
-    return newErrors;
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const validationErrors = validateForm();
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-    } else {
-      setErrors({});
-      console.log("Form valid, data siap dikirim", {
-        email,
-        password,
+  const handleLogin = (e) => {
+    e.preventDefault();
+    api
+      .post("/user/login", {
+        email: email,
+        password: password,
+      })
+      .then((response) => {
+        console.log(response.data);
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        window.location.href = "/beranda";
+      })
+      .catch((error) => {
+        console.error("Login failed:", error);
       });
-      alert("Login Berhasil");
-    }
   };
+
+  
 
   return (
     <div>
@@ -52,9 +45,7 @@ const Login = () => {
         setEmail={setEmail}
         password={password}
         setPassword={setPassword}
-        handleSubmit={handleSubmit}
-        validateForm={validateForm}
-        errors={errors}
+        handleLogin={handleLogin}
       />
     </div>
   );
