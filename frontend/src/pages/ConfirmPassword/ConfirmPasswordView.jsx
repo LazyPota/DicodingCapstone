@@ -4,7 +4,7 @@ import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 
-const ForgetPasswordView = ({ showPassword, setShowPassword }) => {
+const ConfirmPasswordView = ({ showPassword, setShowPassword }) => {
   return (
     <main className="relative flex min-h-[140vh] md:p-2">
       <header className="absolute top-4 left-4">
@@ -151,4 +151,4 @@ const ForgetPasswordView = ({ showPassword, setShowPassword }) => {
   );
 };
 
-export default ForgetPasswordView;
+export default ConfirmPasswordView;

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import ForgetPasswordView from "./ForgetPasswordView";
+import ConfirmPasswordView from "./ConfirmPasswordView";
 
-const ForgetPassword = () => {
+const ConfirmPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   return (
-    <ForgetPasswordView
+    <ConfirmPasswordView
       showPassword={showPassword}
       setShowPassword={setShowPassword}
     />
   );
 };
 
-export default ForgetPassword;
+export default ConfirmPassword;
