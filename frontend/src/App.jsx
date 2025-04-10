@@ -1,4 +1,4 @@
-;import Login from "./pages/Login/Login";
+import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Beranda from "./pages/Beranda/Beranda";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -11,6 +11,7 @@ import Kategori from "./pages/Kategori/Kategori";
 import Settings from "./pages/Settings/Settings";
 import GoalSaving from "./pages/GoalSaving/GoalSaving";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import Verification from "./pages/Verification/Verification";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/kategori" element={<Kategori />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verification" element={<Verification />} />
       </Routes>
     </BrowserRouter>
   );
