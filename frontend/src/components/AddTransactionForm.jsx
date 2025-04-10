@@ -108,14 +108,14 @@ const FormTransfer = ({ formData, handleFormChange, handleSubmit, wallets, goals
       />
 
       <select
-        value={formData.transfer_type || ""}
+        value={formData.transfer_type}
         onChange={(e) => handleFormChange("transfer_type", e.target.value)}
         className="w-full border rounded px-3 py-2"
       >
         <option value="">Tipe Transfer</option>
-        <option value="wallettowallet" selected={formData.transfer_type === "wallettowallet"}>Dompet Ke Dompet</option>
-        <option value="wallettobudget" selected={formData.transfer_type === "wallettobudget"}>Dompet Ke Anggaran</option>
-        <option value="budgettobudget" selected={formData.transfer_type === "budgettobudget"}>Anggaran Ke Anggaran</option>
+        <option value="wallettowallet">Dompet Ke Dompet</option>
+        <option value="wallettobudget">Dompet Ke Anggaran</option>
+        <option value="budgettobudget">Anggaran Ke Anggaran</option>
       </select>
 
       <select
