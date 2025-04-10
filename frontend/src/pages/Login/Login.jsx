@@ -19,7 +19,7 @@ const Login = () => {
   const handleLogin = (e) => {
     e.preventDefault();
     api
-      .post("/user/login", {
+      .post("capstone/user/login", {
         email: email,
         password: password,
       })
