@@ -37,14 +37,6 @@ const WalletDetailView = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex space-x-3">
-                    <span className="px-4 py-1 rounded-full text-sm font-bold font-inter bg-green-100 text-green-600">
-                      +1.26%
-                    </span>
-                    <span className="px-4 py-1 rounded-full text-sm font-bold font-inter bg-red-100 text-red-600">
-                      +1.26%
-                    </span>
-                  </div>
                 </div>
                 <div className="flex flex-row space-x-9">
                   <div className="flex flex-col">
