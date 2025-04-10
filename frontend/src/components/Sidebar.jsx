@@ -14,39 +14,76 @@ const Sidebar = () => {
           </span>
         </div>
         <ul className="space-y-[15px] mt-[43px] text-[14px] font-medium">
-          <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
-            <Icon icon="mage:dashboard-fill" />
-            <Link to="/beranda">Beranda</Link>
+          <li>
+            {/* Setiap Link sekarang adalah flex container */}
+            <Link
+              to="/beranda"
+              className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer w-full"
+            >
+              <Icon icon="mage:dashboard-fill" width="20" height="20" />{" "}
+              {/* Tambahkan ukuran ikon jika perlu */}
+              <span>Beranda</span>
+            </Link>
           </li>
-          <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
-            <Icon icon="tdesign:wallet" />
-            <Link to="/dompet">Dompet</Link>
+          <li>
+            <Link
+              to="/dompet"
+              className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer w-full"
+            >
+              <Icon icon="tdesign:wallet" width="20" height="20" />
+              <span>Dompet</span>
+            </Link>
           </li>
-          <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
-            <Icon icon="cuida:lamp-on-outline" />
-            <Link to="/anggaran">Anggaran</Link>
+          <li>
+            <Link
+              to="/anggaran"
+              className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer w-full"
+            >
+              <Icon icon="cuida:lamp-on-outline" width="20" height="20" />
+              <span>Anggaran</span>
+            </Link>
           </li>
-          <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
-            <Icon icon="ph:money-wavy-bold" />
-            <Link to="/transaksi">Transaksi</Link>
+          <li>
+            <Link
+              to="/transaksi"
+              className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer w-full"
+            >
+              <Icon icon="ph:money-wavy-bold" width="20" height="20" />
+              <span>Transaksi</span>
+            </Link>
           </li>
-          <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
-            <Icon icon="mdi:piggy-bank-outline" />
-            <Link to="/goal">Rencana Tabungan</Link>
+          <li>
+            <Link
+              to="/goal"
+              className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer w-full"
+            >
+              <Icon icon="mdi:piggy-bank-outline" width="20" height="20" />
+              <span>Rencana Tabungan</span>
+            </Link>
           </li>
-          <li className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer">
-            <Icon icon="uil:sliders-v" />
-            <Link to="/kategori">Kategori</Link>
+          <li>
+            <Link
+              to="/kategori"
+              className="flex items-center space-x-[15px] p-2 py-2 hover:bg-blue-600 rounded cursor-pointer w-full transition delay-150 ease-in-out"
+            >
+              <Icon icon="uil:sliders-v" width="20" height="20" />
+              <span>Kategori</span>
+            </Link>
           </li>
         </ul>
       </div>
       <div>
         <ul className="space-y-2 text-[12px]">
-          <li className="flex items-center space-x-2 p-2 hover:bg-blue-600 rounded cursor-pointer">
-            <Icon icon="uil:setting" />
-            <Link to="/settings">Pengaturan</Link>
+          <li>
+            <Link
+              to="/settings"
+              className="flex items-center space-x-2 p-2 hover:bg-blue-600 rounded cursor-pointer transition delay-150 ease-in"
+            >
+              <Icon icon="uil:setting" />
+              <span>Pengaturan</span>
+            </Link>
           </li>
-          <li className="flex items-center space-x-2 p-2 text-red-500 hover:bg-red-600 hover:text-white rounded cursor-pointer">
+          <li className="flex items-center space-x-2 p-2 bg-red-600 hover:bg-red-800 text-white rounded-md cursor-pointer">
             <Icon icon="material-symbols:logout" />
             <span>Keluar</span>
           </li>

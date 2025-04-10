@@ -79,6 +79,31 @@ const GoalSaving = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = savingsGoals.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(savingsGoals.length / itemsPerPage);
+  const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const closeSuccessPopup = () => {
+    setIsSuccessPopupOpen(false);
+  };
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      closeModal();
+      setIsSuccessPopupOpen(true);
+    } catch (error) {
+      console.error("Submit failed:", error);
+      alert("Gagal menambahkan data!");
+    }
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -116,6 +141,11 @@ const GoalSaving = () => {
       savingsGoals={savingsGoals}
       currentPage={currentPage}
       handlePageChange={handlePageChange}
+      handleFormSubmit={handleFormSubmit}
+      closeSuccessPopup={closeSuccessPopup}
+      isSuccessPopupOpen={isSuccessPopupOpen}
+      openModal={openModal}
+      closeModal={closeModal}
     />
   );
 };

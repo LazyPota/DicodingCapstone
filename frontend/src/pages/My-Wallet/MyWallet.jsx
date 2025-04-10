@@ -13,6 +13,32 @@ const MyWallet = () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
 
+  const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
+
+  const closeSuccessPopup = () => {
+    setIsSuccessPopupOpen(false);
+  };
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      closeModal();
+      setIsSuccessPopupOpen(true);
+    } catch (error) {
+      console.error("Submit failed:", error);
+      alert("Gagal menambahkan data!");
+    }
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   useEffect(() => {
     fetchWallets();
   }, []);
@@ -66,6 +92,9 @@ const MyWallet = () => {
         handleSubmit={handleSubmit}
         filter={filter}
         setFilter={setFilter}
+        handleFormSubmit={handleFormSubmit}
+        closeSuccessPopup={closeSuccessPopup}
+        isSuccessPopupOpen={isSuccessPopupOpen}
       />
     </div>
   );

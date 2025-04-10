@@ -6,6 +6,7 @@ import Button from "../../components/Button";
 import Modal from "../../components/Modal";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
+import SuccessPopup from "../../components/Popup/SuccessPopup";
 
 const MyWaletView = ({
   closeModal,
@@ -20,6 +21,8 @@ const MyWaletView = ({
   handleSubmit,
   filter,
   setFilter,
+  isSuccessPopupOpen,
+  closeSuccessPopup
 }) => {
   return (
     <div className="flex h-screen">
@@ -82,10 +85,13 @@ const MyWaletView = ({
       <div className="flex flex-col space-y-[20px]">
         <Modal isOpen={isModalOpen} onClose={closeModal} title="Tambah Kartu" onSubmit={handleSubmit}>
           <div className="mb-2">
+            <label htmlFor="Nama Kartu" className="block text-sm font-medium">
+              Nama Kartu
+            </label>
             <input
               type="text"
               id="namaKartu"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
               placeholder="Nama Kartu"
               value={walletName}
               onChange={(e) => setWalletName(e.target.value)}
@@ -97,7 +103,7 @@ const MyWaletView = ({
             </label>
             <select
               id="jenisKartu"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
               defaultValue=""
               onChange={(e) => setWalletType(e.target.value)}
             >
@@ -118,12 +124,16 @@ const MyWaletView = ({
               type="number"
               id="saldo"
               placeholder="Rp 0.00"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
           </div>
         </Modal>
+        <SuccessPopup
+            isOpen={isSuccessPopupOpen}
+            onClose={closeSuccessPopup} // Fungsi saat tombol 'Selesai' atau 'X' diklik
+        />
       </div>
     </div>
   );

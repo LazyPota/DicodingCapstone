@@ -12,7 +12,9 @@ const Kategori = () => {
   ];
 
   const filteredCategories =
-    filter === "Semua" ? categories : categories.filter((category) => category.type === filter);
+    filter === "Semua"
+      ? categories
+      : categories.filter((category) => category.type === filter);
 
   return (
     <KategoriView
