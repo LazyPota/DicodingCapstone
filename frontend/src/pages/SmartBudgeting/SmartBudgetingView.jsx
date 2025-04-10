@@ -78,7 +78,9 @@ const SmartBudgetingView = ({
           <h2 className="mt-6 text-[20px] font-semibold">Anggaran</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
             {currentItems.map((budget, index) => {
-              const percentage = Math.round((budget.current / budget.target) * 100);
+              const percentage = Math.round(
+                (budget.current / budget.target) * 100
+              );
               return (
                 <div
                   key={index}
@@ -113,7 +115,8 @@ const SmartBudgetingView = ({
                       </span>
                     </div>
                     <p className="text-sm text-gray-500 mt-1 text-right">
-                      Sisa: Rp {(budget.target - budget.current).toLocaleString()}
+                      Sisa: Rp{" "}
+                      {(budget.target - budget.current).toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -137,11 +140,14 @@ const SmartBudgetingView = ({
           title="Tambah Rencana Anggaran"
         >
           <div className="mb-2 relative">
+            <label htmlFor="tipeKartu" className="block text-sm font-medium">
+              Tipe Kartu
+            </label>
             <select
               id="tipeKartu"
               value={tipeKartu}
               onChange={(e) => setTipeKartu(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 appearance-none pr-8 bg-white ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 appearance-none pr-8 bg-white mt-2 ${
                 tipeKartu === "" ? "text-gray-400" : "text-gray-900"
               }`}
             >
@@ -165,7 +171,7 @@ const SmartBudgetingView = ({
               type="number"
               id="saldo"
               placeholder="Rp 0.00"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
             />
           </div>
         </Modal>

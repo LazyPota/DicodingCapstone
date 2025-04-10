@@ -106,7 +106,7 @@ const KategoriView = ({
               </label>
               <input
                 type="text"
-                className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2"
+                className="mt-2 block w-full border border-gray-300 rounded-lg px-3 py-2"
                 placeholder="Masukkan nama kategori"
               />
             </div>
@@ -115,7 +115,7 @@ const KategoriView = ({
               <label className="block text-sm font-medium text-gray-700">
                 Tipe Kategori
               </label>
-              <select className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2">
+              <select className="mt-2 block w-full border border-gray-300 rounded-lg px-3 py-2">
                 <option value="Pemasukan">Pemasukan</option>
                 <option value="Pengeluaran">Pengeluaran</option>
               </select>

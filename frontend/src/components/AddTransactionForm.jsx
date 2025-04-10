@@ -14,7 +14,9 @@ const AddTransactionForm = ({ isOpen, onClose }) => {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-2 px-4 font-semibold ${
-                  activeTab === tab ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-500"
+                  activeTab === tab
+                    ? "border-b-2 border-blue-600 text-blue-600"
+                    : "text-gray-500"
                 }`}
               >
                 {tab === "income" && "Pemasukan"}
@@ -54,24 +56,43 @@ const AddTransactionForm = ({ isOpen, onClose }) => {
 
 const FormTransaksi = () => {
   return (
-    <form className="space-y-4">
+    <form className="space-y-2 max-h-[400px] overflow-auto no-scrollbar">
       {/* Date */}
+      <label htmlFor="date" className="block text-sm font-medium">
+        Tanggal Dibuat
+      </label>
       <input type="date" className="w-full border rounded px-3 py-2" />
 
       {/* Kategori */}
+      <label htmlFor="kategori" className="block text-sm font-medium">
+        Pilih Kategori
+      </label>
       <select className="w-full border rounded px-3 py-2">
         <option>Kategori</option>
       </select>
 
       {/* Total */}
-      <input type="number" placeholder="Rp 0.00" className="w-full border rounded px-3 py-2" />
+      <label htmlFor="total" className="block text-sm font-medium">
+        Total
+      </label>
+      <input
+        type="number"
+        placeholder="Rp 0.00"
+        className="w-full border rounded px-3 py-2"
+      />
 
       {/* Dompet */}
+      <label htmlFor="dompet" className="block text-sm font-medium">
+        Dompet
+      </label>
       <select className="w-full border rounded px-3 py-2">
-        <option>Dompet</option>
+        <option>Pilih Dompet</option>
       </select>
 
       {/* Catatan */}
+      <label htmlFor="catatan" className="block text-sm font-medium">
+        Catatan
+      </label>
       <textarea
         rows={3}
         placeholder="Catatan"
@@ -83,8 +104,11 @@ const FormTransaksi = () => {
 
 const FormTransfer = () => {
   return (
-    <form className="space-y-4">
+    <form className="space-y-2 max-h-[400px] overflow-auto no-scrollbar">
       {/* Tanggal */}
+      <label htmlFor="date" className="block text-sm font-medium">
+        Tanggal Dibuat
+      </label>
       <input
         type="date"
         className="w-full border rounded px-3 py-2"
@@ -92,22 +116,31 @@ const FormTransfer = () => {
       />
 
       {/* Tipe Transfer */}
+      <label htmlFor="transfer" className="block text-sm font-medium">
+        Tipe Transfer
+      </label>
       <select className="w-full border rounded px-3 py-2">
-        <option value="">Tipe Transfer</option>
+        <option value="">Pilih Tipe Transfer</option>
         <option value="bank">Antar Bank</option>
         <option value="wallet">Dompet Digital</option>
       </select>
 
       {/* Dari */}
+      <label htmlFor="dari" className="block text-sm font-medium">
+        Dari
+      </label>
       <select className="w-full border rounded px-3 py-2">
-        <option value="">Dari</option>
+        <option value="">Pilih Dari</option>
         <option value="bank1">Rekening BCA</option>
         <option value="wallet1">OVO</option>
       </select>
 
       {/* Tujuan */}
+      <label htmlFor="Tujuan" className="block text-sm font-medium">
+        Tujuan
+      </label>
       <select className="w-full border rounded px-3 py-2">
-        <option value="">Tujuan</option>
+        <option value="">Pilih Tujuan</option>
         <option value="bank2">Rekening Mandiri</option>
         <option value="wallet2">Gopay</option>
       </select>
@@ -123,6 +156,9 @@ const FormTransfer = () => {
       </div>
 
       {/* Catatan */}
+      <label htmlFor="catatan" className="block text-sm font-medium">
+        Catatan
+      </label>
       <textarea
         rows={3}
         placeholder="Catatan"
@@ -131,6 +167,5 @@ const FormTransfer = () => {
     </form>
   );
 };
-
 
 export default AddTransactionForm;

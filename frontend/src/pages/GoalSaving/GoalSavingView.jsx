@@ -47,9 +47,15 @@ const GoalSavingView = ({
             >
               <form>
                 <div className="mb-3">
+                  <label
+                    htmlFor="namaTabungan"
+                    className="block text-sm font-medium"
+                  >
+                    Nama Tabungan
+                  </label>
                   <input
                     type="text"
-                    className="w-full border p-2 rounded-md"
+                    className="w-full border p-2 rounded-md mt-2"
                     placeholder="Nama Tabungan"
                   />
                 </div>
@@ -61,7 +67,7 @@ const GoalSavingView = ({
                     type="number"
                     id="saldo"
                     placeholder="Rp 0.00"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
                   />
                 </div>
               </form>
