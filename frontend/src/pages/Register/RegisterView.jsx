@@ -1,4 +1,3 @@
-import React from "react";
 import logo from "../../assets/logoFIX.png";
 import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
@@ -15,7 +14,7 @@ const RegisterView = ({
   setPassword,
   name,
   setName,
-  handleSubmit,
+  handleRegister,
 }) => {
   return (
     <main className="relative flex min-h-[140vh] p-2">
@@ -44,7 +43,7 @@ const RegisterView = ({
 
           <form
             className="mt-3 flex flex-col space-y-[20px]"
-            onSubmit={handleSubmit}
+            onSubmit={handleRegister}
             noValidate
           >
             <div className="relative">
@@ -58,12 +57,10 @@ const RegisterView = ({
                     : "border-[#D9D9D9]"
                 } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10`}
                 placeholder=" "
-                value={name}
-                onChange={(e) => setName(e.target.value)}
                 required
                 aria-required="true"
-                aria-invalid={errors.name ? "true" : "false"}
-                aria-describedby={errors.name ? "name-error" : undefined}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
               <label
                 className={`
@@ -104,8 +101,6 @@ const RegisterView = ({
                 required
                 aria-required="true"
                 onChange={(e) => setEmail(e.target.value)}
-                aria-invalid={errors.email ? "true" : "false"}
-                aria-describedby={errors.email ? "email-error" : undefined}
               />
               <label
                 htmlFor="email"
@@ -147,10 +142,6 @@ const RegisterView = ({
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 aria-required="true"
-                aria-invalid={errors.password ? "true" : "false"}
-                aria-describedby={
-                  errors.password ? "password-error" : undefined
-                }
               />
               <label
                 htmlFor="password"
@@ -196,6 +187,7 @@ const RegisterView = ({
             <div className="flex flex-col items-center space-y-4 w-full pt-4">
               <button
                 type="submit"
+                onClick={handleRegister}
                 className="w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
               >
                 Buat Akun

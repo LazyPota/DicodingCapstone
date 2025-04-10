@@ -1,4 +1,3 @@
-import React from "react";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import MonthPicker from "../../components/MonthPicker";
@@ -11,7 +10,6 @@ import CardWallet from "../../components/CardWallet";
 import RecentTransactions from "../../components/RecentTransactions";
 
 const DashboardView = ({financialHealth, savings, data}) => {
- 
   return (
     <div className="flex h-screen">
       <Sidebar />

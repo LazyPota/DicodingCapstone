@@ -1,4 +1,4 @@
-import React from "react"; // Tidak perlu useState jika hanya digunakan di komponen induk
+import React from "react"; 
 import logo from "../../assets/logoFIX.png";
 import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 const LoginView = ({
   setShowPassword,
   showPassword,
-  handleSubmit,
+  handleLogin,
   errors,
   email,
   setEmail,
@@ -39,7 +39,7 @@ const LoginView = ({
           </p>
           <form
             className="mt-3 flex flex-col space-y-[20px]"
-            onSubmit={handleSubmit}
+            onSubmit={handleLogin}
             noValidate
           >
             <div className="relative">
@@ -57,8 +57,6 @@ const LoginView = ({
                 required
                 aria-required="true"
                 onChange={(e) => setEmail(e.target.value)}
-                aria-invalid={errors.email ? "true" : "false"}
-                aria-describedby={errors.email ? "email-error" : undefined}
               />
               <label
                 htmlFor="email"
@@ -100,10 +98,6 @@ const LoginView = ({
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 aria-required="true"
-                aria-invalid={errors.password ? "true" : "false"}
-                aria-describedby={
-                  errors.password ? "password-error" : undefined
-                }
               />
               <label
                 htmlFor="password"
@@ -168,6 +162,7 @@ const LoginView = ({
             <div className="flex flex-col items-center space-y-4 w-full pt-4">
               <button
                 type="submit"
+                onClick={(e) => handleLogin(e)}
                 className="w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
               >
                 Masuk

@@ -94,12 +94,12 @@ const KategoriView = ({
         </div>
 
         {/* Modal untuk tambah kategori */}
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          title="Tambah Kategori"
-        >
-          <form>
+        <div>
+          <Modal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            title="Tambah Kategori"
+          >
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700">
                 Nama Kategori
@@ -120,8 +120,8 @@ const KategoriView = ({
                 <option value="Pengeluaran">Pengeluaran</option>
               </select>
             </div>
-          </form>
-        </Modal>
+          </Modal>
+        </div>
       </div>
     </div>
   );

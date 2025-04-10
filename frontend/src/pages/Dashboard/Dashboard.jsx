@@ -1,8 +1,11 @@
-import React from "react";
+// import React, { useEffect, useState } from "react";
 import DashboardView from "./DashboardView";
 import { FaHome, FaMotorcycle, FaMobileAlt, FaKaaba } from "react-icons/fa";
 
 const Dashboard = () => {
+  // const [isTokenReady, setIsTokenReady] = useState(false); 
+  // const []
+
   const financialHealth = 30;
   const data = [
     { minggu: "Minggu - 1", pemasukan: 20000, pengeluaran: 30000 },
@@ -41,6 +44,17 @@ const Dashboard = () => {
       percent: 10,
     },
   ];
+
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if (!token) {
+  //     window.location.href = "/login";
+  //   } else {
+  //     setIsTokenReady(true); 
+  //   }
+  // }, []);
+
+  // if (!isTokenReady) return null;
 
   return (
     <div>
