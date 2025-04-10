@@ -74,7 +74,6 @@ func (c *UserController) Login(ctx *gin.Context) {
 }
 
 
-
 func (c *UserController) CreateUser(ctx *gin.Context) {
 	var req createUserRequest
 	if !utils.HandleValidation(ctx, &req, func(ctx *gin.Context, code string, err error) {
@@ -100,7 +99,21 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	c.baseController.ResponseJSONCreated(ctx, user)
+	token, err := utils.GenerateToken(user.ID, user.Username)
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_InternalServer, "Failed to generate token")
+		return
+	}
+
+	c.baseController.ResponseJSONCreated(ctx, gin.H{
+		"message": "Account created & logged in",
+		"token":   token,
+		"user": gin.H{
+			"id":       user.ID,
+			"username": user.Username,
+			"email":    user.Email,
+		},
+	})
 }
 
 func (c *UserController) GetAllUser(ctx *gin.Context) {
