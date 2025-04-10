@@ -1,7 +1,11 @@
 import React from "react";
-import icon from "./../assets/whiteicon.png";
 
-const CardWallet = ({ size = "large", amount = 0, name = "null", type = "null"}) => {
+const CardWallet = ({
+  size = "large",
+  amount = 0,
+  name = "null",
+  type = "null",
+}) => {
   const isSmall = size === "small";
 
   return (
@@ -10,13 +14,6 @@ const CardWallet = ({ size = "large", amount = 0, name = "null", type = "null"})
         isSmall ? "py-4 px-3 h-[150px]" : "py-7 px-5 h-[231px]"
       } bg-gradient-to-br from-[#3973FF] to-[#224599] rounded-xl text-white shadow-lg relative`}
     >
-      <div className="absolute top-3 right-3">
-        <img
-          src={icon}
-          alt="white-icon"
-          className={isSmall ? "w-4 h-4" : "w-[26px] h-[26px]"}
-        />
-      </div>
       <p className={`${isSmall ? "text-sm" : "text-[20px] font-medium"}`}>
         Total Saldo
       </p>
