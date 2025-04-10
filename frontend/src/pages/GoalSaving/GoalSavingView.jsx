@@ -51,7 +51,6 @@ const GoalSavingView = ({
               title="Tambah Rencana Tabungan"
               onSubmit={handleFormSubmit}
             >
-              <form>
                 <div className="mb-3">
                   <label
                     htmlFor="namaTabungan"
@@ -76,7 +75,6 @@ const GoalSavingView = ({
                     className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
                   />
                 </div>
-              </form>
             </Modal>
           )}
 
