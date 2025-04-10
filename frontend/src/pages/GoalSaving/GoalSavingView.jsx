@@ -6,9 +6,9 @@ import Modal from "../../components/Modal";
 import Pagination from "../../components/Pagination";
 import { Icon } from "@iconify/react";
 import { BarChart } from "@mui/x-charts/BarChart";
+import SuccessPopup from "../../components/Popup/SuccessPopup";
 
 const GoalSavingView = ({
-  setIsModalOpen,
   isModalOpen,
   data,
   currentItems,
@@ -16,6 +16,11 @@ const GoalSavingView = ({
   currentPage,
   totalPages,
   handlePageChange,
+  openModal,
+  closeModal,
+  handleFormSubmit,
+  isSuccessPopupOpen,
+  closeSuccessPopup,
 }) => {
   return (
     <div className="flex h-screen">
@@ -32,7 +37,7 @@ const GoalSavingView = ({
             </div>
             <button
               className="z-50 px-4 py-2 bg-blue-600 text-white rounded-[16px] font-semibold flex flex-row items-center space-x-2"
-              onClick={() => setIsModalOpen(true)}
+              onClick={openModal}
             >
               <Icon icon="ic:outline-plus" />
               Tambah Rencana
@@ -42,8 +47,9 @@ const GoalSavingView = ({
           {isModalOpen && (
             <Modal
               isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
+              onClose={closeModal}
               title="Tambah Rencana Tabungan"
+              onSubmit={handleFormSubmit}
             >
               <form>
                 <div className="mb-3">
@@ -67,7 +73,7 @@ const GoalSavingView = ({
                     type="number"
                     id="saldo"
                     placeholder="Rp 0.00"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </form>
@@ -171,7 +177,10 @@ const GoalSavingView = ({
                 );
               })}
             </div>
-
+            <SuccessPopup
+              isOpen={isSuccessPopupOpen}
+              onClose={closeSuccessPopup}
+            />
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

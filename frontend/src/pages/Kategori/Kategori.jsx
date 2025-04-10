@@ -4,6 +4,15 @@ import KategoriView from "./KategoriView";
 const Kategori = () => {
   const [filter, setFilter] = useState("Semua");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   const categories = [
     { id: 1, name: "Gajian", type: "Pemasukan" },
@@ -12,7 +21,9 @@ const Kategori = () => {
   ];
 
   const filteredCategories =
-    filter === "Semua" ? categories : categories.filter((category) => category.type === filter);
+    filter === "Semua"
+      ? categories
+      : categories.filter((category) => category.type === filter);
 
   return (
     <KategoriView

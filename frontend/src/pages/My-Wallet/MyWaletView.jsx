@@ -9,11 +9,14 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import api from "../../instance/api";
+import SuccessPopup from "../../components/Popup/SuccessPopup";
 
 const MyWaletView = ({
   closeModal,
   isModalOpen,
   setIsModalOpen,
+  isSuccessPopupOpen,
+  closeSuccessPopup
 }) => {
   const [filter, setFilter] = useState("Semua");
   const [wallets, setWallets] = useState([]);
@@ -114,16 +117,6 @@ const MyWaletView = ({
                 </div>
               </div>
             ))}
-
-            {/* HAPUS CARD TAMBAH DOMPET */}
-            {/* <div className="bg-white p-5 rounded-xl shadow-lg flex items-center justify-center">
-              <button
-                className="bg-blue-600 text-white px-6 py-3 rounded-[16px]"
-                onClick={openModal}
-              >
-                Tambah Kartu
-              </button>
-            </div> */}
           </div>
         </div>
       </div>
@@ -177,6 +170,10 @@ const MyWaletView = ({
             />
           </div>
         </Modal>
+        <SuccessPopup
+            isOpen={isSuccessPopupOpen}
+            onClose={closeSuccessPopup} // Fungsi saat tombol 'Selesai' atau 'X' diklik
+        />
       </div>
     </div>
   );

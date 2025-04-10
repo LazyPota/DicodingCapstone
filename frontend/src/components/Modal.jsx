@@ -3,11 +3,21 @@ import React from "react";
 const Modal = ({ isOpen, onClose, title, children, onSubmit }) => {
   if (!isOpen) return null;
 
+  const handleContentClick = (e) => {
+    e.stopPropagation();
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white p-6 rounded-lg shadow-lg w-[400px]"
+        onClick={handleContentClick}
+      >
         <h2 className="text-xl font-bold mb-4">{title}</h2>
-        
+
         <form onSubmit={onSubmit}>
           {children}
           <div className="flex justify-center mt-4 space-x-[39px]">
