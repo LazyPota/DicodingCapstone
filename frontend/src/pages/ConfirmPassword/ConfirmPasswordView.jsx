@@ -4,7 +4,15 @@ import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 
-const ConfirmPasswordView = ({ showPassword, setShowPassword }) => {
+const ConfirmPasswordView = ({
+  showPassword,
+  setShowPassword,
+  password,
+  setPassword,
+  confirmPassword,
+  setConfirmPassword,
+  handleChangePassword
+}) => {
   return (
     <main className="relative flex min-h-[140vh] md:p-2">
       <header className="absolute top-4 left-4">
@@ -28,7 +36,7 @@ const ConfirmPasswordView = ({ showPassword, setShowPassword }) => {
           <p className="text-[18px] font-normal font-inter text-[#969696] mt-2 text-center lg:text-left">
             Buat Kata Sandi Baru Untuk Akunmu
           </p>
-          <form className="mt-3 flex flex-col space-y-[20px]" noValidate>
+          <form className="mt-3 flex flex-col space-y-[20px]" noValidate onSubmit={handleChangePassword}>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -38,6 +46,8 @@ const ConfirmPasswordView = ({ showPassword, setShowPassword }) => {
                 placeholder=" "
                 required
                 aria-required="true"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <label
                 htmlFor="password"
@@ -67,15 +77,17 @@ const ConfirmPasswordView = ({ showPassword, setShowPassword }) => {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                id="password"
-                name="password"
+                id="confirm_password"
+                name="confirm_password"
                 className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
                 placeholder=" "
                 required
                 aria-required="true"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
               <label
-                htmlFor="password"
+                htmlFor="confirm_password"
                 className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600"
               >
                 Ulang Kata Sandi baru

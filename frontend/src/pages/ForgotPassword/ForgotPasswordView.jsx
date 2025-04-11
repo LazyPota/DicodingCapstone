@@ -4,7 +4,7 @@ import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 
-const ForgotPasswordView = () => {
+const ForgotPasswordView = ({handleSendEmail, setEmail, email}) => {
   return (
     <main className="relative flex min-h-[140vh] md:p-2">
       <header className="absolute top-4 left-4">
@@ -28,7 +28,7 @@ const ForgotPasswordView = () => {
           <p className="text-[18px] font-normal font-inter text-[#969696] mt-2 text-center lg:text-left">
             Masukkan alamat email untuk mengatur ulang kata sandi.
           </p>
-          <form className="mt-3 flex flex-col space-y-[20px]" noValidate>
+          <form className="mt-3 flex flex-col space-y-[20px]" noValidate onSubmit={handleSendEmail}>
             <div className="relative">
               <input
                 type="email"
@@ -38,6 +38,8 @@ const ForgotPasswordView = () => {
                 placeholder=" "
                 required
                 aria-required="true"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <label
                 htmlFor="email"
