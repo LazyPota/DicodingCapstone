@@ -10,7 +10,7 @@ export const getCategories = createAsyncThunk(
         return rejectWithValue("User tidak terautentikasi");
       }
       const response = await api.get(`/capstone/user/${userId}/categories/`);
-      return response.data;
+      return response.data.result;
     } catch (error) {
       const message =
         error.response?.data?.message ||

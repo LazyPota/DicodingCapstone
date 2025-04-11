@@ -11,6 +11,7 @@ const KategoriView = ({
   onAddClick,
   onEditClick,
   onDeleteClick,
+  displayCategoryType,
 }) => {
   return (
     <div className="flex h-screen">
@@ -90,22 +91,22 @@ const KategoriView = ({
                               <Icon icon={iconName} />
                             </span>
                             <span className="text-gray-800">
-                              {category.category_type}
+                              {displayCategoryType(category.category_type)}
                             </span>
                           </div>
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex space-x-2 text-[20px]">
                             <button
-                              onClick={() => onDeleteClick(category.id)} 
-                              disabled={isLoading} 
+                              onClick={() => onDeleteClick(category.id)}
+                              disabled={isLoading}
                               className="bg-red-500 hover:bg-red-700 text-white p-3 rounded-full transition-colors duration-150 disabled:opacity-50"
                               aria-label="Hapus"
                             >
                               <Icon icon="ic:outline-delete" />
                             </button>
                             <button
-                              onClick={() => onEditClick(category)} 
+                              onClick={() => onEditClick(category)}
                               disabled={isLoading}
                               className="text-white bg-green-500 hover:bg-green-700 transition-colors duration-150 rounded-full p-3 disabled:opacity-50"
                               aria-label="Edit"
@@ -122,8 +123,6 @@ const KategoriView = ({
             </table>
           )}
         </div>
-
-        {/* Modal dipindahkan ke Kategori.jsx */}
       </div>
     </div>
   );

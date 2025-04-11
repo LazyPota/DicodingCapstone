@@ -54,6 +54,15 @@ const Kategori = () => {
     return category.category_type === filter;
   });
 
+  const displayCategoryType = (typeValue) => {
+    if (typeValue === "Income") {
+      return "Pemasukan";
+    } else if (typeValue === "Expense") {
+      return "Pengeluaran";
+    }
+    return typeValue;
+  };
+
   const handleOpenAddModal = () => {
     setModalMode("add");
     setCurrentCategory(null);
@@ -122,6 +131,7 @@ const Kategori = () => {
         onEditClick={handleOpenEditModal}
         onDeleteClick={handleDelete}
         isModalOpen={isModalOpen}
+        displayCategoryType={displayCategoryType}
       />
       <Modal
         isOpen={isModalOpen}
