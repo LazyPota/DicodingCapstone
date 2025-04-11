@@ -4,7 +4,12 @@ import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 
-const VerificationView = () => {
+const VerificationView = ({
+  handleChange,
+  handleSendCode,
+  inputsRef,
+}) => {
+
   return (
     <main className="relative flex min-h-[140vh] md:p-2">
       <header className="absolute top-4 left-4">
@@ -28,23 +33,19 @@ const VerificationView = () => {
           <p className="text-[18px] font-normal font-inter text-[#969696] mt-2 text-center lg:text-left">
             Kode Autentikasi Sudah Dikirim Ke Email.
           </p>
-          <form className="mt-3 flex flex-col space-y-[20px]" noValidate>
-            <div className="relative">
-              <input
-                type="text"
-                id="verifikasi"
-                name="verifikasi"
-                className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
-                placeholder=" "
-                required
-                aria-required="true"
-              />
-              <label
-                htmlFor="verifikasi"
-                className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600"
-              >
-                Masukan Kode
-              </label>
+          <form className="mt-3 flex flex-col space-y-[20px]" noValidate onSubmit={handleSendCode}>
+            <div className="flex justify-between gap-2">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <input
+                  key={idx}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  ref={(el) => (inputsRef.current[idx] = el)}
+                  onChange={(e) => handleChange(e, idx)}
+                  className="w-12 h-12 md:w-14 md:h-14 text-center text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 no-spinner"
+                />
+              ))}
             </div>
             <div className="flex flex-col items-center space-y-4 w-full pt-4">
               <button
@@ -74,7 +75,7 @@ const VerificationView = () => {
             </div>
           </form>
           <p className="text-gray-500 text-[16px] font-medium font-inter text-center mt-[32px]">
-            Sudah Punya Akun?{" "}
+            Sudah Punya Akun? {" "}
             <Link
               to="/login"
               className="text-blue-600 font-semibold font-inter underline hover:text-blue-800"
