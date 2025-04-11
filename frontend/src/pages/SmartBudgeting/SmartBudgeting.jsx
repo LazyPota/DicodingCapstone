@@ -1,116 +1,286 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  getBudgets,
+  createBudget,
+  updateBudget, // <-- Import updateBudget
+  resetBudgetState,
+} from "../../features/budgets/budgetSlice";
+import { getCategories } from "../../features/categories/categorySlice";
 import SmartBudgetingView from "./SmartBudgetingView";
-
-const savingsBudgeting = [
-  {
-    title: "Umrah Sekeluarga",
-    current: 20000000,
-    target: 24000000,
-  },
-  {
-    title: "Beli Rumah 3 Tingkat",
-    current: 50000000,
-    target: 200000000,
-  },
-  {
-    title: "Beli HP 16 Promax",
-    current: 15000000,
-    target: 25000000,
-  },
-  {
-    title: "Liburan ke Jogja",
-    current: 4500000,
-    target: 6000000,
-  },
-];
+import Modal from "../../components/Modal";
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 const SmartBudgeting = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tipeKartu, setTipeKartu] = useState("");
+  const [modalMode, setModalMode] = useState("add"); // <-- Tambah state mode
+  const [currentBudget, setCurrentBudget] = useState(null); // <-- State untuk budget yg diedit
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = savingsBudgeting.slice(
-    indexOfFirstItem,
-    indexOfLastItem
+  const [formData, setFormData] = useState({
+    category_id: "",
+    amount: "",
+    period: "Monthly",
+  });
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { user } = useSelector((state) => state.auth);
+  const { budgets, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.budgets
   );
-  const totalPages = Math.ceil(savingsBudgeting.length / itemsPerPage);
+  const { categories: availableCategories } = useSelector(
+    (state) => state.categories
+  );
+
+  useEffect(() => {
+    if (!user?.id) {
+      console.log("User ID tidak ditemukan.");
+      navigate("/login");
+      return;
+    }
+    dispatch(getBudgets(user.id));
+    if (!availableCategories || availableCategories.length === 0) {
+      dispatch(getCategories(user.id));
+    }
+  }, [dispatch, user?.id, navigate, availableCategories]);
+
+  useEffect(() => {
+    if (isError) {
+      alert(`Error: ${message}`);
+      dispatch(resetBudgetState());
+    }
+    if (isSuccess && message) {
+      setIsModalOpen(false);
+      setFormData({ category_id: "", amount: "", period: "Monthly" });
+      setCurrentBudget(null); // <-- Reset currentBudget
+      setModalMode("add"); // <-- Reset mode
+      alert(message);
+      dispatch(resetBudgetState());
+    }
+  }, [isError, isSuccess, message, dispatch]);
+
+  const safeBudgets = useMemo(
+    () => (Array.isArray(budgets) ? budgets : []),
+    [budgets]
+  );
 
   const budgetSummary = useMemo(() => {
-    const totalTarget = savingsBudgeting.reduce(
-      (sum, goal) => sum + goal.target,
+    const totalTarget = safeBudgets.reduce(
+      (sum, budget) => sum + (budget.amount || 0),
       0
     );
-    const totalCurrent = savingsBudgeting.reduce(
-      (sum, goal) => sum + goal.current,
+    const totalCurrent = safeBudgets.reduce(
+      (sum, budget) => sum + (budget.spent_amount || 0),
       0
     );
     const sisa = totalTarget - totalCurrent;
     const percentage =
       totalTarget > 0 ? Math.round((totalCurrent / totalTarget) * 100) : 0;
-
     return {
       totalAnggaran: totalTarget,
       totalTercapai: totalCurrent,
       sisaAnggaran: sisa,
-      persentase: percentage,
+      persentase: percentage > 100 ? 100 : percentage,
     };
-  }, [savingsBudgeting]);
+  }, [safeBudgets]);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = safeBudgets.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(safeBudgets.length / itemsPerPage);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
+  const openModal = () => {
+    setModalMode("add"); // <-- Set mode tambah
+    setCurrentBudget(null); // <-- Pastikan null saat tambah
+    setFormData({ category_id: "", amount: "", period: "Monthly" });
+    setIsModalOpen(true);
+  };
+
+  // --- TAMBAHKAN HANDLER OPEN EDIT MODAL ---
+  const handleOpenEditModal = (budget) => {
+    setModalMode("edit"); // <-- Set mode edit
+    setCurrentBudget(budget); // <-- Simpan budget yg diedit
+    // Isi form dengan data budget yg ada
+    // Sesuaikan field jika perlu (misal budget.category_id)
+    setFormData({
+      category_id: budget.category_id || "",
+      amount: budget.amount || "",
+      period: budget.period || "Monthly",
+    });
+    setIsModalOpen(true);
+  };
+  // --- AKHIR HANDLER OPEN EDIT MODAL ---
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setCurrentBudget(null); // <-- Reset saat tutup
+    setModalMode("add"); // <-- Reset mode
+    // dispatch(resetBudgetState());
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]:
+        name === "amount" || name === "category_id"
+          ? parseFloat(value) || ""
+          : value,
+    }));
+  };
+
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
+    if (!user?.id) return;
+
+    if (!formData.category_id || !formData.amount) {
+      alert("Kategori dan Jumlah Anggaran wajib diisi.");
+      return;
+    }
+
+    // Data untuk dikirim (bisa berbeda untuk create vs update)
+    let budgetData = {};
+    if (modalMode === "add") {
+      budgetData = {
+        category_id: Number(formData.category_id),
+        amount: parseFloat(formData.amount),
+        period: formData.period,
+        wallet_id: 1, // <-- MASIH HARDCODED!
+      };
+      console.log("Submitting create budget data:", budgetData);
+      dispatch(createBudget({ userId: user.id, budgetData }));
+    } else if (modalMode === "edit" && currentBudget) {
+      // Untuk update, hanya kirim field yg bisa diubah sesuai backend API
+      budgetData = {
+        amount: parseFloat(formData.amount),
+        period: formData.period,
+        // start_date mungkin perlu jika period diubah? Cek logic backend
+      };
+      console.log("Submitting update budget data:", budgetData);
+      // Sesuaikan currentBudget.id jika field ID beda
+      dispatch(
+        updateBudget({
+          userId: user.id,
+          budgetId: currentBudget.id,
+          budgetData,
+        })
+      );
+    }
+  };
+
+  // Delete handler jika perlu
+  // const handleDelete = ...
+
   const formatCurrencyShort = (value) => {
+    if (typeof value !== "number") return "Rp. -";
     if (value >= 1000000000) {
-      const num = value / 1000000000;
-      const formattedNum = num.toLocaleString("id-ID", {
+      return `Rp. ${(value / 1000000000).toLocaleString("id-ID", {
         minimumFractionDigits: 0,
         maximumFractionDigits: 1,
-      });
-      return `Rp. ${formattedNum} M`;
+      })} M`;
     } else if (value >= 1000000) {
-      const num = value / 1000000;
-      const formattedNum = num.toLocaleString("id-ID", {
+      return `Rp. ${(value / 1000000).toLocaleString("id-ID", {
         minimumFractionDigits: 0,
         maximumFractionDigits: 1,
-      });
-      return `Rp. ${formattedNum} jt`;
+      })} jt`;
     } else {
       return `Rp. ${value.toLocaleString("id-ID")}`;
     }
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
   return (
-    <div>
+    <>
       <SmartBudgetingView
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-        openModal={openModal}
-        closeModal={closeModal}
-        tipeKartu={tipeKartu}
-        setTipeKartu={setTipeKartu}
-        setCurrentPage={setCurrentPage}
+        isLoading={isLoading}
         currentItems={currentItems}
-        totalPages={totalPages}
         formatCurrencyShort={formatCurrencyShort}
-        savingsGoals={savingsBudgeting}
         currentPage={currentPage}
+        totalPages={totalPages}
         handlePageChange={handlePageChange}
+        openModal={openModal} // Tetap openModal untuk tombol tambah
+        onEditBudget={handleOpenEditModal} // <-- Kirim handler edit baru
+        // onDeleteBudget={handleDelete} // <-- Kirim handler delete jika ada
         totalAnggaran={budgetSummary.totalAnggaran}
         totalTercapai={budgetSummary.totalTercapai}
         sisaAnggaran={budgetSummary.sisaAnggaran}
         persentaseAnggaran={budgetSummary.persentase}
       />
-    </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={
+          modalMode === "add"
+            ? "Tambah Rencana Anggaran"
+            : "Edit Rencana Anggaran"
+        } // <-- Title dinamis
+        onSubmit={handleFormSubmit}
+        isLoading={isLoading}
+        submitLabel={modalMode === "add" ? "Tambah" : "Simpan Perubahan"} // <-- Label tombol dinamis
+      >
+        <>
+          <div className="mb-4 relative">
+            <label htmlFor="category_id" className="block text-sm font-medium">
+              Kategori
+            </label>
+            <select
+              id="category_id"
+              name="category_id"
+              value={formData.category_id}
+              onChange={handleFormChange}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 appearance-none pr-8 bg-white mt-2 ${
+                formData.category_id === "" ? "text-gray-400" : "text-gray-900"
+              }`}
+              required
+              // Disable kategori saat mode edit
+              disabled={isLoading || modalMode === "edit"}
+            >
+              <option value="" disabled>
+                Pilih Kategori...
+              </option>
+              {availableCategories &&
+                availableCategories
+                  .filter((cat) => cat.category_type === "Expense")
+                  .map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.category_name}
+                    </option>
+                  ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 top-6 flex items-center px-2 pointer-events-none">
+              <Icon
+                icon="heroicons:chevron-down"
+                className="text-gray-500 h-4 w-4"
+              />
+            </div>
+          </div>
+          <div className="mb-4">
+            <label htmlFor="amount" className="block text-sm font-medium">
+              Jumlah Anggaran
+            </label>
+            <input
+              id="amount"
+              name="amount"
+              type="number"
+              value={formData.amount}
+              onChange={handleFormChange}
+              placeholder="Rp 0.00"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
+              required
+              min="0"
+              disabled={isLoading}
+            />
+          </div>
+        </>
+      </Modal>
+    </>
   );
 };
 

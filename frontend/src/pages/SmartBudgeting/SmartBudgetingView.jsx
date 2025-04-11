@@ -1,19 +1,14 @@
 import React from "react";
-import SmartBudgeting from "./SmartBudgeting";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import MonthPicker from "../../components/MonthPicker";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { FaChevronDown, FaMedal } from "react-icons/fa";
-import Modal from "../../components/Modal";
+import { FaMedal } from "react-icons/fa";
 import Pagination from "../../components/Pagination";
 
 const SmartBudgetingView = ({
-  isModalOpen,
-  closeModal,
+  isLoading,
   openModal,
-  tipeKartu,
-  setTipeKartu,
   currentItems,
   formatCurrencyShort,
   currentPage,
@@ -23,6 +18,8 @@ const SmartBudgetingView = ({
   totalTercapai,
   sisaAnggaran,
   persentaseAnggaran,
+  onEditBudget, // <-- Terima prop baru
+  // onDeleteBudget, // Jika ada tombol delete
 }) => {
   return (
     <div className="flex h-screen">
@@ -30,7 +27,8 @@ const SmartBudgetingView = ({
       <div className="flex-1 flex flex-col">
         <Header />
         <div className="flex-1 bg-[#F3F4F7] p-7 overflow-auto">
-          <div className="flex flex-row justify-between">
+          {/* ... Header section ... */}
+           <div className="flex flex-row justify-between">
             <div className="flex space-x-4 items-center">
               <MonthPicker />
               <h1 className="font-extrabold text-[24px] text-[#121212]">
@@ -38,14 +36,16 @@ const SmartBudgetingView = ({
               </h1>
             </div>
             <button
-              className="px-4 space-x-2 bg-blue-600 text-white rounded-[16px] font-semibold flex flex-row items-center"
+              className={`px-4 space-x-2 bg-blue-600 text-white rounded-[16px] font-semibold flex flex-row items-center hover:bg-blue-700 disabled:opacity-50 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={openModal}
+              disabled={isLoading}
             >
               <Icon icon="ic:outline-plus" />
-              <span>Tambah Rencana</span>
+              <span>Tambah Anggaran</span>
             </button>
           </div>
 
+          {/* ... Ringkasan ... */}
           <div className="bg-white p-6 rounded-lg mt-5">
             <h2 className="text-[22px] font-extrabold">
               Ringkasan total anggaran
@@ -60,121 +60,87 @@ const SmartBudgetingView = ({
             <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
               <div
                 className="bg-blue-500 h-3 rounded-full"
-                style={{ width: `${persentaseAnggaran}%` }}
+                style={{ width: `${Math.min(100, persentaseAnggaran)}%` }}
               ></div>
               <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
-                {persentaseAnggaran}%
+                 {Math.min(100, persentaseAnggaran)}%
               </span>
             </div>
             <div className="flex items-center mt-[26px]">
               <FaMedal className="text-blue-500 text-[44px] mr-2" />
               <p className="font-semibold text-[20px]">
-                Tercapai:{formatCurrencyShort(totalTercapai)}
+                Tercapai: {formatCurrencyShort(totalTercapai)}
               </p>
             </div>
           </div>
 
+
           {/* Target tiap kategori */}
           <h2 className="mt-6 text-[20px] font-semibold">Anggaran</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            {currentItems.map((budget, index) => {
-              const percentage = Math.round(
-                (budget.current / budget.target) * 100
-              );
-              return (
-                <div
-                  key={index}
-                  className="bg-white p-5 rounded-[16px] border border-[#E2E8F0] space-y-1"
-                >
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">{budget.title}</h3>
-                    <button
-                      className="text-blue-500 px-2 py-1 flex space-x-2 border border-blue-500 rounded-[16px] items-center"
-                      onClick={() => {
-                        console.log(`Edit goal: ${budget.title}`);
-                      }}
+          {!isLoading && currentItems.length === 0 ? (
+             <p className="text-center text-gray-500 mt-4">Belum ada anggaran yang dibuat.</p>
+          ) : (
+             <>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                {currentItems.map((budget) => {
+                  const amount = budget.amount || 0;
+                  const spent = budget.spent_amount || 0;
+                  const percentage = amount > 0 ? Math.round((spent / amount) * 100) : 0;
+
+                  return (
+                    <div
+                      key={budget.id}
+                      className="bg-white p-5 rounded-[16px] border border-[#E2E8F0] space-y-1"
                     >
-                      <span className="text-base">
-                        <Icon icon="ph:pencil-line-fill" />
-                      </span>
-                      <span>Edit</span>
-                    </button>
-                  </div>
-                  <div className="pt-3">
-                    <p className="text-lg font-bold text-blue-500">
-                      {formatCurrencyShort(budget.current)} /{" "}
-                      {formatCurrencyShort(budget.target)}
-                    </p>
-                    <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
-                      <div
-                        className="bg-blue-500 h-3 rounded-full"
-                        style={{ width: `${percentage}%` }}
-                      ></div>
-                      <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
-                        {percentage}%
-                      </span>
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-semibold">{budget.category?.category_name || 'Kategori?'}</h3>
+                        {/* --- TOMBOL EDIT --- */}
+                        <button
+                          className={`text-blue-500 px-2 py-1 flex space-x-2 border border-blue-500 rounded-[16px] items-center hover:bg-blue-100 disabled:opacity-50 ${isLoading ? 'cursor-not-allowed' : ''}`}
+                          onClick={() => onEditBudget(budget)} // <-- Panggil handler edit
+                          disabled={isLoading}
+                        >
+                          <span className="text-base">
+                            <Icon icon="ph:pencil-line-fill" />
+                          </span>
+                          <span>Edit</span>
+                        </button>
+                        {/* --- AKHIR TOMBOL EDIT --- */}
+                      </div>
+                      {/* ... Sisa card ... */}
+                       <div className="pt-3">
+                        <p className="text-lg font-bold text-blue-500">
+                          {formatCurrencyShort(spent)} /{" "}
+                          {formatCurrencyShort(amount)}
+                        </p>
+                        <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
+                          <div
+                            className="bg-blue-500 h-3 rounded-full"
+                            style={{ width: `${Math.min(100, percentage)}%` }}
+                          ></div>
+                          <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
+                             {Math.min(100, percentage)}%
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1 text-right">
+                          Sisa: {formatCurrencyShort(Math.max(0, amount - spent))}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1 text-right">
-                      Sisa: Rp{" "}
-                      {(budget.target - budget.current).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+                  );
+                })}
+              </div>
+               {/* ... Pagination ... */}
+                { totalPages > 1 && !isLoading && (
+                    <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    />
+               )}
+             </>
+          )}
         </div>
-      </div>
-
-      {/* Modal */}
-      <div className="flex flex-col space-y-[20px]">
-        <Modal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          title="Tambah Rencana Anggaran"
-        >
-          <div className="mb-2 relative">
-            <label htmlFor="tipeKartu" className="block text-sm font-medium">
-              Tipe Kartu
-            </label>
-            <select
-              id="tipeKartu"
-              value={tipeKartu}
-              onChange={(e) => setTipeKartu(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 appearance-none pr-8 bg-white mt-2 ${
-                tipeKartu === "" ? "text-gray-400" : "text-gray-900"
-              }`}
-            >
-              <option value="" disabled>
-                Kategori
-              </option>
-              <option value="Debit">Freelance</option>
-              <option value="Kredit">Makan</option>
-              <option value="Prabayar">Gaji Perbulan</option>
-              <option value="Lainnya">Lainnya</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-              <FaChevronDown className="text-gray-500 h-4 w-4" />
-            </div>
-          </div>
-          <div className="mb-2">
-            <label htmlFor="saldo" className="block text-sm font-medium">
-              Jumlah Anggaran
-            </label>
-            <input
-              type="number"
-              id="saldo"
-              placeholder="Rp 0.00"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
-            />
-          </div>
-        </Modal>
       </div>
     </div>
   );
