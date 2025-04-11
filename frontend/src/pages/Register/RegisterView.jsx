@@ -2,17 +2,17 @@ import logo from "../../assets/logoFIX.png";
 import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import "react-datepicker/dist/react-datepicker.css";
+import { Link } from "react-router-dom";
 
 const RegisterView = ({
   setShowPassword,
   showPassword,
   email,
   password,
-  setEmail,
-  setPassword,
   username,
-  setUsername,
   handleRegister,
+  onChange,
+  isLoading,
 }) => {
   return (
     <main className="relative flex min-h-[140vh] p-2">
@@ -47,14 +47,15 @@ const RegisterView = ({
             <div className="relative">
               <input
                 type="text"
-                id="name"
-                name="name"
+                id="username"
+                name="username"
                 className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
                 placeholder=" "
                 required
                 aria-required="true"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={onChange}
+                disabled={isLoading}
               />
               <label className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600">
                 Nama Lengkap
@@ -70,7 +71,8 @@ const RegisterView = ({
                 value={email}
                 required
                 aria-required="true"
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={onChange}
+                disabled={isLoading}
               />
               <label
                 htmlFor="email"
@@ -87,7 +89,8 @@ const RegisterView = ({
                 className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
                 placeholder=" "
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={onChange}
+                disabled={isLoading}
                 required
                 aria-required="true"
               />
@@ -148,12 +151,12 @@ const RegisterView = ({
 
           <p className="text-gray-500 text-[16px] font-medium font-inter text-center mt-[32px]">
             Sudah Punya Akun?{" "}
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="text-blue-600 font-semibold font-inter underline hover:text-blue-800"
             >
               Masuk
-            </a>
+            </Link>
           </p>
         </div>
       </section>

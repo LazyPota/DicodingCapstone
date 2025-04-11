@@ -9,9 +9,9 @@ const LoginView = ({
   showPassword,
   handleLogin,
   email,
-  setEmail,
   password,
-  setPassword,
+  onChange,
+  isLoading
 }) => {
   return (
     <main className="relative flex min-h-[140vh] md:p-2">
@@ -51,7 +51,8 @@ const LoginView = ({
                 value={email}
                 required
                 aria-required="true"
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={onChange} 
+                disabled={isLoading}
               />
               <label
                 htmlFor="email"
@@ -68,7 +69,8 @@ const LoginView = ({
                 className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
                 placeholder=" "
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={onChange} 
+                disabled={isLoading}
                 required
                 aria-required="true"
               />

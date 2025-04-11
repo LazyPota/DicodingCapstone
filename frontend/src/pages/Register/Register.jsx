@@ -1,77 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { registerUser, reset } from "../../features/auth/authSlice";
 import RegisterView from "./RegisterView";
-import api from "../../instance/api";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const { username, email, password } = formData;
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
+
+  const onChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const handleRegister = (e) => {
     e.preventDefault();
-    api
-      .post("/capstone/user/register", {
-        username: username,
-        email: email,
-        password: password,
-      })
-      .then((response) => {
-        console.log("Registrasi Berhasil:", response.data);
-        window.location.href = "/login";
-      })
-      .catch((error) => {
-        console.error(
-          "Error saat registrasi:",
-          error.response || error.request || error.message
-        );
-        if (error.response) {
-          alert(
-            `Registrasi gagal: ${
-              error.response.data.message || error.response.statusText
-            }`
-          );
-        } else {
-          alert("Gagal terhubung ke server.");
-        }
-      });
+    const userData = { username, email, password };
+    dispatch(registerUser(userData));
   };
 
-  // const validateForm = () => {
-  //   const newErrors = {};
-  //   const emailRegex =
-  //     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  useEffect(() => {
+    if (isError) {
+      alert(`Registrasi Gagal: ${message}`);
+    }
 
-  //   if (!name) {
-  //     newErrors.name = "Nama wajib diisi";
-  //   }
-
-  //   if (!email) {
-  //     newErrors.email = "Email wajib diisi";
-  //   } else if (!emailRegex.test(email)) {
-  //     newErrors.email = "Format Email tidak valid";
-  //   }
-
-  //   if (!password) {
-  //     newErrors.password = "Password wajib diisi";
-  //   } else if (!password.length < 8) {
-  //     newErrors.password = "Password minimal harus 8 karakter";
-  //   }
-
-  //   return newErrors;
-  // };
+    if (isSuccess) {
+      alert(message || "Registrasi berhasil! Silakan login.");
+      navigate("/login");
+    }
+    return () => {
+      dispatch(reset());
+    };
+  }, [isError, isSuccess, message, navigate, dispatch]);
 
   return (
     <div>
+      {isLoading && <p>Loading...</p>}
       <RegisterView
         showPassword={showPassword}
         setShowPassword={setShowPassword}
-        password={password}
-        setPassword={setPassword}
-        email={email}
-        setEmail={setEmail}
         username={username}
-        setUsername={setUsername}
+        email={email}
+        password={password}
+        onChange={onChange}
         handleRegister={handleRegister}
       />
     </div>
