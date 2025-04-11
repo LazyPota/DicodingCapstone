@@ -22,8 +22,8 @@ func NewMiddleware() *Middleware {
 }
 
 func (m *Middleware) AuthMiddleware() gin.HandlerFunc {
-	env := config.NewEnv()
-	secretKey := env.JWTSecretKey
+    env := config.NewEnv()
+    secretKey := env.JWTSecretKey
 
 	return func(ctx *gin.Context) {
 		if secretKey == "" {

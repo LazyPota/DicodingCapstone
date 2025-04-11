@@ -4,6 +4,7 @@ import (
 	"backend-capstone/models"
 	"backend-capstone/repository"
 	"backend-capstone/utils"
+	"log"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -32,11 +33,16 @@ type updateCategoryRequest struct {
 }
 
 func (c *CategoryController) GetAllCategories(ctx *gin.Context) {
-	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
-	if err != nil {
-		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
-		return
-	}
+	idParam := ctx.Param("id") // Ambil parameter mentah
+    log.Printf("[GetAllCategories] Received raw ID parameter: '%s'", idParam) // Log parameter mentah
+
+    userID, err := strconv.ParseUint(idParam, 10, 32) // Parse parameter mentah
+    if err != nil {
+        log.Printf("[GetAllCategories] Error parsing User ID '%s': %v", idParam, err) // Log error parsing
+        c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid User ID")
+        return
+    }
+    log.Printf("[GetAllCategories] Parsed User ID: %d", userID) // Log ID setelah parsing sukses
 
 	categories, err := c.categoryRepo.GetAllCategories(uint(userID))
 	if err != nil {
@@ -74,7 +80,7 @@ func (c *CategoryController) CreateCategory(ctx *gin.Context) {
 	if !utils.HandleValidation(ctx, &req, func(ctx *gin.Context, code string, err error) {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, err.Error())
 	}) {
-		return
+		return 
 	}
 
 	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
