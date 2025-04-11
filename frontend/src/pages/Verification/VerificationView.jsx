@@ -5,9 +5,14 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 
 const VerificationView = ({
-  handleChange,
-  handleSendCode,
-  inputsRef,
+  email, 
+  otp, // Terima array otp
+  handleChange, // Terima handler dari container
+  handleKeyDown, // Terima handler dari container
+  inputsRef, 
+  handleVerifyCode, 
+  isLoading, 
+  error, 
 }) => {
 
   return (
@@ -31,9 +36,10 @@ const VerificationView = ({
             Verifikasi Kode
           </h1>
           <p className="text-[18px] font-normal font-inter text-[#969696] mt-2 text-center lg:text-left">
-            Kode Autentikasi Sudah Dikirim Ke Email.
+            Kode Autentikasi Sudah Dikirim Ke {email || "Email Anda"}.
           </p>
-          <form className="mt-3 flex flex-col space-y-[20px]" noValidate onSubmit={handleSendCode}>
+          {error && <p className="text-red-500 text-center mt-2 mb-2">{error}</p>}
+          <form className="mt-3 flex flex-col space-y-[20px]" noValidate onSubmit={handleVerifyCode}>
             <div className="flex justify-between gap-2">
               {Array.from({ length: 6 }).map((_, idx) => (
                 <input
@@ -41,18 +47,26 @@ const VerificationView = ({
                   type="text"
                   inputMode="numeric"
                   maxLength={1}
+                  // Hubungkan ref
                   ref={(el) => (inputsRef.current[idx] = el)}
+                  // Gunakan handler dari props
                   onChange={(e) => handleChange(e, idx)}
+                  onKeyDown={(e) => handleKeyDown(e, idx)}
+                  // Tampilkan digit dari array otp
+                  value={otp[idx]}
                   className="w-12 h-12 md:w-14 md:h-14 text-center text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 no-spinner"
+                  disabled={isLoading}
+                  autoComplete="one-time-code"
                 />
               ))}
             </div>
             <div className="flex flex-col items-center space-y-4 w-full pt-4">
               <button
                 type="submit"
-                className="w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
+                className={`w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                 disabled={isLoading}
               >
-                Verifikasi
+                 {isLoading ? 'Memverifikasi...' : 'Verifikasi Kode'}
               </button>
               <div className="flex items-center w-full">
                 <hr className="flex-grow border-t border-gray-300" />

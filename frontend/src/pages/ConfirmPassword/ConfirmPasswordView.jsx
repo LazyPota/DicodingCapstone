@@ -11,7 +11,9 @@ const ConfirmPasswordView = ({
   setPassword,
   confirmPassword,
   setConfirmPassword,
-  handleChangePassword
+  handleChangePassword,
+  isLoading,
+  error,
 }) => {
   return (
     <main className="relative flex min-h-[140vh] md:p-2">
@@ -24,11 +26,11 @@ const ConfirmPasswordView = ({
       </header>
       <section
         className="flex flex-1 justify-center items-center w-full md:w-1/2 lg:w-1/2 px-4 sm:px-6 lg:px-8"
-        aria-labelledby="login-heading"
+        aria-labelledby="reset-heading"
       >
         <div className="w-full max-w-[450px]">
           <h1
-            id="login-heading"
+            id="reset-heading"
             className="text-3xl md:text-[40px] font-bold font-inter text-center lg:text-left"
           >
             Atur Kata Sandi Baru
@@ -36,7 +38,15 @@ const ConfirmPasswordView = ({
           <p className="text-[18px] font-normal font-inter text-[#969696] mt-2 text-center lg:text-left">
             Buat Kata Sandi Baru Untuk Akunmu
           </p>
-          <form className="mt-3 flex flex-col space-y-[20px]" noValidate onSubmit={handleChangePassword}>
+          {error && (
+            <p className="text-red-500 text-center mt-2 mb-2">{error}</p>
+          )}
+          <form
+            className="mt-3 flex flex-col space-y-[20px]"
+            noValidate
+            onSubmit={handleChangePassword}
+          >
+            {/* Input Password Baru */}
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -47,7 +57,9 @@ const ConfirmPasswordView = ({
                 required
                 aria-required="true"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)} // Gunakan setPassword dari props
+                disabled={isLoading} // Disable saat loading
+                autoComplete="new-password"
               />
               <label
                 htmlFor="password"
@@ -58,10 +70,11 @@ const ConfirmPasswordView = ({
               <button
                 type="button"
                 className="absolute z-10 top-1/2 right-3 -translate-y-1/2 text-gray-500 cursor-pointer"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword(!showPassword)} // Gunakan setShowPassword dari props
                 aria-label={
                   showPassword ? "Sembunyikan password" : "Tampilkan password"
                 }
+                disabled={isLoading} // Disable saat loading
               >
                 {showPassword ? (
                   <Icon
@@ -74,20 +87,23 @@ const ConfirmPasswordView = ({
                 )}
               </button>
             </div>
+            {/* Input Konfirmasi Password Baru */}
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                id="confirm_password"
-                name="confirm_password"
+                id="confirmPassword" // Perbaiki ID
+                name="confirmPassword" // Perbaiki name
                 className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
                 placeholder=" "
                 required
                 aria-required="true"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => setConfirmPassword(e.target.value)} // Gunakan setConfirmPassword dari props
+                disabled={isLoading} // Disable saat loading
+                autoComplete="new-password"
               />
               <label
-                htmlFor="confirm_password"
+                htmlFor="confirmPassword"
                 className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600"
               >
                 Ulang Kata Sandi baru
@@ -95,10 +111,11 @@ const ConfirmPasswordView = ({
               <button
                 type="button"
                 className="absolute z-10 top-1/2 right-3 -translate-y-1/2 text-gray-500 cursor-pointer"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword(!showPassword)} // Gunakan setShowPassword dari props
                 aria-label={
                   showPassword ? "Sembunyikan password" : "Tampilkan password"
                 }
+                disabled={isLoading} // Disable saat loading
               >
                 {showPassword ? (
                   <Icon
@@ -111,12 +128,16 @@ const ConfirmPasswordView = ({
                 )}
               </button>
             </div>
+            {/* Tombol Submit */}
             <div className="flex flex-col items-center space-y-4 w-full pt-4">
               <button
                 type="submit"
-                className="w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
+                className={`w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isLoading} // Disable saat loading
               >
-                Simpan
+                {isLoading ? "Menyimpan..." : "Simpan"} {/* Teks dinamis */}
               </button>
               <div className="flex items-center w-full">
                 <hr className="flex-grow border-t border-gray-300" />

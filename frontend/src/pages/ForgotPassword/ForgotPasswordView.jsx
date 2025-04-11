@@ -4,7 +4,13 @@ import container from "../../assets/container.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 
-const ForgotPasswordView = ({handleSendEmail, setEmail, email}) => {
+const ForgotPasswordView = ({
+  handleSendEmail,
+  setEmail,
+  email,
+  isLoading,
+  error,
+}) => {
   return (
     <main className="relative flex min-h-[140vh] md:p-2">
       <header className="absolute top-4 left-4">
@@ -28,6 +34,7 @@ const ForgotPasswordView = ({handleSendEmail, setEmail, email}) => {
           <p className="text-[18px] font-normal font-inter text-[#969696] mt-2 text-center lg:text-left">
             Masukkan alamat email untuk mengatur ulang kata sandi.
           </p>
+          {error && <p className="text-red-500 text-center mt-2 mb-2">{error}</p>}
           <form className="mt-3 flex flex-col space-y-[20px]" noValidate onSubmit={handleSendEmail}>
             <div className="relative">
               <input
@@ -39,21 +46,21 @@ const ForgotPasswordView = ({handleSendEmail, setEmail, email}) => {
                 required
                 aria-required="true"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)} // Gunakan setEmail dari props
+                disabled={isLoading} // Disable saat loading
+                autoComplete="email" // Tambah autocomplete
               />
-              <label
-                htmlFor="email"
-                className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600"
-              >
+              <label htmlFor="email" className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600">
                 Email
               </label>
             </div>
             <div className="flex flex-col items-center space-y-4 w-full pt-4">
               <button
                 type="submit"
-                className="w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
+                className={`w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={isLoading} // Disable saat loading
               >
-                Selanjutnya
+                {isLoading ? 'Mengirim...' : 'Selanjutnya'} {/* Teks dinamis */}
               </button>
               <div className="flex items-center w-full">
                 <hr className="flex-grow border-t border-gray-300" />

@@ -12,7 +12,7 @@ import Settings from "./pages/Settings/Settings";
 import GoalSaving from "./pages/GoalSaving/GoalSaving";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import Verification from "./pages/Verification/Verification";
-import ForgetPasswordView from "./pages/ConfirmPassword/ConfirmPasswordView";
+import ConfirmPassword from "./pages/ConfirmPassword/ConfirmPassword";
 
 function App() {
   return (
@@ -31,7 +31,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verification" element={<Verification />} />
-        <Route path="/confirm-password" element={<ForgetPasswordView />} />
+        <Route path="/confirm-password" element={<ConfirmPassword />} />
       </Routes>
     </BrowserRouter>
   );

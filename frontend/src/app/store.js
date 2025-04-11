@@ -4,6 +4,7 @@ import authReducer from "../features/auth/authSlice";
 import categoryReducer from "../features/categories/categorySlice";
 import goalSavingReducer from "../features/goal-saving/goalSavingSlice";
 import budgetReducer from "../features/budgets/budgetSlice";
+import passwordResetReducer from "../features/passwordReset/passwordResetSlice"; // <-- 1. Import
 
 export const store = configureStore({
   reducer: {
@@ -11,5 +12,6 @@ export const store = configureStore({
     categories: categoryReducer,
     goalSavings: goalSavingReducer,
     budgets: budgetReducer,
+    passwordReset: passwordResetReducer,
   },
 });
