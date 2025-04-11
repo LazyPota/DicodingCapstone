@@ -4,10 +4,8 @@ import (
 	"backend-capstone/config"
 	"backend-capstone/routes"
 	"fmt"
-	"log"
-	"log" 
 	"time"
-
+	"log"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -16,7 +14,6 @@ import (
 
 func RequestLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.Printf("[REQUEST] Method: %s, Path: %s, Origin: %s\n", c.Request.Method, c.Request.URL.Path, c.Request.Header.Get("Origin"))
 		c.Next();
 	}
 };

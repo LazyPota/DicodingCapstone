@@ -53,6 +53,8 @@ type CodeRequest struct {
 }
 
 type resetPasswordRequest struct {
+	Email              string `json:"email" binding:"required,email"` // <-- Tambah Email
+	Code               string `json:"code" binding:"required"`        // <-- Tambah Kode
 	NewPassword        string `json:"new_password" binding:"required"`
 	NewPasswordConfirm string `json:"new_password_confirm" binding:"required"`
 }
@@ -276,35 +278,57 @@ func (c *UserController) CheckCode(ctx *gin.Context) {
 }
 
 func (c *UserController) ResetPassword(ctx *gin.Context) {
-	var req resetPasswordRequest
+	var req resetPasswordRequest 
+
 	if !utils.HandleValidation(ctx, &req, func(ctx *gin.Context, code string, err error) {
+		log.Printf("[ResetPassword] Validation/Binding Error: %v", err)
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, err.Error())
 	}) {
 		return
 	}
 
 	if req.NewPassword != req.NewPasswordConfirm {
+		log.Printf("[ResetPassword] Passwords do not match for email: %s", req.Email)
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Passwords do not match")
 		return
 	}
 
-	userID := ctx.Param("id")
-	user, err := c.userRepo.GetUserByID(userID)
+	otp, err := c.otpRepo.GetLatestOTPByEmail(req.Email)
 	if err != nil {
-		c.baseController.ResponseJSONError(ctx, Error_NotFound, err.Error())
+		log.Printf("[ResetPassword] Error getting OTP for %s: %v", req.Email, err)
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid email or unable to verify code")
+		return
+	}
+	if otp.Code != req.Code {
+		log.Printf("[ResetPassword] Invalid code for %s. Received: %s, Expected: %s", req.Email, req.Code, otp.Code)
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid verification code")
 		return
 	}
 
-	hashedPassword, err := utils.HashPassword(req.NewPassword)
+	user, err := c.userRepo.GetUserByEmail(req.Email)
 	if err != nil {
+		log.Printf("[ResetPassword] Error getting user by email %s after code validation: %v", req.Email, err)
+		c.baseController.ResponseJSONError(ctx, Error_NotFound, "User not found for the provided email")
+		return
+	}
+    if err := c.otpRepo.DeleteOTPByEmail(req.Email); err != nil {
+		log.Printf("[ResetPassword] Warning: Failed to delete OTP for email %s: %v", req.Email, err)
+    }
+
+    hashedPassword, err := utils.HashPassword(req.NewPassword)
+	if err != nil {
+		log.Printf("[ResetPassword] Error hashing password for user %d: %v", user.ID, err)
 		c.baseController.ResponseJSONError(ctx, Error_InternalServer, "Failed to hash password")
 		return
 	}
 	user.Password = string(hashedPassword)
 
-	if err := c.userRepo.UpdateUser(userID, user); err != nil {
+	if err := c.userRepo.UpdateUser(fmt.Sprint(user.ID), user); err != nil {
+		log.Printf("[ResetPassword] Error updating password for user %d: %v", user.ID, err)
 		c.baseController.ResponseJSONError(ctx, Error_InternalServer, "Failed to update password")
 		return
 	}
-	c.baseController.ResponseJSONUpdated(ctx, gin.H{"message": "Password updated"})
+
+    log.Printf("[ResetPassword] Password successfully updated for user %d (email: %s)", user.ID, user.Email)
+	c.baseController.ResponseJSONUpdated(ctx, gin.H{"message": "Password updated successfully"})
 }
