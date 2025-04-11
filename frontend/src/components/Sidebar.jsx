@@ -1,9 +1,19 @@
 import React from "react";
 import icon from "./../assets/whiteicon.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../features/auth/authSlice";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
+
   return (
     <div className="w-[240px] bg-blue-700 text-white h-screen p-5 flex flex-col justify-between">
       <div>
@@ -83,9 +93,14 @@ const Sidebar = () => {
               <span>Pengaturan</span>
             </Link>
           </li>
-          <li className="flex items-center space-x-2 p-2 bg-red-600 hover:bg-red-800 text-white rounded-md cursor-pointer">
-            <Icon icon="material-symbols:logout" />
-            <span>Keluar</span>
+          <li>
+            <button
+              onClick={handleLogout}
+              className="flex items-center space-x-2 p-2 bg-red-600 hover:bg-red-800 text-white rounded-md cursor-pointer w-full text-left"
+            >
+              <Icon icon="material-symbols:logout" />
+              <span>Keluar</span>
+            </button>
           </li>
         </ul>
       </div>
