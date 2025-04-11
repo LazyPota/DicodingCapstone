@@ -11,10 +11,10 @@ const LoginView = ({
   email,
   password,
   onChange,
-  isLoading
+  isLoading,
 }) => {
   return (
-    <main className="relative flex min-h-[140vh] md:p-2">
+    <main className="relative flex min-h-[50vh] md:p-2">
       <header className="absolute top-4 left-4">
         <img
           src={logo}
@@ -51,7 +51,7 @@ const LoginView = ({
                 value={email}
                 required
                 aria-required="true"
-                onChange={onChange} 
+                onChange={onChange}
                 disabled={isLoading}
               />
               <label
@@ -69,7 +69,7 @@ const LoginView = ({
                 className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
                 placeholder=" "
                 value={password}
-                onChange={onChange} 
+                onChange={onChange}
                 disabled={isLoading}
                 required
                 aria-required="true"

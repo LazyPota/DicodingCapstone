@@ -21,7 +21,10 @@ const GoalSavingView = ({
   handleFormSubmit,
   isSuccessPopupOpen,
   closeSuccessPopup,
+  isLoading,
+  onDeleteGoal,
 }) => {
+  const safeCurrentItems = Array.isArray(currentItems) ? currentItems : [];
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -44,37 +47,41 @@ const GoalSavingView = ({
             </button>
           </div>
 
-          {isModalOpen && (
+          {isModalOpen && safeCurrentItems.length === 0 ? (
+            <p className="text-center text-gray-500 mt-4">
+              Memuat rencana tabungan...
+            </p>
+          ) : (
             <Modal
               isOpen={isModalOpen}
               onClose={closeModal}
               title="Tambah Rencana Tabungan"
               onSubmit={handleFormSubmit}
             >
-                <div className="mb-3">
-                  <label
-                    htmlFor="namaTabungan"
-                    className="block text-sm font-medium"
-                  >
-                    Nama Tabungan
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full border p-2 rounded-md mt-2"
-                    placeholder="Nama Tabungan"
-                  />
-                </div>
-                <div className="mb-2">
-                  <label htmlFor="saldo" className="block text-sm font-medium">
-                    Jumlah Target
-                  </label>
-                  <input
-                    type="number"
-                    id="saldo"
-                    placeholder="Rp 0.00"
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-                  />
-                </div>
+              <div className="mb-3">
+                <label
+                  htmlFor="namaTabungan"
+                  className="block text-sm font-medium"
+                >
+                  Nama Tabungan
+                </label>
+                <input
+                  type="text"
+                  className="w-full border p-2 rounded-md mt-2"
+                  placeholder="Nama Tabungan"
+                />
+              </div>
+              <div className="mb-2">
+                <label htmlFor="saldo" className="block text-sm font-medium">
+                  Jumlah Target
+                </label>
+                <input
+                  type="number"
+                  id="saldo"
+                  placeholder="Rp 0.00"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+                />
+              </div>
             </Modal>
           )}
 
@@ -120,7 +127,7 @@ const GoalSavingView = ({
                     color: "#1E3A8A",
                   },
                 ]}
-                width={600}
+                width={570}
                 height={300}
               />
             </div>
@@ -129,60 +136,89 @@ const GoalSavingView = ({
           {/* Target Tiap Kategori */}
           <div className="mt-6">
             <h2 className="text-[20px] font-semibold">Target Tiap Kategori</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-              {currentItems.map((goal, index) => {
-                const percentage = Math.round(
-                  (goal.current / goal.target) * 100
-                );
-                return (
-                  <div
-                    key={index}
-                    className="bg-white p-5 rounded-[16px] border border-[#E2E8F0] space-y-1"
-                  >
-                    <div className="flex justify-between items-center">
-                      <h3 className="font-semibold">{goal.title}</h3>
-                      <button
-                        className="text-red-500 px-2 py-1 flex space-x-2 border border-red-500 rounded-[16px] items-center"
-                        onClick={() => {
-                          console.log(`Hapus goal: ${goal.title}`);
-                        }}
-                      >
-                        <span className="text-base">
-                          <Icon icon="ph:trash-simple" />
-                        </span>
-                        <span>Hapus</span>
-                      </button>
-                    </div>
-                    <div className="pt-3">
-                      <p className="text-lg font-bold text-blue-500">
-                        {formatCurrencyShort(goal.current)} /{" "}
-                        {formatCurrencyShort(goal.target)}
-                      </p>
-                      <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
+            {/* Gunakan safeCurrentItems untuk pengecekan .length dan .map */}
+            {isLoading && safeCurrentItems.length === 0 ? (
+              <p className="text-center text-gray-500 mt-4">
+                Memuat rencana tabungan...
+              </p>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mt-4">
+                  {safeCurrentItems.length === 0 && !isLoading ? (
+                    <p className="col-span-full text-center text-gray-500">
+                      Belum ada rencana tabungan.
+                    </p>
+                  ) : (
+                    safeCurrentItems.map((goal) => {
+                      // Gunakan safeCurrentItems
+                      const current = goal.current_amount || 0;
+                      const target = goal.target_amount || 1;
+                      const percentage =
+                        target > 0 ? Math.round((current / target) * 100) : 0;
+
+                      return (
                         <div
-                          className="bg-blue-500 h-3 rounded-full"
-                          style={{ width: `${percentage}%` }}
-                        ></div>
-                        <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
-                          {percentage}%
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-500 mt-1 text-right">
-                        Sisa: Rp {(goal.target - goal.current).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                          key={goal.id}
+                          className="bg-white p-5 rounded-[16px] border border-[#E2E8F0] space-y-1"
+                        >
+                          <div className="flex justify-between items-center">
+                            <h3 className="font-semibold">{goal.goal_name}</h3>
+                            <button
+                              className={`text-red-500 px-2 py-1 flex space-x-2 border border-red-500 rounded-[16px] items-center hover:bg-red-100 disabled:opacity-50 ${
+                                isLoading ? "cursor-not-allowed" : ""
+                              }`}
+                              onClick={() => onDeleteGoal(goal.id)}
+                              disabled={isLoading}
+                            >
+                              <span className="text-base">
+                                <Icon icon="ph:trash-simple" />
+                              </span>
+                              <span>Hapus</span>
+                            </button>
+                          </div>
+                          <div className="pt-3">
+                            <p className="text-lg font-bold text-blue-500">
+                              {/* Format nilai dari backend */}
+                              {formatCurrencyShort(current)} /{" "}
+                              {formatCurrencyShort(target)}
+                            </p>
+                            <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
+                              <div
+                                className="bg-blue-500 h-3 rounded-full"
+                                style={{
+                                  width: `${
+                                    percentage > 100 ? 100 : percentage
+                                  }%`,
+                                }} // Batasi maks 100%
+                              ></div>
+                              <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
+                                {percentage}%
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-500 mt-1 text-right">
+                              Sisa:{" "}
+                              {formatCurrencyShort(
+                                Math.max(0, target - current)
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+                {totalPages > 1 && !isLoading && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+              </>
+            )}
             <SuccessPopup
               isOpen={isSuccessPopupOpen}
               onClose={closeSuccessPopup}
-            />
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
             />
           </div>
         </div>
