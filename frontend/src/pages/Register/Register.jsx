@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import RegisterView from "./RegisterView";
 import api from "../../instance/api";
 
@@ -6,30 +6,34 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-
-  useEffect(() => {
-    return () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        window.location.href = "/dashboard";
-      }
-    };
-  }, []);
+  const [username, setUsername] = useState("");
 
   const handleRegister = (e) => {
     e.preventDefault();
     api
-      .post("/register", {
-        name: name,
+      .post("/capstone/user/register", {
+        username: username,
         email: email,
         password: password,
       })
       .then((response) => {
-        console.log(response.data);
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        window.location.href = "/beranda";
+        console.log("Registrasi Berhasil:", response.data);
+        window.location.href = "/login";
+      })
+      .catch((error) => {
+        console.error(
+          "Error saat registrasi:",
+          error.response || error.request || error.message
+        );
+        if (error.response) {
+          alert(
+            `Registrasi gagal: ${
+              error.response.data.message || error.response.statusText
+            }`
+          );
+        } else {
+          alert("Gagal terhubung ke server.");
+        }
       });
   };
 
@@ -66,8 +70,8 @@ const Register = () => {
         setPassword={setPassword}
         email={email}
         setEmail={setEmail}
-        name={name}
-        setName={setName}
+        username={username}
+        setUsername={setUsername}
         handleRegister={handleRegister}
       />
     </div>

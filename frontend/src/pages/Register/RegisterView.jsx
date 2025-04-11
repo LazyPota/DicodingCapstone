@@ -10,8 +10,8 @@ const RegisterView = ({
   password,
   setEmail,
   setPassword,
-  name,
-  setName,
+  username,
+  setUsername,
   handleRegister,
 }) => {
   return (
@@ -53,8 +53,8 @@ const RegisterView = ({
                 placeholder=" "
                 required
                 aria-required="true"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
               <label className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600">
                 Nama Lengkap

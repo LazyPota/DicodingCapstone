@@ -31,10 +31,6 @@ const MyWallet = () => {
     }
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
   const closeModal = () => {
     setIsModalOpen(false);
   };
