@@ -17,7 +17,7 @@ type AllController struct {
 
 func NewAllController(repo *repository.AllRepository, db *gorm.DB, base IBaseController) *AllController {
 	return &AllController{
-		UserController:              NewUserController(repo.UserRepository),
+		UserController:              NewUserController(repo.UserRepository, repo.OTPRepository),
 		CategoryController:          NewCategoryController(repo.CategoryRepository),
 		WalletController:            NewWalletController(repo.WalletRepository),
 		BudgetController:            NewBudgetController(repo.BudgetRepository, repo.TransactionRepository),

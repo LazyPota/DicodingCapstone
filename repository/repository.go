@@ -10,6 +10,7 @@ type AllRepository struct {
 	GoalSavingRepository  GoalSavingRepository
 	TransactionRepository TransactionRepository
 	TransferRepository    TransferRepository
+	OTPRepository		  OTPRepository
 }
 
 func NewAllRepository(db *gorm.DB) *AllRepository {
@@ -21,5 +22,6 @@ func NewAllRepository(db *gorm.DB) *AllRepository {
 		GoalSavingRepository:  NewGoalSavingRepository(db),
 		TransactionRepository: NewTransactionRepository(db),
 		TransferRepository:    NewTransferRepository(db),
+		OTPRepository:         NewOTPRepository(db),
 	}
 }

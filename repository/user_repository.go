@@ -14,6 +14,7 @@ type UserRepository interface {
 	DeleteUser(id string) error
 	ForceDeleteUser(id string) error
 	GetUserByEmail(email string) (*models.User, error)
+	UpdateUserPasswordByEmail(email string, hashedPassword string) error
 }
 
 type userRepository struct {
@@ -58,4 +59,14 @@ func (r *userRepository) GetUserByEmail(email string) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *userRepository) UpdateUserPasswordByEmail(email string, hashedPassword string) error {
+	var user models.User
+	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		return err
+	}
+
+	user.Password = hashedPassword
+	return r.db.Save(&user).Error
 }

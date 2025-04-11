@@ -11,6 +11,10 @@ func InitUserRoutes(r *gin.RouterGroup, ctrl *controller.AllController) {
 
 	authMiddleware := middleware.NewMiddleware()
 
+	r.POST("/send-reset-code", ctrl.UserController.SendResetCode)
+	r.POST("/check-code", ctrl.UserController.CheckCode)
+	r.POST("/reset-password", ctrl.UserController.ResetPassword)
+
 	r.POST("/user/login", ctrl.UserController.Login)
 	r.POST("/user/register", ctrl.UserController.CreateUser)
 

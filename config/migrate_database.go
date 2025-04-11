@@ -16,6 +16,7 @@ func MigrateDatabase(db *gorm.DB) {
 		&models.Budget{},
 		&models.GoalSaving{},
 		&models.Transfer{},
+		&models.OTP{},
 	); err != nil {
 		log.Fatalf("Failed to migrate the database: %v", err)
 	}

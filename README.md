@@ -26,6 +26,8 @@
    ```
    DB_DSN="username:password@tcp(localhost:3306)/urdbname?charset=utf8mb4&parseTime=True&loc=Asia%2FJakarta"
    JWT_SECRET_KEY="URSECREATKEYYASH"
+   EMAIL_SENDER=your_email
+   EMAIL_PASSWORD=xxxx xxxx xxxx xxxx
    ```
    
    Replace `username`, `password`, and `urdbname` with values that match your database configuration.
