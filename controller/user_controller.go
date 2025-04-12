@@ -6,6 +6,9 @@ import (
 	"backend-capstone/utils"
 	"fmt"
 	"log"
+	"net/http"
+	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -59,6 +62,10 @@ type resetPasswordRequest struct {
 	NewPasswordConfirm string `json:"new_password_confirm" binding:"required"`
 }
 
+type updateProfileRequest struct {
+	Username    string `form:"username"`     
+}
+
 func (c *UserController) Login(ctx *gin.Context) {
 	var req loginRequest
 	if !utils.HandleValidation(ctx, &req, func(ctx *gin.Context, code string, err error) {
@@ -91,6 +98,7 @@ func (c *UserController) Login(ctx *gin.Context) {
 			"id":       user.ID,
 			"username": user.Username,
 			"email":    user.Email,
+			"profile_image_path": user.ProfileImagePath,
 		},
 	})
 }
@@ -331,4 +339,98 @@ func (c *UserController) ResetPassword(ctx *gin.Context) {
 
     log.Printf("[ResetPassword] Password successfully updated for user %d (email: %s)", user.ID, user.Email)
 	c.baseController.ResponseJSONUpdated(ctx, gin.H{"message": "Password updated successfully"})
+}
+
+func (c *UserController) UpdateProfile(ctx *gin.Context) {
+	userIDAny, exists := ctx.Get("user_id")
+	if !exists {
+		log.Println("[UpdateProfile] Error: user_id not found in context")
+		c.baseController.ResponseJSONError(ctx, Error_Unauthorized, "User ID not found in token")
+		return
+	}
+    var userID uint
+    switch v := userIDAny.(type) {
+    case float64:
+        userID = uint(v)
+    case uint:
+        userID = v
+    case int:
+        userID = uint(v)
+    default:
+         log.Printf("[UpdateProfile] Error: Invalid type for user_id in context: %T", userIDAny)
+         c.baseController.ResponseJSONError(ctx, Error_InternalServer, "Invalid user ID type in token")
+         return
+    }
+    log.Printf("[UpdateProfile] Updating profile for User ID: %d", userID)
+
+	user, err := c.userRepo.GetUserByID(fmt.Sprint(userID)) 
+	if err != nil {
+        log.Printf("[UpdateProfile] Error getting user %d: %v", userID, err)
+		c.baseController.ResponseJSONError(ctx, Error_NotFound, "User profile not found")
+		return
+	}
+
+    var req updateProfileRequest
+    if err := ctx.ShouldBind(&req); err != nil {
+         log.Printf("[UpdateProfile] Error binding form data for user %d: %v", userID, err)
+         c.baseController.ResponseJSONError(ctx, Error_BadRequest, fmt.Sprintf("Invalid form data: %v", err))
+         return
+    }
+     log.Printf("[UpdateProfile] Received form data: Username='%s'", req.Username)
+
+
+	if req.Username != "" && req.Username != user.Username {
+        log.Printf("[UpdateProfile] Updating username for user %d to '%s'", userID, req.Username)
+		user.Username = req.Username
+	}
+
+    file, header, err := ctx.Request.FormFile("profile_image") 
+    if err == nil {
+        defer file.Close()
+        log.Printf("[UpdateProfile] Received profile image: %s, Size: %d", header.Filename, header.Size)
+
+        ext := filepath.Ext(header.Filename)
+        if ext != ".jpg" && ext != ".jpeg" && ext != ".png" {
+             log.Printf("[UpdateProfile] Invalid file type for user %d: %s", userID, ext)
+             c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid file type. Only JPG, JPEG, PNG allowed.")
+             return
+        }
+
+        filename := fmt.Sprintf("user_%d_profile_%d%s", userID, time.Now().Unix(), ext)
+        filePath := filepath.Join("uploads", "profiles", filename) // Path relatif di server
+
+        if err := ctx.SaveUploadedFile(header, filePath); err != nil {
+             log.Printf("[UpdateProfile] Error saving uploaded file for user %d: %v", userID, err)
+             c.baseController.ResponseJSONError(ctx, Error_InternalServer, "Failed to save profile image")
+             return
+        }
+        log.Printf("[UpdateProfile] Profile image saved to: %s", filePath)
+
+        user.ProfileImagePath = filePath 
+
+    } else if err != http.ErrMissingFile {
+         log.Printf("[UpdateProfile] Error retrieving profile image for user %d: %v", userID, err)
+         c.baseController.ResponseJSONError(ctx, Error_BadRequest, fmt.Sprintf("Error processing profile image: %v", err))
+         return
+    } else {
+        log.Printf("[UpdateProfile] No profile image uploaded for user %d.", userID)
+    }
+
+	if err := c.userRepo.UpdateUser(fmt.Sprint(userID), user); err != nil {
+         log.Printf("[UpdateProfile] Error updating user profile %d in DB: %v", userID, err)
+		c.baseController.ResponseJSONError(ctx, Error_FailedToUpdate, "Failed to update profile")
+		return
+	}
+
+    updatedUserResponse := gin.H{
+        "id": user.ID,
+        "username": user.Username,
+        "email": user.Email,
+        "profile_image_path": user.ProfileImagePath, 
+    }
+    log.Printf("[UpdateProfile] Profile updated successfully for user %d", userID)
+	c.baseController.ResponseJSONUpdated(ctx, gin.H{
+        "message": "Profile updated successfully",
+        "user": updatedUserResponse,
+    })
 }

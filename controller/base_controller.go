@@ -24,6 +24,7 @@ const (
 	Error_InvalidTokenFormat ResponseCode = "ZB4007"
 	Error_InvalidToken       ResponseCode = "ZB4008"
 	Error_ExpiredToken       ResponseCode = "ZB4009"
+	Error_Unauthorized      ResponseCode = "ZB4010"
 
 	Error_FailedToCreate        ResponseCode = "ZB5000"
 	Error_FailedToRetrieve      ResponseCode = "ZB5001"
@@ -52,6 +53,7 @@ var message = map[ResponseCode]string{
 	Error_InvalidTokenFormat: "Invalid Token Format",
 	Error_InvalidToken:       "Invalid Token",
 	Error_ExpiredToken:       "Expired Token",
+	Error_Unauthorized:      "Unauthorized Access",
 
 	Error_FailedToCreate:        "Failed to Create Data",
 	Error_FailedToRetrieve:      "Failed to Retrieve Data",
@@ -80,6 +82,7 @@ var httpStatus = map[ResponseCode]int{
 	Error_InvalidTokenFormat: http.StatusBadRequest,
 	Error_InvalidToken:       http.StatusUnauthorized,
 	Error_ExpiredToken:       http.StatusUnauthorized,
+	Error_Unauthorized:      http.StatusUnauthorized,
 
 	Error_FailedToCreate:        http.StatusInternalServerError,
 	Error_FailedToRetrieve:      http.StatusInternalServerError,
