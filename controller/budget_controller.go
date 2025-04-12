@@ -4,6 +4,8 @@ import (
 	"backend-capstone/models"
 	"backend-capstone/repository"
 	"backend-capstone/utils"
+	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -265,29 +267,52 @@ func (c *BudgetController) DeleteBudget(ctx *gin.Context) {
 func (c *BudgetController) calculateBudgetSpending(userID uint, budget *models.Budget) (float64, error) {
 	var transactions []models.Transaction
 	var err error
+    var startDateString, endDateString string
+
+    // --- GUNAKAN FORMAT YYYY-MM-DD ---
+    const dateFormat = "2006-01-02"
+
+    log.Printf("[CalcSpending] Budget ID: %d, CatID: %d, Period: %s, Amount: %.2f",
+                budget.ID, budget.CategoryID, budget.Period, budget.Amount)
 
 	if budget.Period == models.Daily {
-		today := time.Now().Format("02-01-2006")
+        // --- PERBAIKI FORMAT ---
+		today := time.Now().Format(dateFormat) // <-- Gunakan YYYY-MM-DD
+		log.Printf("[CalcSpending] Getting Daily transactions for %s", today)
 		transactions, err = c.transactionRepo.GetTransactionsByDateAndCategory(userID, budget.CategoryID, today)
 	} else {
+        if budget.StartDate == nil || budget.EndDate == nil {
+             log.Printf("[CalcSpending] Warning: StartDate or EndDate is nil for non-daily budget ID %d", budget.ID)
+             return 0, fmt.Errorf("start or end date missing for budget period %s", budget.Period)
+        }
+        // --- PERBAIKI FORMAT ---
+        startDateString = budget.StartDate.Time.Format(dateFormat) // <-- Gunakan YYYY-MM-DD
+		endDateString = budget.EndDate.Time.Format(dateFormat)   // <-- Gunakan YYYY-MM-DD
+        log.Printf("[CalcSpending] Getting Ranged transactions from %s to %s", startDateString, endDateString)
 		transactions, err = c.transactionRepo.GetTransactionsByDateRangeAndCategory(
-			userID, 
-			budget.CategoryID, 
-			budget.StartDate.Time.Format("02-01-2006"), 
-			budget.EndDate.Time.Format("02-01-2006"),
+			userID,
+			budget.CategoryID,
+			startDateString, // <-- Sekarang mengirim YYYY-MM-DD
+			endDateString,   // <-- Sekarang mengirim YYYY-MM-DD
 		)
 	}
-	
+
 	if err != nil {
+        log.Printf("[CalcSpending] Error getting transactions: %v", err)
 		return 0, err
 	}
+
+    log.Printf("[CalcSpending] Found %d transactions matching criteria.", len(transactions))
 
 	var totalSpent float64
 	for _, transaction := range transactions {
 		if transaction.TransactionType == models.TransactionExpense {
+            log.Printf("[CalcSpending] Adding expense amount: %.2f (Tx ID: %d)", transaction.Amount, transaction.ID)
 			totalSpent += transaction.Amount
-		}
+		} else {
+            log.Printf("[CalcSpending] Skipping non-expense transaction (Type: %s, Tx ID: %d)", transaction.TransactionType, transaction.ID)
+        }
 	}
-
+    log.Printf("[CalcSpending] Calculated total spent: %.2f", totalSpent)
 	return totalSpent, nil
 }
