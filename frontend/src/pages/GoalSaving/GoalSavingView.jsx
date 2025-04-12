@@ -10,7 +10,6 @@ import SuccessPopup from "../../components/Popup/SuccessPopup";
 
 const GoalSavingView = ({
   isModalOpen,
-  data,
   currentItems,
   formatCurrencyShort,
   currentPage,
@@ -23,8 +22,34 @@ const GoalSavingView = ({
   closeSuccessPopup,
   isLoading,
   onDeleteGoal,
+  targetTercapai,
+  onEditGoal,
+  chartData,
+  totalTarget,
 }) => {
   const safeCurrentItems = Array.isArray(currentItems) ? currentItems : [];
+
+  const getProgressBarColor = (percentage) => {
+    const cappedPercentage = Math.min(percentage, 100);
+    if (cappedPercentage < 34) {
+      return "bg-red-500";
+    } else if (cappedPercentage < 67) {
+      return "bg-orange-500";
+    } else {
+      return "bg-blue-500";
+    }
+  };
+  const getPercentageTextColor = (percentage) => {
+    const cappedPercentage = Math.min(percentage, 100);
+    if (cappedPercentage < 34) {
+      return "text-red-600";
+    } else if (cappedPercentage < 67) {
+      return "text-orange-600";
+    } else {
+      return "text-blue-600";
+    }
+  };
+
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -94,7 +119,12 @@ const GoalSavingView = ({
                 </div>
                 <div className="ml-4">
                   <p className="text-[16px] text-[#6B6B6B]">Target Tercapai</p>
-                  <h3 className="text-[24px] font-bold">Rp. 10jt</h3>
+                  <h3 className="text-[24px] font-bold">
+                    {" "}
+                    <h3 className="text-[24px] font-bold">
+                      {formatCurrencyShort(targetTercapai)}
+                    </h3>
+                  </h3>
                 </div>
               </div>
               <div className="bg-white p-5 rounded-[16px] flex items-center w-full h-full">
@@ -104,7 +134,7 @@ const GoalSavingView = ({
                 <div className="ml-4">
                   <p className="text-[16px] text-[#6B6B6B]">Target Bulan Ini</p>
                   <h3 className="text-[24px] font-bold text-black">
-                    Rp. 5.5jt
+                    {formatCurrencyShort(totalTarget)}
                   </h3>
                 </div>
               </div>
@@ -113,30 +143,28 @@ const GoalSavingView = ({
             <div className="md:col-span-2 bg-white rounded-[16px] p-[17px] h-full">
               <h2 className="text-[22px] font-bold">Analitik</h2>
               <BarChart
-                dataset={data}
-                xAxis={[{ scaleType: "band", dataKey: "minggu" }]}
-                series={[
+                dataset={chartData}
+                xAxis={[
                   {
-                    dataKey: "pemasukanBulanIni",
-                    label: "Pemasukan Bulan Ini",
-                    color: "#4F46E5",
-                  },
-                  {
-                    dataKey: "pemasukanBulanLalu",
-                    label: "Pemasukan Bulan Lalu",
-                    color: "#1E3A8A",
+                    scaleType: "band",
+                    dataKey: "name",
+                    tickLabelStyle: { fontSize: 10 },
                   },
                 ]}
-                width={570}
+                yAxis={[{ max: 100 }]}
+                series={[
+                  {
+                    dataKey: "progress",
+                    label: "Persentase Tercapai",
+                    color: "#2563eb",
+                  },
+                ]}
                 height={300}
               />
             </div>
           </div>
-
-          {/* Target Tiap Kategori */}
           <div className="mt-6">
             <h2 className="text-[20px] font-semibold">Target Tiap Kategori</h2>
-            {/* Gunakan safeCurrentItems untuk pengecekan .length dan .map */}
             {isLoading && safeCurrentItems.length === 0 ? (
               <p className="text-center text-gray-500 mt-4">
                 Memuat rencana tabungan...
@@ -150,11 +178,14 @@ const GoalSavingView = ({
                     </p>
                   ) : (
                     safeCurrentItems.map((goal) => {
-                      // Gunakan safeCurrentItems
                       const current = goal.current_amount || 0;
                       const target = goal.target_amount || 1;
                       const percentage =
                         target > 0 ? Math.round((current / target) * 100) : 0;
+                      const progressBarColorClass =
+                        getProgressBarColor(percentage);
+                      const percentageTextColorClass =
+                        getPercentageTextColor(percentage);
 
                       return (
                         <div
@@ -163,35 +194,44 @@ const GoalSavingView = ({
                         >
                           <div className="flex justify-between items-center">
                             <h3 className="font-semibold">{goal.goal_name}</h3>
-                            <button
-                              className={`text-red-500 px-2 py-1 flex space-x-2 border border-red-500 rounded-[16px] items-center hover:bg-red-100 disabled:opacity-50 ${
-                                isLoading ? "cursor-not-allowed" : ""
-                              }`}
-                              onClick={() => onDeleteGoal(goal.id)}
-                              disabled={isLoading}
-                            >
-                              <span className="text-base">
+                            <div className="flex space-x-2">
+                              {/* Tombol Edit */}
+                              <button
+                                className={`text-blue-500 px-2 py-2 flex space-x-1 border border-blue-500 rounded-[16px] items-center text-xs hover:bg-blue-100 disabled:opacity-50 ${
+                                  isLoading ? "cursor-not-allowed" : ""
+                                }`}
+                                onClick={() => onEditGoal(goal)}
+                                disabled={isLoading}
+                              >
+                                <Icon icon="ph:pencil-simple-line-fill" />
+                              </button>
+                              {/* Tombol Hapus */}
+                              <button
+                                className={`text-red-500 px-2 py-2 flex space-x-1 border border-red-500 rounded-[16px] items-center text-xs hover:bg-red-100 disabled:opacity-50 ${
+                                  isLoading ? "cursor-not-allowed" : ""
+                                }`}
+                                onClick={() => onDeleteGoal(goal.id)}
+                                disabled={isLoading}
+                              >
                                 <Icon icon="ph:trash-simple" />
-                              </span>
-                              <span>Hapus</span>
-                            </button>
+                              </button>
+                            </div>
                           </div>
                           <div className="pt-3">
                             <p className="text-lg font-bold text-blue-500">
-                              {/* Format nilai dari backend */}
                               {formatCurrencyShort(current)} /{" "}
                               {formatCurrencyShort(target)}
                             </p>
                             <div className="relative w-full bg-gray-200 rounded-full h-3 mt-2">
                               <div
-                                className="bg-blue-500 h-3 rounded-full"
+                                className={`h-3 rounded-full ${progressBarColorClass}`}
                                 style={{
-                                  width: `${
-                                    percentage > 100 ? 100 : percentage
-                                  }%`,
-                                }} // Batasi maks 100%
+                                  width: `${Math.min(100, percentage)}%`,
+                                }}
                               ></div>
-                              <span className="absolute right-0 top-[-30px] text-blue-500 font-semibold">
+                              <span
+                                className={`text-sm font-semibold ${percentageTextColorClass} absolute right-0 top-[-30px] text-blue-500 font-semibold`}
+                              >
                                 {percentage}%
                               </span>
                             </div>

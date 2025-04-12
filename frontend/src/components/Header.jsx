@@ -20,7 +20,7 @@ const Header = () => {
   const userName = user?.username || "Pengguna";
 
   return (
-    <div className="flex justify-between items-center px-8 h-[80px] bg-white shadow-md border-b border-[#DCDCDC] w-full">
+    <div className="flex justify-between items-center px-8 h-[80px] bg-white shadow-md border-b border-[#DCDCDC">
       <div className="flex flex-col">
         <h1 className="text-black font-bold text-[20px]">
           Selamat Datang, {userName}
