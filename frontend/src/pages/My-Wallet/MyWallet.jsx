@@ -1,98 +1,113 @@
 import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  getWallets,
+  createWallet,
+  resetWalletState,
+} from "../../features/wallets/walletSlice";
 import MyWaletView from "./MyWaletView";
-import api from "../../instance/api";
 
 const MyWallet = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [wallets, setWallets] = useState([]);
-  const [walletName, setWalletName] = useState("");
-  const [walletType, setWalletType] = useState("");
-  const [amount, setAmount] = useState("");
   const [filter, setFilter] = useState("Semua");
-
-  const user = JSON.parse(localStorage.getItem("user"));
-
   const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    wallet_name: "",
+    wallet_type: "",
+    amount: "",
+  });
 
-  const closeSuccessPopup = () => {
-    setIsSuccessPopupOpen(false);
-  };
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      closeModal();
-      setIsSuccessPopupOpen(true);
-    } catch (error) {
-      console.error("Submit failed:", error);
-      alert("Gagal menambahkan data!");
+  const { user } = useSelector((state) => state.auth);
+  const { wallets, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.wallets
+  );
+  useEffect(() => {
+    if (!user?.id) {
+      console.log("User ID not found, cannot fetch wallets.");
+      return;
     }
-  };
+    dispatch(getWallets(user.id));
+    dispatch(resetWalletState());
+    return () => {
+      dispatch(resetWalletState());
+    };
+  }, [dispatch, user?.id, navigate]);
+
+  useEffect(() => {
+    if (isSuccess && message.includes("berhasil ditambahkan")) {
+      setIsModalOpen(false);
+      setFormData({ wallet_name: "", wallet_type: "", amount: "" });
+      setIsSuccessPopupOpen(true);
+      dispatch(resetWalletState());
+    }
+    if (isError && message) {
+      alert(`Error: ${message}`);
+      dispatch(resetWalletState());
+    }
+  }, [isSuccess, isError, message, dispatch]);
+
+  // Filtering di frontend
+  const filteredWallets = React.useMemo(() => {
+    const safeWallets = Array.isArray(wallets) ? wallets : [];
+    if (filter === "Semua") return safeWallets;
+    return safeWallets.filter((w) => w.wallet_type === filter);
+  }, [wallets, filter]);
 
   const closeModal = () => {
     setIsModalOpen(false);
   };
 
-  useEffect(() => {
-    fetchWallets();
-  }, []);
+  const closeSuccessPopup = () => {
+    setIsSuccessPopupOpen(false);
+  };
 
-  const fetchWallets = async () => {
-    try {
-      const res = await api.get(`capstone/user/${user.id}/wallets/`);
-      setWallets(res.data.result || []);
-    } catch (err) {
-      console.error("Gagal ambil data wallet:", err);
-    }
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: name === "amount" ? parseFloat(value) || "" : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await api.post(`capstone/user/${user.id}/wallets/`, {
-        wallet_name: walletName,
-        wallet_type: walletType,
-        amount: parseFloat(amount),
-      });
-      fetchWallets();
-      setIsModalOpen(false);
-      setWalletName("");
-      setWalletType("");
-      setAmount("");
-    } catch (err) {
-      console.error("Gagal nambah dompet:", err);
+    if (!user?.id) return;
+
+    if (!formData.wallet_name || !formData.wallet_type || !formData.amount) {
+      alert("Nama, Jenis, dan Saldo Dompet wajib diisi.");
+      return;
     }
+
+    const walletData = {
+      wallet_name: formData.wallet_name,
+      wallet_type: formData.wallet_type,
+      amount: parseFloat(formData.amount),
+    };
+
+    console.log("Dispatching createWallet:", walletData);
+    dispatch(resetWalletState());
+    await dispatch(createWallet({ userId: user.id, walletData }));
   };
 
   return (
-    <div>
-      <MyWaletView
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        closeModal={() => setIsModalOpen(false)}
-        wallets={
-          filter === "Semua"
-            ? wallets
-            : wallets.filter((w) => w.wallet_type === filter)
-        }
-        walletName={walletName}
-        walletType={walletType}
-        amount={amount}
-        setWalletName={setWalletName}
-        setWalletType={setWalletType}
-        setAmount={setAmount}
-        handleSubmit={handleSubmit}
-        filter={filter}
-        setFilter={setFilter}
-        handleFormSubmit={handleFormSubmit}
-        closeSuccessPopup={closeSuccessPopup}
-        isSuccessPopupOpen={isSuccessPopupOpen}
-      />
-    </div>
+    <MyWaletView
+      isModalOpen={isModalOpen}
+      setIsModalOpen={setIsModalOpen}
+      closeModal={closeModal}
+      wallets={filteredWallets}
+      formData={formData}
+      handleFormChange={handleFormChange}
+      handleSubmit={handleSubmit}
+      filter={filter}
+      setFilter={setFilter}
+      isSuccessPopupOpen={isSuccessPopupOpen}
+      closeSuccessPopup={closeSuccessPopup}
+      isLoading={isLoading}
+    />
   );
 };
 

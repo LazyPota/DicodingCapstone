@@ -23,7 +23,7 @@ function App() {
         <Route path="/" element={<Beranda />} />
         <Route path="/beranda" element={<Dashboard />} />
         <Route path="/dompet" element={<MyWallet />} />
-        <Route path="/dompet/detail" element={<WalletDetail />} />
+        <Route path="/dompet/detail/:walletId" element={<WalletDetail />} />
         <Route path="/anggaran" element={<SmartBudgeting />} />
         <Route path="/transaksi" element={<ExpenseTracker />} />
         <Route path="/goal" element={<GoalSaving />} />
