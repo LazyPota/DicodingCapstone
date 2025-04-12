@@ -20,7 +20,7 @@ const Header = () => {
   const userName = user?.username || "Pengguna";
 
   return (
-    <div className="flex justify-between items-center px-8 h-[80px] bg-white shadow-md border-b border-[#DCDCDC">
+    <div className="flex justify-between items-center px-10 h-[80px] bg-white shadow-md border-b border-[#DCDCDC]">
       <div className="flex flex-col">
         <h1 className="text-black font-bold text-[20px]">
           Selamat Datang, {userName}
@@ -30,22 +30,20 @@ const Header = () => {
         </p>
       </div>
 
-      <div className="flex items-center px-8">
-        {user && (
-          <div className="flex items-center space-x-4 cursor-pointer">
-            <img
-              src={profileImageUrl}
-              alt="User"
-              className="w-10 h-10 rounded-full object-cover"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = defaultAvatarPlaceholder;
-              }}
-            />
-            <span className="text-[18px] font-semibold">{userName}</span>
-          </div>
-        )}
-      </div>
+      {user && (
+        <div className="flex items-center space-x-5 cursor-pointer">
+          <img
+            src={profileImageUrl}
+            alt="User"
+            className="w-10 h-10 rounded-full object-cover"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = defaultAvatarPlaceholder;
+            }}
+          />
+          <span className="text-[18px] font-semibold">{userName}</span>
+        </div>
+      )}
     </div>
   );
 };

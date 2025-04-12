@@ -2,6 +2,7 @@ import React from "react";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
 import { Icon } from "@iconify/react";
+import SuccessPopup from "../../components/Popup/SuccessPopup";
 
 const KategoriView = ({
   categories,
@@ -12,6 +13,8 @@ const KategoriView = ({
   onEditClick,
   onDeleteClick,
   displayCategoryType,
+  isSuccessPopupOpen,
+  closeSuccessPopup,
 }) => {
   return (
     <div className="flex h-screen">
@@ -66,7 +69,7 @@ const KategoriView = ({
                   </tr>
                 ) : (
                   categories.map((category, index) => {
-                    const isIncomeType = category.category_type === "Pemasukan";
+                    const isIncomeType = category.category_type === "Income";
                     const iconBg = isIncomeType
                       ? "bg-[#2667FF]"
                       : "bg-[#0A2E6D]";
@@ -122,6 +125,10 @@ const KategoriView = ({
               </tbody>
             </table>
           )}
+          <SuccessPopup
+            isOpen={isSuccessPopupOpen}
+            onClose={closeSuccessPopup}
+          />
         </div>
       </div>
     </div>

@@ -7,7 +7,9 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 const WalletDetailView = ({
   wallet,
   onDelete,
-  isDeleting /*, transactions */,
+  isDeleting,
+  transactions,
+  isLoadingTransactions,
 }) => {
   const displayWalletType = (type) => {
     switch (type) {
@@ -114,7 +116,13 @@ const WalletDetailView = ({
             </div>
 
             {/* Recent Transactions */}
-            <RecentTransactions />
+            <RecentTransactions
+              title={`Histori Transaksi (${wallet.wallet_name})`} // Judul spesifik
+              transactions={transactions} // Data terfilter dari props
+              isLoading={isLoadingTransactions}
+              showWalletColumn={false} // <-- Sembunyikan kolom dompet
+              showSeeAllLink={false}
+            />
           </div>
         </div>
       </div>

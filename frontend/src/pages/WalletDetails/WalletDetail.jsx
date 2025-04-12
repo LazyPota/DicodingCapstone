@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -7,7 +7,7 @@ import {
   resetCurrentWallet,
 } from "../../features/wallets/walletSlice";
 import WalletDetailView from "./WalletDetailView";
-import RecentTransactions from "../../components/RecentTransactions";
+import { getTransactions } from "../../features/transactions/transactionSlice";
 
 const WalletDetail = () => {
   const { walletId } = useParams();
@@ -22,6 +22,9 @@ const WalletDetail = () => {
     message,
     isLoading: isDeleting,
   } = useSelector((state) => state.wallets);
+  const { transactions = [], isLoading: isLoadingTransactions } = useSelector(
+    (state) => state.transactions
+  );
 
   useEffect(() => {
     if (user?.id && walletId) {
@@ -37,6 +40,19 @@ const WalletDetail = () => {
       dispatch(resetCurrentWallet());
     };
   }, [dispatch, user?.id, walletId, navigate]);
+  useEffect(() => {
+    if (user?.id && transactions.length === 0) {
+      dispatch(getTransactions(user.id));
+    }
+  }, [dispatch, user?.id, transactions.length]);
+
+  const walletTransactions = useMemo(() => {
+    const safeTransactions = Array.isArray(transactions) ? transactions : [];
+    const idToFilter = Number(walletId); // Pastikan ID adalah angka
+    return safeTransactions
+      .filter((tx) => tx.wallet_id === idToFilter) // Filter berdasarkan walletId
+      .slice(0, 10); // Ambil beberapa saja untuk detail? Atau semua?
+  }, [transactions, walletId]);
 
   const handleDeleteWallet = async () => {
     if (!user?.id || !walletId) return;
@@ -96,6 +112,8 @@ const WalletDetail = () => {
       wallet={currentWallet}
       onDelete={handleDeleteWallet}
       isDeleting={isDeleting}
+      transactions={walletTransactions} // Kirim data terfilter
+      isLoadingTransactions={isLoadingTransactions} // Kirim status loading global
     />
   );
 };

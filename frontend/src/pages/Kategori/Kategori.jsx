@@ -17,6 +17,7 @@ const Kategori = () => {
   const [modalMode, setModalMode] = useState("add");
   const [currentCategory, setCurrentCategory] = useState(null);
   const [formData, setFormData] = useState({ name: "", type: "Expense" });
+  const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ const Kategori = () => {
       setFormData({ name: "", type: "Expense" });
       setCurrentCategory(null);
       setModalMode("add");
+      setIsSuccessPopupOpen(true)
       dispatch(resetCategoryState());
     }
   }, [isError, isSuccess, message, dispatch]);
@@ -61,6 +63,10 @@ const Kategori = () => {
       return "Pengeluaran";
     }
     return typeValue;
+  };
+
+  const closeSuccessPopup = () => {
+    setIsSuccessPopupOpen(false);
   };
 
   const handleOpenAddModal = () => {
@@ -132,6 +138,8 @@ const Kategori = () => {
         onDeleteClick={handleDelete}
         isModalOpen={isModalOpen}
         displayCategoryType={displayCategoryType}
+        isSuccessPopupOpen={isSuccessPopupOpen}
+        closeSuccessPopup={closeSuccessPopup}
       />
       <Modal
         isOpen={isModalOpen}
