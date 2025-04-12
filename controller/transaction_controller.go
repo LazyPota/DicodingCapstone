@@ -3,6 +3,9 @@ package controller
 import (
 	"backend-capstone/models"
 	"backend-capstone/repository"
+	"bytes"
+	"io"
+	"log"
 	"strconv"
 	"time"
 
@@ -244,12 +247,18 @@ func (c *TransactionController) DeleteTransaction(ctx *gin.Context) {
 
 func (c *TransactionController) CreateTransfer(ctx *gin.Context) {
 	userID, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	bodyBytes, _ := io.ReadAll(ctx.Request.Body)
+    ctx.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes)) 
+    log.Printf("[Handler %s] Raw Request Body: %s", ctx.FullPath(), string(bodyBytes))
 
 	var req createTransferRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
+		log.Printf("[Handler %s] JSON Binding Error: %v", ctx.FullPath(), err)
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, err.Error())
 		return
 	}
+
+	log.Printf("[Handler %s] Request Body Bound: %+v", ctx.FullPath(), req)
 
 	if (req.FromWalletID == nil && req.FromGoalID == nil) || (req.ToWalletID == nil && req.ToGoalID == nil) {
 		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Harus ada sumber dan tujuan transfer")
