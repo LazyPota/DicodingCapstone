@@ -46,7 +46,6 @@ const ConfirmPasswordView = ({
             noValidate
             onSubmit={handleChangePassword}
           >
-            {/* Input Password Baru */}
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -57,8 +56,8 @@ const ConfirmPasswordView = ({
                 required
                 aria-required="true"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)} // Gunakan setPassword dari props
-                disabled={isLoading} // Disable saat loading
+                onChange={(e) => setPassword(e.target.value)} 
+                disabled={isLoading} 
                 autoComplete="new-password"
               />
               <label
@@ -70,11 +69,11 @@ const ConfirmPasswordView = ({
               <button
                 type="button"
                 className="absolute z-10 top-1/2 right-3 -translate-y-1/2 text-gray-500 cursor-pointer"
-                onClick={() => setShowPassword(!showPassword)} // Gunakan setShowPassword dari props
+                onClick={() => setShowPassword(!showPassword)} 
                 aria-label={
                   showPassword ? "Sembunyikan password" : "Tampilkan password"
                 }
-                disabled={isLoading} // Disable saat loading
+                disabled={isLoading} 
               >
                 {showPassword ? (
                   <Icon
@@ -87,19 +86,18 @@ const ConfirmPasswordView = ({
                 )}
               </button>
             </div>
-            {/* Input Konfirmasi Password Baru */}
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                id="confirmPassword" // Perbaiki ID
-                name="confirmPassword" // Perbaiki name
+                id="confirmPassword" 
+                name="confirmPassword" 
                 className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
                 placeholder=" "
                 required
                 aria-required="true"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)} // Gunakan setConfirmPassword dari props
-                disabled={isLoading} // Disable saat loading
+                onChange={(e) => setConfirmPassword(e.target.value)} 
+                disabled={isLoading} 
                 autoComplete="new-password"
               />
               <label
@@ -111,11 +109,11 @@ const ConfirmPasswordView = ({
               <button
                 type="button"
                 className="absolute z-10 top-1/2 right-3 -translate-y-1/2 text-gray-500 cursor-pointer"
-                onClick={() => setShowPassword(!showPassword)} // Gunakan setShowPassword dari props
+                onClick={() => setShowPassword(!showPassword)} 
                 aria-label={
                   showPassword ? "Sembunyikan password" : "Tampilkan password"
                 }
-                disabled={isLoading} // Disable saat loading
+                disabled={isLoading} 
               >
                 {showPassword ? (
                   <Icon
@@ -128,16 +126,15 @@ const ConfirmPasswordView = ({
                 )}
               </button>
             </div>
-            {/* Tombol Submit */}
             <div className="flex flex-col items-center space-y-4 w-full pt-4">
               <button
                 type="submit"
                 className={`w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out ${
                   isLoading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
-                disabled={isLoading} // Disable saat loading
+                disabled={isLoading}
               >
-                {isLoading ? "Menyimpan..." : "Simpan"} {/* Teks dinamis */}
+                {isLoading ? "Menyimpan..." : "Simpan"}
               </button>
               <div className="flex items-center w-full">
                 <hr className="flex-grow border-t border-gray-300" />

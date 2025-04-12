@@ -6,9 +6,9 @@ import { Link } from "react-router-dom";
 
 const VerificationView = ({
   email, 
-  otp, // Terima array otp
-  handleChange, // Terima handler dari container
-  handleKeyDown, // Terima handler dari container
+  otp, 
+  handleChange,
+  handleKeyDown, 
   inputsRef, 
   handleVerifyCode, 
   isLoading, 
@@ -47,12 +47,9 @@ const VerificationView = ({
                   type="text"
                   inputMode="numeric"
                   maxLength={1}
-                  // Hubungkan ref
                   ref={(el) => (inputsRef.current[idx] = el)}
-                  // Gunakan handler dari props
                   onChange={(e) => handleChange(e, idx)}
                   onKeyDown={(e) => handleKeyDown(e, idx)}
-                  // Tampilkan digit dari array otp
                   value={otp[idx]}
                   className="w-12 h-12 md:w-14 md:h-14 text-center text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 no-spinner"
                   disabled={isLoading}

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   getBudgets,
   createBudget,
-  updateBudget, // <-- Import updateBudget
+  updateBudget, 
   resetBudgetState,
 } from "../../features/budgets/budgetSlice";
 import { getCategories } from "../../features/categories/categorySlice";
@@ -14,8 +14,8 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 
 const SmartBudgeting = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState("add"); // <-- Tambah state mode
-  const [currentBudget, setCurrentBudget] = useState(null); // <-- State untuk budget yg diedit
+  const [modalMode, setModalMode] = useState("add"); 
+  const [currentBudget, setCurrentBudget] = useState(null); 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const [formData, setFormData] = useState({
@@ -55,8 +55,8 @@ const SmartBudgeting = () => {
     if (isSuccess && message) {
       setIsModalOpen(false);
       setFormData({ category_id: "", amount: "", period: "Monthly" });
-      setCurrentBudget(null); // <-- Reset currentBudget
-      setModalMode("add"); // <-- Reset mode
+      setCurrentBudget(null); 
+      setModalMode("add"); 
       alert(message);
       dispatch(resetBudgetState());
     }
@@ -97,18 +97,15 @@ const SmartBudgeting = () => {
   };
 
   const openModal = () => {
-    setModalMode("add"); // <-- Set mode tambah
-    setCurrentBudget(null); // <-- Pastikan null saat tambah
+    setModalMode("add"); 
+    setCurrentBudget(null); 
     setFormData({ category_id: "", amount: "", period: "Monthly" });
     setIsModalOpen(true);
   };
 
-  // --- TAMBAHKAN HANDLER OPEN EDIT MODAL ---
   const handleOpenEditModal = (budget) => {
-    setModalMode("edit"); // <-- Set mode edit
-    setCurrentBudget(budget); // <-- Simpan budget yg diedit
-    // Isi form dengan data budget yg ada
-    // Sesuaikan field jika perlu (misal budget.category_id)
+    setModalMode("edit"); 
+    setCurrentBudget(budget); 
     setFormData({
       category_id: budget.category_id || "",
       amount: budget.amount || "",
@@ -116,13 +113,11 @@ const SmartBudgeting = () => {
     });
     setIsModalOpen(true);
   };
-  // --- AKHIR HANDLER OPEN EDIT MODAL ---
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setCurrentBudget(null); // <-- Reset saat tutup
-    setModalMode("add"); // <-- Reset mode
-    // dispatch(resetBudgetState());
+    setCurrentBudget(null); 
+    setModalMode("add"); 
   };
 
   const handleFormChange = (e) => {
@@ -145,26 +140,22 @@ const SmartBudgeting = () => {
       return;
     }
 
-    // Data untuk dikirim (bisa berbeda untuk create vs update)
     let budgetData = {};
     if (modalMode === "add") {
       budgetData = {
         category_id: Number(formData.category_id),
         amount: parseFloat(formData.amount),
         period: formData.period,
-        wallet_id: 1, // <-- MASIH HARDCODED!
+        wallet_id: 1, 
       };
       console.log("Submitting create budget data:", budgetData);
       dispatch(createBudget({ userId: user.id, budgetData }));
     } else if (modalMode === "edit" && currentBudget) {
-      // Untuk update, hanya kirim field yg bisa diubah sesuai backend API
       budgetData = {
         amount: parseFloat(formData.amount),
         period: formData.period,
-        // start_date mungkin perlu jika period diubah? Cek logic backend
       };
       console.log("Submitting update budget data:", budgetData);
-      // Sesuaikan currentBudget.id jika field ID beda
       dispatch(
         updateBudget({
           userId: user.id,
@@ -174,9 +165,6 @@ const SmartBudgeting = () => {
       );
     }
   };
-
-  // Delete handler jika perlu
-  // const handleDelete = ...
 
   const formatCurrencyShort = (value) => {
     if (typeof value !== "number") return "Rp. -";
@@ -204,9 +192,8 @@ const SmartBudgeting = () => {
         currentPage={currentPage}
         totalPages={totalPages}
         handlePageChange={handlePageChange}
-        openModal={openModal} // Tetap openModal untuk tombol tambah
-        onEditBudget={handleOpenEditModal} // <-- Kirim handler edit baru
-        // onDeleteBudget={handleDelete} // <-- Kirim handler delete jika ada
+        openModal={openModal} 
+        onEditBudget={handleOpenEditModal}
         totalAnggaran={budgetSummary.totalAnggaran}
         totalTercapai={budgetSummary.totalTercapai}
         sisaAnggaran={budgetSummary.sisaAnggaran}
@@ -220,7 +207,7 @@ const SmartBudgeting = () => {
           modalMode === "add"
             ? "Tambah Rencana Anggaran"
             : "Edit Rencana Anggaran"
-        } // <-- Title dinamis
+        } 
         onSubmit={handleFormSubmit}
         isLoading={isLoading}
         submitLabel={modalMode === "add" ? "Tambah" : "Simpan Perubahan"} // <-- Label tombol dinamis
@@ -239,7 +226,6 @@ const SmartBudgeting = () => {
                 formData.category_id === "" ? "text-gray-400" : "text-gray-900"
               }`}
               required
-              // Disable kategori saat mode edit
               disabled={isLoading || modalMode === "edit"}
             >
               <option value="" disabled>

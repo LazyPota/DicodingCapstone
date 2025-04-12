@@ -6,7 +6,7 @@ export const sendResetCode = createAsyncThunk(
   async (email, { rejectWithValue }) => {
     try {
       const response = await api.post("/capstone/send-reset-code", { email });
-      return response.data; // Kirim seluruh data respons (termasuk message)
+      return response.data; 
     } catch (error) {
       const message =
         error.response?.data?.message || error.message || "Gagal mengirim kode";
@@ -34,9 +34,7 @@ export const checkCode = createAsyncThunk(
 export const resetPassword = createAsyncThunk(
   "passwordReset/reset",
   async (resetData, { rejectWithValue }) => {
-    // resetData = { email, code, new_password, new_password_confirm }
     try {
-      // URL tidak pakai /:id karena kita identifikasi via email/code di body
       const response = await api.post("/capstone/reset-password", resetData);
       return response.data;
     } catch (error) {
@@ -52,7 +50,7 @@ export const resetPassword = createAsyncThunk(
 const initialState = {
   isLoading: false,
   isError: false,
-  isSuccess: false, // Lebih berguna untuk checkCode dan resetPassword
+  isSuccess: false,
   message: "",
 };
 
@@ -69,7 +67,6 @@ export const passwordResetSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Send Reset Code
       .addCase(sendResetCode.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
@@ -78,7 +75,6 @@ export const passwordResetSlice = createSlice({
       })
       .addCase(sendResetCode.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Tidak set isSuccess=true di sini, biarkan komponen yg handle navigasi
         state.message = action.payload?.message || "Kode berhasil dikirim";
       })
       .addCase(sendResetCode.rejected, (state, action) => {
@@ -86,7 +82,6 @@ export const passwordResetSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
       })
-      // Check Code
       .addCase(checkCode.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
@@ -95,7 +90,7 @@ export const passwordResetSlice = createSlice({
       })
       .addCase(checkCode.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isSuccess = true; // Sukses verifikasi
+        state.isSuccess = true; 
         state.message = action.payload?.message || "Kode valid";
       })
       .addCase(checkCode.rejected, (state, action) => {
@@ -104,7 +99,6 @@ export const passwordResetSlice = createSlice({
         state.isSuccess = false;
         state.message = action.payload;
       })
-      // Reset Password
       .addCase(resetPassword.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
@@ -113,7 +107,7 @@ export const passwordResetSlice = createSlice({
       })
       .addCase(resetPassword.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isSuccess = true; // Sukses reset
+        state.isSuccess = true; 
         state.message = action.payload?.message || "Password berhasil direset";
       })
       .addCase(resetPassword.rejected, (state, action) => {

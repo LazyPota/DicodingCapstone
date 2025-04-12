@@ -46,9 +46,9 @@ const ForgotPasswordView = ({
                 required
                 aria-required="true"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)} // Gunakan setEmail dari props
-                disabled={isLoading} // Disable saat loading
-                autoComplete="email" // Tambah autocomplete
+                onChange={(e) => setEmail(e.target.value)} 
+                disabled={isLoading} 
+                autoComplete="email" 
               />
               <label htmlFor="email" className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600">
                 Email
@@ -58,9 +58,9 @@ const ForgotPasswordView = ({
               <button
                 type="submit"
                 className={`w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={isLoading} // Disable saat loading
+                disabled={isLoading} 
               >
-                {isLoading ? 'Mengirim...' : 'Selanjutnya'} {/* Teks dinamis */}
+                {isLoading ? 'Mengirim...' : 'Selanjutnya'} 
               </button>
               <div className="flex items-center w-full">
                 <hr className="flex-grow border-t border-gray-300" />

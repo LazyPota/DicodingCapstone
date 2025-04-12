@@ -103,7 +103,6 @@ export const budgetSlice = createSlice({
         state.message = action.payload;
         state.budgets = [];
       })
-      // Create
       .addCase(createBudget.pending, (state) => {
         state.isLoading = true;
         state.isSuccess = false;
@@ -112,7 +111,6 @@ export const budgetSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         if (action.payload) {
-            // Hitung spentAmount sementara 0 atau panggil ulang getBudgets
             const newBudget = { ...action.payload, spent_amount: 0 };
             state.budgets.unshift(newBudget);
         }
@@ -144,7 +142,6 @@ export const budgetSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
       })
-      // Delete
       .addCase(deleteBudget.pending, (state) => {
         state.isLoading = true;
         state.isSuccess = false;
@@ -152,7 +149,6 @@ export const budgetSlice = createSlice({
       .addCase(deleteBudget.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        // Sesuaikan 'budget.id' jika field ID beda
         state.budgets = state.budgets.filter((budget) => budget.id !== action.payload);
         state.message = 'Anggaran berhasil dihapus!';
       })
@@ -161,7 +157,6 @@ export const budgetSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
       });
-      // Tambahkan case untuk updateBudget jika perlu
   },
 });
 
