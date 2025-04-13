@@ -2,25 +2,20 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React from "react";
 import { Link } from "react-router-dom";
 
-// Terima props transactions dan isLoading
 const RecentTransactions = ({
-  title = "Transaksi Terbaru", // Judul default
+  title = "Transaksi Terbaru", 
   transactions = [],
   isLoading = false,
-  showWalletColumn = true, // Default tampilkan kolom dompet
+  showWalletColumn = true, 
   showSeeAllLink = true,
 }) => {
-  // Fungsi format mata uang (bisa juga diimpor dari utils)
   const formatCurrency = (value) => {
     if (typeof value !== "number") return "Rp. -";
-    return value.toLocaleString("id-ID"); // Format standar tanpa Rp. di sini
+    return value.toLocaleString("id-ID"); 
   };
 
-  // Fungsi format tanggal (opsional, bisa di-improve)
   const formatDate = (dateString) => {
-    // Asumsi dateString format YYYY-MM-DD
     if (!dateString || !dateString.includes("-")) return "-";
-    // Coba ubah ke format DD Mon YYYY
     const date = new Date(dateString);
     return date.toLocaleDateString("id-ID", {
       day: "numeric",
@@ -30,7 +25,7 @@ const RecentTransactions = ({
   };
 
   return (
-    <div className="bg-white rounded-[16px] p-8">
+    <div className="bg-white rounded-[16px] p-6">
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-[24px] font-bold text-black">{title}</h2>
         {showSeeAllLink && transactions.length > 0 && (
@@ -42,7 +37,7 @@ const RecentTransactions = ({
           </Link>
         )}
       </div>
-      <div className="overflow-x-auto mt-4">
+      <div className="overflow-auto mt-4">
         <table className="w-full min-w-[500px]">
           <thead>
             <tr className="text-left text-[12px] text-[#2B2B2B] tracking-wider border-b">
@@ -75,7 +70,6 @@ const RecentTransactions = ({
             {!isLoading &&
               transactions.map((transaction) => {
                 const isIncome = transaction.transaction_type === "Income";
-                // ... (logika ikon, warna, format) ...
                 const iconBg = isIncome ? "bg-[#2667FF]" : "bg-[#112E73]";
                 const iconColor = isIncome ? "text-white" : "text-white";
                 const iconName = isIncome

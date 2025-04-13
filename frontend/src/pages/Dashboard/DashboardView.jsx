@@ -145,46 +145,36 @@ const DashboardView = ({
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4">
-
-        {/* Kolom untuk Analitik & Transaksi Terbaru */}
-        {/* Span: 1 (mobile/tablet), 2 (desktop) */}
-        <div className="lg:col-span-2 flex flex-col gap-2 h-[357px]"> {/* Tinggi tetap dari style asli Anda */}
-          {/* Card Analitik */}
+        <div className="lg:col-span-2 flex flex-col gap-2 lg:min-h-[307px]">
           <div className="bg-white rounded-[16px] p-[17px]">
             <h2 className="text-[22px] font-bold">Analitik</h2>
-            {/* Wrapper untuk overflow chart - SUDAH ADA */}
             <div className="w-full overflow-x-auto">
-              {chartData && chartData.length > 0 ? (
-                <BarChart
-                  dataset={chartData}
-                  xAxis={[{ scaleType: "band", dataKey: "minggu", tickLabelStyle: { fontSize: 10 } }]}
-                  series={[
-                    { dataKey: "pemasukan", label: "Pemasukan", color: "#2667FF" },
-                    { dataKey: "pengeluaran", label: "Pengeluaran", color: "#112E73" },
-                  ]}
-                  height={350} // Tinggi chart tetap
-                />
-              ) : (
-                <p className="text-center text-gray-500 py-10">
-                  Data analitik belum tersedia untuk periode ini.
-                </p>
-              )}
+              <div style={{ minWidth: '600px' }}>
+                {chartData && chartData.length > 0 ? (
+                  <BarChart
+                    dataset={chartData}
+                    xAxis={[{ scaleType: "band", dataKey: "minggu", tickLabelStyle: { fontSize: 10 } }]}
+                    series={[
+                      { dataKey: "pemasukan", label: "Pemasukan", color: "#2667FF" },
+                      { dataKey: "pengeluaran", label: "Pengeluaran", color: "#112E73" },
+                    ]}
+                    height={350}
+                  />
+                ) : (
+                  <p className="text-center text-gray-500 py-10 h-[350px] flex items-center justify-center">
+                    Data analitik belum tersedia untuk periode ini.
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-
-          {/* Card Transaksi Terbaru */}
-          {/* Komponen RecentTransactions sudah menangani overflow tabel internal */}
-          <RecentTransactions
-            transactions={recentTransactions}
-            isLoading={isLoading}
-            // Anda bisa mengatur prop lain di sini jika perlu, misal:
-            // showWalletColumn={true} // default true
-            // showSeeAllLink={true} // default true
-          />
+          <div className="">
+            <RecentTransactions
+              transactions={recentTransactions}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
-
-        {/* Kolom untuk Rencana Tabungan */}
-        {/* Span: 1 (mobile/tablet), 1 (desktop) */}
         <div className="lg:col-span-1 bg-white rounded-[16px] p-5">
           <div className="flex justify-between items-center">
             <h2 className="text-[20px] font-bold">Rencana Tabungan</h2>
@@ -193,14 +183,16 @@ const DashboardView = ({
             </a>
           </div>
           <div className="mt-4 space-y-4">
-            {/* ... Konten Rencana Tabungan ... */}
             {savingsToShow.length === 0 && !isLoading ? (
               <p className="text-center text-gray-500 py-10">
                 Belum ada rencana tabungan.
               </p>
             ) : (
               savingsToShow.map((item, index) => (
-                <div key={index} className="bg-white border p-4 rounded-[16px] flex items-center gap-4 shadow-sm">
+                <div
+                  key={index}
+                  className="bg-white border p-4 rounded-[16px] flex items-center gap-4 shadow-sm"
+                >
                   <div className="flex-col flex justify-center flex-1 h-[136px]">
                     <p className="font-semibold text-[16px]">{item.name}</p>
                     <div className="flex flex-row items-center justify-between mt-[18px]">
@@ -220,7 +212,9 @@ const DashboardView = ({
                       value={item.percent}
                       className="mt-2 !h-3 rounded-full"
                       sx={{
-                        "& .MuiLinearProgress-bar": { backgroundColor: "#2563EB" },
+                        "& .MuiLinearProgress-bar": {
+                          backgroundColor: "#2563EB",
+                        },
                         backgroundColor: "#BFDBFE",
                       }}
                     />
