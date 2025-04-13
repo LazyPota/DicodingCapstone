@@ -51,8 +51,8 @@ const GoalSavingView = ({
   };
 
   return (
-    <div className="flex-1 bg-[#F3F4F7] p-7 overflow-auto">
-      <div className="flex flex-row justify-between mb-5">
+    <div className="flex-1 bg-[#F3F4F7] p-5 md:p-7 overflow-auto">
+      <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:justify-between md:items-center mb-5">
         <div className="flex space-x-4 items-center">
           <MonthPicker />
           <h1 className="font-extrabold text-[24px] text-[#121212]">
@@ -60,7 +60,7 @@ const GoalSavingView = ({
           </h1>
         </div>
         <button
-          className="z-50 px-4 py-2 bg-blue-600 text-white rounded-[16px] font-semibold flex flex-row items-center space-x-2"
+          className="z-50 px-4 py-2 bg-blue-600 text-white rounded-[16px] font-semibold flex flex-row items-center space-x-2 justify-center"
           onClick={openModal}
         >
           <Icon icon="ic:outline-plus" />
@@ -104,7 +104,7 @@ const GoalSavingView = ({
       )}
 
       {/* Statistik */}
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="flex flex-col gap-5 h-full">
           <div className="bg-white p-5 rounded-[16px] flex items-center w-full h-full">
             <div className="bg-[#2667FF] text-white w-[52px] h-[52px] flex justify-center items-center rounded-lg text-[32px]">
@@ -164,7 +164,7 @@ const GoalSavingView = ({
           </p>
         ) : (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-2">
               {safeCurrentItems.length === 0 && !isLoading ? (
                 <p className="col-span-full text-center text-gray-500">
                   Belum ada rencana tabungan.
