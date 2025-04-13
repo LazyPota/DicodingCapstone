@@ -2,8 +2,6 @@ package repository
 
 import (
 	"backend-capstone/models"
-	"log"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -64,54 +62,38 @@ func (r *transactionRepository) DeleteTransaction(userID, transactionID uint) er
 	return r.db.Where("id = ? AND user_id = ?", transactionID, userID).Delete(&models.Transaction{}).Error
 }
 
-func (r *transactionRepository) GetTransactionsByDateAndCategory(userID uint, categoryID uint, date string) ([]models.Transaction, error) {
+func (r *transactionRepository) GetTransactionsByDateAndCategory(userID uint, categoryID uint, date string) ([]models.Transaction,error) {
 	var transactions []models.Transaction
 	customTime := &models.CustomTime{}
-
-    parsedTime, err := time.Parse("2006-01-02", date)
-    if err != nil {
-        log.Printf("[Repo:DateCat] Error parsing date string '%s': %v", date, err)
-        return nil, err
-    }
-    customTime.Time = parsedTime 
-
-	err = r.db.
-		Preload("Category"). 
+	if err := customTime.UnmarshalJSON([]byte(`"` + date + `"`)); err != nil {
+		return nil, err
+	}
+	
+	err := r.db.
+		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").
 		Where("user_id = ? AND category_id = ? AND DATE(transaction_date) = DATE(?)", userID, categoryID, customTime.Time).
-        Where("transaction_type = ?", models.TransactionExpense). 
 		Find(&transactions).Error
-
-    log.Printf("[Repo:DateCat] Query finished for UID: %d, CatID: %d, Date: %s. Found: %d, Err: %v", userID, categoryID, date, len(transactions), err) 
-
+		
 	return transactions, err
 }
 
 func (r *transactionRepository) GetTransactionsByDateRangeAndCategory(userID uint, categoryID uint, startDate string, endDate string) ([]models.Transaction, error) {
 	var transactions []models.Transaction
-
 	startCustomTime := &models.CustomTime{}
-    parsedStartTime, err := time.Parse("2006-01-02", startDate)
-    if err != nil {
-        log.Printf("[Repo:DateRangeCat] Error parsing start date string '%s': %v", startDate, err)
-        return nil, err
-    }
-    startCustomTime.Time = parsedStartTime
-
+	if err := startCustomTime.UnmarshalJSON([]byte(`"` + startDate + `"`)); err != nil {
+		return nil, err
+	}
+	
 	endCustomTime := &models.CustomTime{}
-    parsedEndTime, err := time.Parse("2006-01-02", endDate)
-     if err != nil {
-        log.Printf("[Repo:DateRangeCat] Error parsing end date string '%s': %v", endDate, err)
-        return nil, err
-    }
-    endCustomTime.Time = parsedEndTime
-	err = r.db.
-		Preload("Category").
-		Where("user_id = ? AND category_id = ? AND DATE(transaction_date) BETWEEN DATE(?) AND DATE(?)",
+	if err := endCustomTime.UnmarshalJSON([]byte(`"` + endDate + `"`)); err != nil {
+		return nil, err
+	}
+	
+	err := r.db.
+		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").
+		Where("user_id = ? AND category_id = ? AND DATE(transaction_date) BETWEEN DATE(?) AND DATE(?)", 
 			userID, categoryID, startCustomTime.Time, endCustomTime.Time).
-        Where("transaction_type = ?", models.TransactionExpense). 
 		Find(&transactions).Error
-
-    log.Printf("[Repo:DateRangeCat] Query finished for UID: %d, CatID: %d, Start: %s, End: %s. Found: %d, Err: %v", userID, categoryID, startDate, endDate, len(transactions), err) 
-
+		
 	return transactions, err
 }
