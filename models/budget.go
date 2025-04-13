@@ -34,7 +34,7 @@ type Budget struct {
 	Period     BudgetPeriod `json:"period" gorm:"type:ENUM('Daily', 'Weekly', 'Monthly', 'Annual');not null"`
 	StartDate  *CustomTime  `json:"start_date"`
 	EndDate    *CustomTime  `json:"end_date"`
-	SpentAmount float64     `json:"spent_amount" gorm:"-"` // Field untuk menyimpan jumlah yang sudah dipakai
+	SpentAmount float64     `json:"spent_amount" gorm:"-"` 
 	CreatedAt  time.Time    `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt  time.Time    `json:"updated_at" gorm:"autoUpdateTime"`
 }

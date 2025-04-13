@@ -12,6 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Pagination struct {
+	CurrentPage int   `json:"current_page"`
+	PerPage     int   `json:"per_page"`
+	TotalItems  int64 `json:"total_items"`
+	TotalPages  int   `json:"total_pages"`
+}
+
 type BudgetController struct {
 	budgetRepo      repository.BudgetRepository
 	transactionRepo repository.TransactionRepository
@@ -38,6 +45,11 @@ type updateBudgetRequest struct {
 	Amount    float64             `json:"amount"`
 	Period    models.BudgetPeriod `json:"period"`
 	StartDate *models.CustomTime  `json:"start_date"`
+}
+
+type budgetsResponse struct {
+	Data       []models.Budget `json:"data"`
+	Pagination Pagination      `json:"pagination"`
 }
 
 func (c *BudgetController) CreateBudget(ctx *gin.Context) {
@@ -110,7 +122,26 @@ func (c *BudgetController) GetAllBudgets(ctx *gin.Context) {
 		return
 	}
 
-	budgets, err := c.budgetRepo.GetAllBudgets(uint(userID))
+	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	perPage, _ := strconv.Atoi(ctx.DefaultQuery("per_page", "10"))
+
+	monthStr := ctx.Query("month")
+	yearStr := ctx.Query("year")
+	
+	month := 0
+	year := 0
+	
+	if monthStr != "" && yearStr != "" {
+		month, _ = strconv.Atoi(monthStr)
+		year, _ = strconv.Atoi(yearStr)
+		
+		if month < 1 || month > 12 || year < 2000 || year > time.Now().Year()+1 {
+			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid month or year")
+			return
+		}
+	}
+
+	budgets, total, err := c.budgetRepo.GetAllBudgets(uint(userID), page, perPage, month, year)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_FailedToRetrieve, err.Error())
 		return
@@ -124,7 +155,22 @@ func (c *BudgetController) GetAllBudgets(ctx *gin.Context) {
 		budgets[i].SpentAmount = spentAmount
 	}
 
-	c.baseController.ResponseJSONRetrieved(ctx, budgets)
+	totalPages := int(total) / perPage
+	if int(total)%perPage > 0 {
+		totalPages++
+	}
+
+	response := budgetsResponse{
+		Data: budgets,
+		Pagination: Pagination{
+			CurrentPage: page,
+			PerPage:     perPage,
+			TotalItems:  total,
+			TotalPages:  totalPages,
+		},
+	}
+
+	c.baseController.ResponseJSONRetrieved(ctx, response)
 }
 
 func (c *BudgetController) GetBudgetByID(ctx *gin.Context) {
@@ -269,15 +315,13 @@ func (c *BudgetController) calculateBudgetSpending(userID uint, budget *models.B
 	var err error
     var startDateString, endDateString string
 
-    // --- GUNAKAN FORMAT YYYY-MM-DD ---
     const dateFormat = "2006-01-02"
 
     log.Printf("[CalcSpending] Budget ID: %d, CatID: %d, Period: %s, Amount: %.2f",
                 budget.ID, budget.CategoryID, budget.Period, budget.Amount)
 
 	if budget.Period == models.Daily {
-        // --- PERBAIKI FORMAT ---
-		today := time.Now().Format(dateFormat) // <-- Gunakan YYYY-MM-DD
+		today := time.Now().Format(dateFormat) 
 		log.Printf("[CalcSpending] Getting Daily transactions for %s", today)
 		transactions, err = c.transactionRepo.GetTransactionsByDateAndCategory(userID, budget.CategoryID, today)
 	} else {
@@ -285,15 +329,14 @@ func (c *BudgetController) calculateBudgetSpending(userID uint, budget *models.B
              log.Printf("[CalcSpending] Warning: StartDate or EndDate is nil for non-daily budget ID %d", budget.ID)
              return 0, fmt.Errorf("start or end date missing for budget period %s", budget.Period)
         }
-        // --- PERBAIKI FORMAT ---
-        startDateString = budget.StartDate.Time.Format(dateFormat) // <-- Gunakan YYYY-MM-DD
-		endDateString = budget.EndDate.Time.Format(dateFormat)   // <-- Gunakan YYYY-MM-DD
+        startDateString = budget.StartDate.Time.Format(dateFormat) 
+		endDateString = budget.EndDate.Time.Format(dateFormat)   
         log.Printf("[CalcSpending] Getting Ranged transactions from %s to %s", startDateString, endDateString)
 		transactions, err = c.transactionRepo.GetTransactionsByDateRangeAndCategory(
 			userID,
 			budget.CategoryID,
-			startDateString, // <-- Sekarang mengirim YYYY-MM-DD
-			endDateString,   // <-- Sekarang mengirim YYYY-MM-DD
+			startDateString, 
+			endDateString,   
 		)
 	}
 

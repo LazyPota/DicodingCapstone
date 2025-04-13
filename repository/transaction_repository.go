@@ -2,6 +2,7 @@ package repository
 
 import (
 	"backend-capstone/models"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -14,6 +15,8 @@ type TransactionRepository interface {
 	DeleteTransaction(userID, transactionID uint) error
 	GetTransactionsByDateAndCategory(userID uint, categoryID uint, date string) ([]models.Transaction, error)
 	GetTransactionsByDateRangeAndCategory(userID uint, categoryID uint, startDate string, endDate string) ([]models.Transaction, error)
+	GetTransferTransactions(userID uint) ([]models.Transaction, error)
+	GetTransactionsByMonthYear(userID uint, month int, year int) ([]models.Transaction, error)
 }
 
 type transactionRepository struct {
@@ -29,27 +32,34 @@ func (r *transactionRepository) CreateTransaction(transaction *models.Transactio
 	if err != nil {
 		return err
 	}
-	return r.db.
-		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").
-		First(transaction, transaction.ID).Error
+	return r.preloadTransaction(r.db).First(transaction, transaction.ID).Error
 }
 
 func (r *transactionRepository) GetAllTransactions(userID uint) ([]models.Transaction, error) {
 	var transactions []models.Transaction
-	err := r.db.
-		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").Where("user_id = ?", userID).Order("created_at DESC").
+	err := r.preloadTransaction(r.db).
+		Where("user_id = ?", userID).Order("created_at DESC").
 		Find(&transactions).Error
 	return transactions, err
 }
 
 func (r *transactionRepository) GetTransactionByID(userID, transactionID uint) (*models.Transaction, error) {
 	var transaction models.Transaction
-	err := r.db.
-		Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").Where("id = ? AND user_id = ?", transactionID, userID).First(&transaction).Error
+	err := r.preloadTransaction(r.db).
+		Where("id = ? AND user_id = ?", transactionID, userID).First(&transaction).Error
 	if err != nil {
 		return nil, err
 	}
 	return &transaction, nil
+}
+
+func (r *transactionRepository) GetTransferTransactions(userID uint) ([]models.Transaction, error) {
+	var transactions []models.Transaction
+	err := r.preloadTransaction(r.db).
+		Where("user_id = ? AND transaction_type = ?", userID, models.TransactionTransfer).
+		Order("created_at DESC").
+		Find(&transactions).Error
+	return transactions, err
 }
 
 func (r *transactionRepository) UpdateTransaction(userID, transactionID uint, transaction *models.Transaction) error {
@@ -96,4 +106,33 @@ func (r *transactionRepository) GetTransactionsByDateRangeAndCategory(userID uin
 		Find(&transactions).Error
 		
 	return transactions, err
+}
+
+func (r *transactionRepository) GetTransactionsByMonthYear(userID uint, month int, year int) ([]models.Transaction, error) {
+	var transactions []models.Transaction
+	
+	startDate := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+	
+	nextMonth := startDate.AddDate(0, 1, 0)
+	endDate := nextMonth.AddDate(0, 0, -1)
+	
+	err := r.preloadTransaction(r.db).
+		Where("user_id = ? AND transaction_date >= ? AND transaction_date <= ?", 
+			userID, startDate, endDate).
+		Order("transaction_date DESC").
+		Find(&transactions).Error
+	
+	return transactions, err
+}
+
+func (r *transactionRepository) preloadTransaction(tx *gorm.DB) *gorm.DB {
+	return tx.
+		Preload("User").
+		Preload("Wallet").Preload("Wallet.User").
+		Preload("Category").Preload("Category.User").
+		Preload("Transfer").
+		Preload("Transfer.FromWallet").
+		Preload("Transfer.ToWallet").
+		Preload("Transfer.FromGoal").
+		Preload("Transfer.ToGoal")
 }

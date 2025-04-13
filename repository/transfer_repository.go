@@ -7,6 +7,7 @@ import (
 
 type TransferRepository interface {
 	CreateTransfer(transfer *models.Transfer) error
+	CreateTransferWithTransaction(transfer *models.Transfer, transaction *models.Transaction) error
 	GetAllTransfers(userID uint) ([]models.Transfer, error)
 	GetTransferByID(userID, transferID uint) (*models.Transfer, error)
 	UpdateTransfer(userID, transferID uint, transfer *models.Transfer) error
@@ -28,6 +29,22 @@ func (r *transferRepository) CreateTransfer(transfer *models.Transfer) error {
 	}
 	return r.preloadTransfer(r.db).
 		First(transfer, transfer.ID).Error
+}
+
+func (r *transferRepository) CreateTransferWithTransaction(transfer *models.Transfer, transaction *models.Transaction) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(transaction).Error; err != nil {
+			return err
+		}
+		
+		transfer.TransactionID = &transaction.ID
+		
+		if err := tx.Create(transfer).Error; err != nil {
+			return err
+		}
+		
+		return r.preloadTransfer(tx).First(transfer, transfer.ID).Error
+	})
 }
 
 func (r *transferRepository) GetAllTransfers(userID uint) ([]models.Transfer, error) {
@@ -62,6 +79,7 @@ func (r *transferRepository) DeleteTransfer(userID, transferID uint) error {
 func (r *transferRepository) preloadTransfer(tx *gorm.DB) *gorm.DB {
 	return tx.
 		Preload("User").
+		Preload("Transaction").  
 		Preload("FromWallet").Preload("FromWallet.User").
 		Preload("FromGoal").Preload("FromGoal.User").
 		Preload("ToWallet").Preload("ToWallet.User").

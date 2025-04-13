@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"backend-capstone/models"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -10,7 +11,7 @@ import (
 type GoalSavingRepository interface {
 	Create(goalSaving *models.GoalSaving) error
 	GetByID(id uint) (*models.GoalSaving, error)
-	GetAllByUserID(userID uint) ([]models.GoalSaving, error)
+	GetAllByUserID(userID uint, page, perPage int, month, year int) ([]models.GoalSaving, int64, error)
 	Update(goalSaving *models.GoalSaving) error
 	Delete(id uint) error
 }
@@ -43,14 +44,31 @@ func (r *goalSavingRepository) GetByID(id uint) (*models.GoalSaving, error) {
 	return &goalSaving, nil
 }
 
-func (r *goalSavingRepository) GetAllByUserID(userID uint) ([]models.GoalSaving, error) {
+func (r *goalSavingRepository) GetAllByUserID(userID uint, page, perPage int, month, year int) ([]models.GoalSaving, int64, error) {
 	var goalSavings []models.GoalSaving
-	if err := r.db.
-		Where("user_id = ?", userID).Preload("User").Order("created_at DESC").
-		Find(&goalSavings).Error; err != nil {
-		return nil, err
+	var total int64
+	query := r.db.Model(&models.GoalSaving{}).Where("user_id = ?", userID)
+
+	if month > 0 && year > 0 {
+		startDate := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+		endDate := startDate.AddDate(0, 1, 0).Add(-time.Second)
+		query = query.Where("created_at >= ? AND created_at <= ?", startDate, endDate)
 	}
-	return goalSavings, nil
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if perPage > 0 && page > 0 {
+		offset := (page - 1) * perPage
+		query = query.Offset(offset).Limit(perPage)
+	}
+
+	if err := query.Preload("User").Order("created_at DESC").Find(&goalSavings).Error; err != nil {
+		return nil, 0, err
+	}
+	
+	return goalSavings, total, nil
 }
 
 func (r *goalSavingRepository) Update(goalSaving *models.GoalSaving) error {

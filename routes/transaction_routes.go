@@ -9,7 +9,7 @@ import (
 
 func InitTransactionRoutes(r *gin.RouterGroup, ctrl *controller.AllController) {
 	authMiddleware := middleware.NewMiddleware()
-	
+
 	transactionGroup := r.Group("/user/:id/transactions", authMiddleware.AuthMiddleware())
 	{
 		transactionGroup.GET("/", ctrl.TransactionController.GetAllTransactions)

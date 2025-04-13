@@ -3,13 +3,14 @@ package repository
 import (
 	"backend-capstone/models"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type BudgetRepository interface {
 	CreateBudget(budget *models.Budget) error
-	GetAllBudgets(userID uint) ([]models.Budget, error)
+	GetAllBudgets(userID uint, page, perPage int, month, year int) ([]models.Budget, int64, error)
 	GetBudgetByID(userID, budgetID uint) (*models.Budget, error)
 	UpdateBudget(userID, budgetID uint, budget *models.Budget) error
 	DeleteBudget(userID, budgetID uint) error
@@ -32,10 +33,36 @@ func (r *budgetRepository) CreateBudget(budget *models.Budget) error {
 	return r.db.Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").First(budget, budget.ID).Error
 }
 
-func (r *budgetRepository) GetAllBudgets(userID uint) ([]models.Budget, error) {
+func (r *budgetRepository) GetAllBudgets(userID uint, page, perPage int, month, year int) ([]models.Budget, int64, error) {
 	var budgets []models.Budget
-	err := r.db.Preload("User").Preload("Wallet").Preload("Wallet.User").Preload("Category").Preload("Category.User").Where("user_id = ?", userID).Order("created_at DESC").Find(&budgets).Error
-	return budgets, err
+	var total int64
+	query := r.db.Model(&models.Budget{}).Where("user_id = ?", userID)
+
+	if month > 0 && year > 0 {
+		startDate := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+		endDate := startDate.AddDate(0, 1, 0).Add(-time.Second)
+		
+		query = query.Where(
+			"(created_at BETWEEN ? AND ?) OR "+
+			"(start_date IS NULL) OR "+
+			"(start_date <= ? AND end_date >= ?)",
+			startDate, endDate, endDate, startDate)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if perPage > 0 && page > 0 {
+		offset := (page - 1) * perPage
+		query = query.Offset(offset).Limit(perPage)
+	}
+
+	err := query.Preload("User").Preload("Wallet").Preload("Wallet.User").
+		Preload("Category").Preload("Category.User").
+		Order("created_at DESC").Find(&budgets).Error
+	
+	return budgets, total, err
 }
 
 func (r *budgetRepository) GetBudgetByID(userID, budgetID uint) (*models.Budget, error) {

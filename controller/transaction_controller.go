@@ -44,7 +44,7 @@ type createTransactionRequest struct {
 	TransactionType models.TransactionType `json:"transaction_type" binding:"required"`
 	Amount          float64                `json:"amount" binding:"required"`
 	TransactionDate models.CustomTime      `json:"transaction_date" binding:"required"`
-	Note            *string                `json:"note"` 
+	Note            *string                `json:"note"`
 }
 
 type updateTransactionRequest struct {
@@ -75,10 +75,21 @@ func (c *TransactionController) CreateTransaction(ctx *gin.Context) {
 		return
 	}
 
+	if (req.TransactionType == models.TransactionIncome || req.TransactionType == models.TransactionExpense) && req.CategoryID == 0 {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Category ID wajib diisi untuk tipe transaksi Income atau Expense")
+		return
+	}
+
+	var categoryID *uint
+	if req.TransactionType != models.TransactionTransfer {
+		categoryIDValue := req.CategoryID
+		categoryID = &categoryIDValue
+	}
+
 	transaction := models.Transaction{
 		UserID:          uint(userID),
 		WalletID:        req.WalletID,
-		CategoryID:      req.CategoryID,
+		CategoryID:      categoryID,
 		TransactionType: req.TransactionType,
 		Amount:          req.Amount,
 		TransactionDate: req.TransactionDate,
@@ -111,8 +122,8 @@ func (c *TransactionController) CreateTransaction(ctx *gin.Context) {
 		return
 	}
 
-	if transaction.TransactionType == models.TransactionExpense {
-		budgets, err := c.budgetRepo.GetBudgetsByCategoryID(uint(userID), transaction.CategoryID)
+	if transaction.TransactionType == models.TransactionExpense && categoryID != nil {
+		budgets, err := c.budgetRepo.GetBudgetsByCategoryID(uint(userID), *categoryID)
 		if err == nil && len(budgets) > 0 {
 			for _, budget := range budgets {
 				if isTransactionInBudgetPeriod(&transaction, &budget) {
@@ -125,7 +136,6 @@ func (c *TransactionController) CreateTransaction(ctx *gin.Context) {
 	c.baseController.ResponseJSONCreated(ctx, transaction)
 }
 
-
 func isTransactionInBudgetPeriod(transaction *models.Transaction, budget *models.Budget) bool {
 	if budget.Period == models.Daily {
 		transactionDate := transaction.TransactionDate.Time
@@ -136,18 +146,36 @@ func isTransactionInBudgetPeriod(transaction *models.Transaction, budget *models
 	}
 
 	transactionDate := transaction.TransactionDate.Time
-	return transactionDate.After(budget.StartDate.Time) && 
-		   transactionDate.Before(budget.EndDate.Time) || 
-		   transactionDate.Equal(budget.StartDate.Time) || 
-		   transactionDate.Equal(budget.EndDate.Time)
+	return transactionDate.After(budget.StartDate.Time) &&
+		transactionDate.Before(budget.EndDate.Time) ||
+		transactionDate.Equal(budget.StartDate.Time) ||
+		transactionDate.Equal(budget.EndDate.Time)
 }
 
 func (c *TransactionController) GetAllTransactions(ctx *gin.Context) {
-	userID, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid user ID")
+		return
+	}
+
+	monthStr := ctx.Query("month")
+	yearStr := ctx.Query("year")
+
+	if monthStr != "" && yearStr != "" {
+		c.GetTransactionsByMonthYear(ctx)
+		return
+	}
+
+	tokenUserID, exist := ctx.Get("user_id")
+	if !exist || tokenUserID.(uint) != uint(userID) {
+		c.baseController.ResponseJSONError(ctx, Error_Forbidden, "You don't have access to this resource")
+		return
+	}
 
 	transactions, err := c.transactionRepo.GetAllTransactions(uint(userID))
 	if err != nil {
-		c.baseController.ResponseJSONError(ctx, Error_FailedToRetrieve, err.Error())
+		c.baseController.ResponseJSONError(ctx, Error_FailedToRetrieve, "Failed to get transactions: "+err.Error())
 		return
 	}
 
@@ -191,20 +219,40 @@ func (c *TransactionController) UpdateTransaction(ctx *gin.Context) {
 	if req.WalletID != 0 {
 		transaction.WalletID = req.WalletID
 	}
+
 	if req.CategoryID != 0 {
-		transaction.CategoryID = req.CategoryID
+		if transaction.TransactionType == models.TransactionTransfer ||
+			(req.TransactionType != "" && req.TransactionType == models.TransactionTransfer) {
+			transaction.CategoryID = nil
+		} else {
+			categoryIDValue := req.CategoryID
+			transaction.CategoryID = &categoryIDValue
+		}
+	} else if req.TransactionType != "" && req.TransactionType == models.TransactionTransfer {
+		transaction.CategoryID = nil
 	}
+
 	if req.TransactionType != "" {
 		transaction.TransactionType = req.TransactionType
 	}
+
 	if req.Amount != 0 {
 		transaction.Amount = req.Amount
 	}
+
 	if !req.TransactionDate.Time.IsZero() {
 		transaction.TransactionDate = req.TransactionDate
 	}
+
 	if req.Note != nil {
 		transaction.Note = req.Note
+	}
+
+	if (transaction.TransactionType == models.TransactionIncome ||
+		transaction.TransactionType == models.TransactionExpense) &&
+		(transaction.CategoryID == nil) {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Category ID wajib diisi untuk tipe transaksi Income atau Expense")
+		return
 	}
 
 	if err := c.transactionRepo.UpdateTransaction(uint(userID), uint(transactionID), transaction); err != nil {
@@ -212,10 +260,20 @@ func (c *TransactionController) UpdateTransaction(ctx *gin.Context) {
 		return
 	}
 
-	if transaction.CategoryID != oldCategoryID || 
-	   transaction.TransactionType != oldTransactionType || 
-	   transaction.Amount != oldAmount ||
-	   transaction.TransactionDate.Time != oldTransactionDate.Time {
+	var oldCategoryIDValue uint
+	if oldCategoryID != nil {
+		oldCategoryIDValue = *oldCategoryID
+	}
+
+	var newCategoryIDValue uint
+	if transaction.CategoryID != nil {
+		newCategoryIDValue = *transaction.CategoryID
+	}
+
+	if newCategoryIDValue != oldCategoryIDValue ||
+		transaction.TransactionType != oldTransactionType ||
+		transaction.Amount != oldAmount ||
+		transaction.TransactionDate.Time != oldTransactionDate.Time {
 	}
 
 	c.baseController.ResponseJSONUpdated(ctx, transaction)
@@ -242,14 +300,13 @@ func (c *TransactionController) DeleteTransaction(ctx *gin.Context) {
 	c.baseController.ResponseJSONDeleted(ctx, nil)
 }
 
-
 //TRANSFER SECTION
 
 func (c *TransactionController) CreateTransfer(ctx *gin.Context) {
 	userID, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	bodyBytes, _ := io.ReadAll(ctx.Request.Body)
-    ctx.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes)) 
-    log.Printf("[Handler %s] Raw Request Body: %s", ctx.FullPath(), string(bodyBytes))
+	ctx.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+	log.Printf("[Handler %s] Raw Request Body: %s", ctx.FullPath(), string(bodyBytes))
 
 	var req createTransferRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -271,6 +328,7 @@ func (c *TransactionController) CreateTransfer(ctx *gin.Context) {
 	}
 
 	var transferType models.TransferType
+	var fromWalletID, toWalletID uint
 
 	if req.FromWalletID != nil && req.ToWalletID != nil {
 		if *req.FromWalletID == *req.ToWalletID {
@@ -279,8 +337,10 @@ func (c *TransactionController) CreateTransfer(ctx *gin.Context) {
 		}
 
 		transferType = models.TransferWalletToWallet
+		fromWalletID = *req.FromWalletID
+		toWalletID = *req.ToWalletID
 
-		fromWallet, err := c.walletRepo.GetWalletByID(uint(userID), *req.FromWalletID)
+		fromWallet, err := c.walletRepo.GetWalletByID(uint(userID), fromWalletID)
 		if err != nil {
 			c.baseController.ResponseJSONError(ctx, Error_NotFound, "Wallet sumber tidak ditemukan")
 			return
@@ -291,7 +351,7 @@ func (c *TransactionController) CreateTransfer(ctx *gin.Context) {
 			return
 		}
 
-		toWallet, err := c.walletRepo.GetWalletByID(uint(userID), *req.ToWalletID)
+		toWallet, err := c.walletRepo.GetWalletByID(uint(userID), toWalletID)
 		if err != nil {
 			c.baseController.ResponseJSONError(ctx, Error_NotFound, "Wallet tujuan tidak ditemukan")
 			return
@@ -313,8 +373,9 @@ func (c *TransactionController) CreateTransfer(ctx *gin.Context) {
 
 	} else if req.FromWalletID != nil && req.ToGoalID != nil {
 		transferType = models.TransferWalletToGoal
+		fromWalletID = *req.FromWalletID
 
-		fromWallet, err := c.walletRepo.GetWalletByID(uint(userID), *req.FromWalletID)
+		fromWallet, err := c.walletRepo.GetWalletByID(uint(userID), fromWalletID)
 		if err != nil {
 			c.baseController.ResponseJSONError(ctx, Error_NotFound, "Wallet sumber tidak ditemukan")
 			return
@@ -357,15 +418,11 @@ func (c *TransactionController) CreateTransfer(ctx *gin.Context) {
 
 	} else if req.FromGoalID != nil && req.ToWalletID != nil {
 		transferType = models.TransferGoalToWallet
+		toWalletID = *req.ToWalletID
 
 		fromGoal, err := c.goalSavingRepo.GetByID(*req.FromGoalID)
 		if err != nil || fromGoal.UserID != uint(userID) {
 			c.baseController.ResponseJSONError(ctx, Error_NotFound, "Goal saving tidak ditemukan")
-			return
-		}
-
-		if fromGoal.CurrentAmount < fromGoal.TargetAmount {
-			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Goal saving belum mencapai target, tidak bisa ditransfer")
 			return
 		}
 
@@ -374,7 +431,7 @@ func (c *TransactionController) CreateTransfer(ctx *gin.Context) {
 			return
 		}
 
-		toWallet, err := c.walletRepo.GetWalletByID(uint(userID), *req.ToWalletID)
+		toWallet, err := c.walletRepo.GetWalletByID(uint(userID), toWalletID)
 		if err != nil {
 			c.baseController.ResponseJSONError(ctx, Error_NotFound, "Wallet tujuan tidak ditemukan")
 			return
@@ -394,7 +451,7 @@ func (c *TransactionController) CreateTransfer(ctx *gin.Context) {
 			return
 		}
 	} else {
-		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "sumber dan tujuan transfer tidak valid")
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Sumber dan tujuan transfer tidak valid")
 		return
 	}
 
@@ -410,15 +467,32 @@ func (c *TransactionController) CreateTransfer(ctx *gin.Context) {
 		Note:         req.Note,
 	}
 
-	if err := c.transferRepo.CreateTransfer(&transfer); err != nil {
-		c.baseController.ResponseJSONError(ctx, Error_FailedToCreate, err.Error())
-		return
+	createTransaction := ctx.Query("create_transaction") == "true"
+
+	if createTransaction {
+		transaction := models.Transaction{
+			UserID:          uint(userID),
+			WalletID:        fromWalletID,
+			CategoryID:      nil,
+			TransactionType: models.TransactionTransfer,
+			Amount:          req.Amount,
+			TransactionDate: req.TransferDate,
+			Note:            req.Note,
+		}
+
+		if err := c.transferRepo.CreateTransferWithTransaction(&transfer, &transaction); err != nil {
+			c.baseController.ResponseJSONError(ctx, Error_FailedToCreate, err.Error())
+			return
+		}
+	} else {
+		if err := c.transferRepo.CreateTransfer(&transfer); err != nil {
+			c.baseController.ResponseJSONError(ctx, Error_FailedToCreate, err.Error())
+			return
+		}
 	}
 
 	c.baseController.ResponseJSONCreated(ctx, transfer)
 }
-
-
 
 func (c *TransactionController) GetAllTransfers(ctx *gin.Context) {
 	userID, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
@@ -460,4 +534,46 @@ func (c *TransactionController) DeleteTransfer(ctx *gin.Context) {
 	}
 
 	c.baseController.ResponseJSONDeleted(ctx, nil)
+}
+
+func (c *TransactionController) GetTransactionsByMonthYear(ctx *gin.Context) {
+	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid user ID")
+		return
+	}
+
+	monthStr := ctx.Query("month")
+	yearStr := ctx.Query("year")
+
+	if monthStr == "" || yearStr == "" {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Month and year parameters are required")
+		return
+	}
+
+	month, err := strconv.Atoi(monthStr)
+	if err != nil || month < 1 || month > 12 {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid month parameter. Must be between 1-12")
+		return
+	}
+
+	year, err := strconv.Atoi(yearStr)
+	if err != nil || year < 1970 {
+		c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid year parameter")
+		return
+	}
+
+	tokenUserID, exist := ctx.Get("user_id")
+	if !exist || tokenUserID.(uint) != uint(userID) {
+		c.baseController.ResponseJSONError(ctx, Error_Forbidden, "You don't have access to this resource")
+		return
+	}
+
+	transactions, err := c.transactionRepo.GetTransactionsByMonthYear(uint(userID), month, year)
+	if err != nil {
+		c.baseController.ResponseJSONError(ctx, Error_FailedToRetrieve, "Failed to get transactions: "+err.Error())
+		return
+	}
+
+	c.baseController.ResponseJSONRetrieved(ctx, transactions)
 }

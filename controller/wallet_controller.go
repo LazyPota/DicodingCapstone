@@ -94,6 +94,10 @@ func (c *WalletController) CreateWallet(ctx *gin.Context) {
 		return
 	}
 
+	if req.WalletType == models.Loan && req.Amount > 0 {
+		req.Amount = -req.Amount
+	}
+
 	wallet := models.Wallet{
 		UserID:     uint(userID),
 		WalletName: req.WalletName,
@@ -108,6 +112,7 @@ func (c *WalletController) CreateWallet(ctx *gin.Context) {
 
 	c.baseController.ResponseJSONCreated(ctx, wallet)
 }
+
 
 func (c *WalletController) UpdateWallet(ctx *gin.Context) {
 	userID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
@@ -142,7 +147,9 @@ func (c *WalletController) UpdateWallet(ctx *gin.Context) {
 		wallet.WalletType = req.WalletType
 	}
 
-	if req.Amount != 0 {
+	if wallet.WalletType == models.Loan && req.Amount > 0 {
+		wallet.Amount = -req.Amount
+	} else if req.Amount != 0 {
 		wallet.Amount = req.Amount
 	}
 
@@ -153,6 +160,7 @@ func (c *WalletController) UpdateWallet(ctx *gin.Context) {
 
 	c.baseController.ResponseJSONUpdated(ctx, wallet)
 }
+
 
 
 func (c *WalletController) DeleteWallet(ctx *gin.Context) {

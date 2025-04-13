@@ -5,6 +5,7 @@ import (
 	"backend-capstone/repository"
 	"backend-capstone/utils"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +17,7 @@ type GoalSavingController struct {
 
 func NewGoalSavingController(goalSavingRepo repository.GoalSavingRepository) *GoalSavingController {
 	return &GoalSavingController{
-		goalSavingRepo:  goalSavingRepo,
+		goalSavingRepo: goalSavingRepo,
 		baseController: NewBaseController(),
 	}
 }
@@ -32,6 +33,11 @@ type updateGoalSavingRequest struct {
 	CurrentAmount float64 `json:"current_amount"`
 }
 
+type goalSavingsResponse struct {
+	Data       []models.GoalSaving `json:"data"`
+	Pagination Pagination          `json:"pagination"`
+}
+
 func (c *GoalSavingController) GetAllGoalSavings(ctx *gin.Context) {
 	userIDStr := ctx.Param("id")
 	if userIDStr == "" {
@@ -45,13 +51,47 @@ func (c *GoalSavingController) GetAllGoalSavings(ctx *gin.Context) {
 		return
 	}
 
-	goalSavings, err := c.goalSavingRepo.GetAllByUserID(uint(userID))
+	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	perPage, _ := strconv.Atoi(ctx.DefaultQuery("per_page", "10"))
+
+	monthStr := ctx.Query("month")
+	yearStr := ctx.Query("year")
+	
+	month := 0
+	year := 0
+	
+	if monthStr != "" && yearStr != "" {
+		month, _ = strconv.Atoi(monthStr)
+		year, _ = strconv.Atoi(yearStr)
+		
+		if month < 1 || month > 12 || year < 2000 || year > time.Now().Year()+1 {
+			c.baseController.ResponseJSONError(ctx, Error_BadRequest, "Invalid month or year")
+			return
+		}
+	}
+
+	goalSavings, total, err := c.goalSavingRepo.GetAllByUserID(uint(userID), page, perPage, month, year)
 	if err != nil {
 		c.baseController.ResponseJSONError(ctx, Error_FailedToRetrieve, err.Error())
 		return
 	}
 
-	c.baseController.ResponseJSONRetrieved(ctx, goalSavings)
+	totalPages := int(total) / perPage
+	if int(total)%perPage > 0 {
+		totalPages++
+	}
+
+	response := goalSavingsResponse{
+		Data: goalSavings,
+		Pagination: Pagination{
+			CurrentPage: page,
+			PerPage:     perPage,
+			TotalItems:  total,
+			TotalPages:  totalPages,
+		},
+	}
+
+	c.baseController.ResponseJSONRetrieved(ctx, response)
 }
 
 func (c *GoalSavingController) GetGoalSavingByID(ctx *gin.Context) {
@@ -197,4 +237,4 @@ func (c *GoalSavingController) DeleteGoalSaving(ctx *gin.Context) {
 	}
 
 	c.baseController.ResponseJSONDeleted(ctx, nil)
-} 
+}

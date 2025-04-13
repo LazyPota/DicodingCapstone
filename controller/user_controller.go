@@ -56,8 +56,8 @@ type CodeRequest struct {
 }
 
 type resetPasswordRequest struct {
-	Email              string `json:"email" binding:"required,email"` // <-- Tambah Email
-	Code               string `json:"code" binding:"required"`        // <-- Tambah Kode
+	Email              string `json:"email" binding:"required,email"` 
+	Code               string `json:"code" binding:"required"`       
 	NewPassword        string `json:"new_password" binding:"required"`
 	NewPasswordConfirm string `json:"new_password_confirm" binding:"required"`
 }
@@ -249,7 +249,7 @@ func (c *UserController) SendResetCode(ctx *gin.Context) {
 				<h1 style="color: #2e86de; font-size: 36px; letter-spacing: 4px;">%s</h1>
 				<p style="color: #555;">Jangan kasih kode ini ke siapa pun. Berlaku cuma beberapa menit aja.</p>
 				<br>
-				<p style="color: #999;">- Tim Easy Money</p>
+				<p style="color: #999;">- Tim Moneasy</p>
 			</div>
 		</div>`, code)
 
@@ -397,7 +397,7 @@ func (c *UserController) UpdateProfile(ctx *gin.Context) {
         }
 
         filename := fmt.Sprintf("user_%d_profile_%d%s", userID, time.Now().Unix(), ext)
-        filePath := filepath.Join("uploads", "profiles", filename) // Path relatif di server
+        filePath := filepath.Join("uploads", "profiles", filename) 
 
         if err := ctx.SaveUploadedFile(header, filePath); err != nil {
              log.Printf("[UpdateProfile] Error saving uploaded file for user %d: %v", userID, err)
