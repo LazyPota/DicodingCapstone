@@ -14,7 +14,7 @@ const LoginView = ({
   isLoading,
 }) => {
   return (
-    <main className="relative flex min-h-[50vh] md:p-2">
+    <main className="relative flex min-h-[100vh] md:p-2">
       <header className="absolute top-4 left-4">
         <img
           src={logo}

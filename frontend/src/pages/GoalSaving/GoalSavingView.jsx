@@ -9,15 +9,12 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import SuccessPopup from "../../components/Popup/SuccessPopup";
 
 const GoalSavingView = ({
-  isModalOpen,
   currentItems,
   formatCurrencyShort,
   currentPage,
   totalPages,
   handlePageChange,
   openModal,
-  closeModal,
-  handleFormSubmit,
   isSuccessPopupOpen,
   closeSuccessPopup,
   isLoading,
@@ -60,48 +57,13 @@ const GoalSavingView = ({
           </h1>
         </div>
         <button
-          className="z-50 px-4 py-2 bg-blue-600 text-white rounded-[16px] font-semibold flex flex-row items-center space-x-2 justify-center"
+          className="px-4 py-2 bg-blue-600 text-white rounded-[16px] font-semibold flex flex-row items-center space-x-2 justify-center"
           onClick={openModal}
         >
           <Icon icon="ic:outline-plus" />
           Tambah Rencana
         </button>
       </div>
-
-      {isModalOpen && safeCurrentItems.length === 0 ? (
-        <p className="text-center text-gray-500 mt-4">
-          Memuat rencana tabungan...
-        </p>
-      ) : (
-        <Modal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          title="Tambah Rencana Tabungan"
-          onSubmit={handleFormSubmit}
-        >
-          <div className="mb-3">
-            <label htmlFor="namaTabungan" className="block text-sm font-medium">
-              Nama Tabungan
-            </label>
-            <input
-              type="text"
-              className="w-full border p-2 rounded-md mt-2"
-              placeholder="Nama Tabungan"
-            />
-          </div>
-          <div className="mb-2">
-            <label htmlFor="saldo" className="block text-sm font-medium">
-              Jumlah Target
-            </label>
-            <input
-              type="number"
-              id="saldo"
-              placeholder="Rp 0.00"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-            />
-          </div>
-        </Modal>
-      )}
 
       {/* Statistik */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -113,10 +75,7 @@ const GoalSavingView = ({
             <div className="ml-4">
               <p className="text-[16px] text-[#6B6B6B]">Target Tercapai</p>
               <h3 className="text-[24px] font-bold">
-                {" "}
-                <h3 className="text-[24px] font-bold">
-                  {formatCurrencyShort(targetTercapai)}
-                </h3>
+                {formatCurrencyShort(targetTercapai)}
               </h3>
             </div>
           </div>
