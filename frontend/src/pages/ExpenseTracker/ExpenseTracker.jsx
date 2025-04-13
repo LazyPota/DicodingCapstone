@@ -275,10 +275,8 @@ const ExpenseTracker = () => {
   );
 
   return (
-    <div className="flex h-screen">
-      <Sidebar />
+    <div className="">
       <div className="flex-1 flex flex-col">
-        <Header />
         <ExpenseTrackerView
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}

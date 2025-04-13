@@ -4,17 +4,47 @@ const CardWallet = ({
   size = "large",
   amount = 0,
   name = "null",
-  type = "null",
+  type = "Other",
 }) => {
   const isSmall = size === "small";
+
+  const displayWalletType = (typeValue) => {
+    switch (typeValue) {
+      case "Cash":
+        return "Tunai";
+      case "Debit":
+        return "Debit";
+      case "Loan":
+        return "Pinjaman";
+      case "E-Money":
+        return "Dompet Digital";
+      case "Investment":
+        return "Investasi";
+      case "Other":
+        return "Lainnya";
+      default:
+        return typeValue;
+    }
+  };
+
+  const gradientMap = {
+    Cash: "from-green-400 to-green-600",
+    Debit: "from-blue-500 to-blue-700",
+    "E-Money": "from-purple-500 to-purple-700",
+    Loan: "from-red-500 to-red-700",
+    Investment: "from-yellow-400 to-yellow-600",
+    Other: "from-gray-500 to-gray-700",
+  };
+
+  const gradientClass = gradientMap[type] || gradientMap.Other;
 
   return (
     <div
       className={`${
-        isSmall ? "py-4 px-3 h-[150px]" : "py-7 px-5 h-[231px]"
-      } bg-gradient-to-br from-[#3973FF] to-[#224599] rounded-xl text-white shadow-lg relative`}
+        isSmall ? "py-4 px-3 h-[150px]" : "py-7 px-5 h-[211px]"
+      } bg-gradient-to-br ${gradientClass} rounded-xl text-white relative shadow-md hover:shadow-lg transition-shadow`}
     >
-      <p className={`${isSmall ? "text-sm" : "text-[20px] font-medium"}`}>
+      <p className={`${isSmall ? "text-sm" : "text-[20px] "} font-medium`}>
         Total Saldo
       </p>
       <h2
@@ -26,8 +56,8 @@ const CardWallet = ({
       </h2>
       <div className="flex flex-row justify-between">
         <div
-          className={`flex space-x-3 ${
-            isSmall ? "text-xs mt-[15px]" : "mt-[55px] text-sm"
+          className={`flex space-x-12 ${
+            isSmall ? "text-xs mt-[15px]" : "mt-[35px] text-sm"
           }`}
         >
           <p>
@@ -35,12 +65,14 @@ const CardWallet = ({
               Nama Dompet
             </span>
             <br />
-            <b className={isSmall ? "text-sm" : "text-[18px]"}>{name}</b>
+            <b className={isSmall ? "text-sm" : "text-[20px]"}>{name}</b>
           </p>
           <p>
             <span className={isSmall ? "text-xs" : "text-[14px]"}>Jenis</span>
             <br />
-            <b className={isSmall ? "text-sm" : "text-[18px]"}>{type}</b>
+            <b className={isSmall ? "text-sm" : "text-[20px]"}>
+              {displayWalletType(type)}
+            </b>
           </p>
         </div>
 

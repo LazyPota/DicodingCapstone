@@ -30,14 +30,13 @@ const RecentTransactions = ({
   };
 
   return (
-    <div className="bg-white rounded-[16px] p-4 shadow">
+    <div className="bg-white rounded-[16px] p-8">
       <div className="flex justify-between items-center mb-3">
-        <h2 className="text-lg font-bold text-gray-800">{title}</h2>
-        {/* Tampilkan link hanya jika diminta */}
+        <h2 className="text-[24px] font-bold text-black">{title}</h2>
         {showSeeAllLink && transactions.length > 0 && (
           <Link
             to="/transaksi"
-            className="text-xs lg:text-sm text-blue-600 hover:underline"
+            className="text-xs lg:text-sm text-gray-600 hover:underline"
           >
             Lihat Semua
           </Link>
@@ -46,7 +45,7 @@ const RecentTransactions = ({
       <div className="overflow-x-auto mt-4">
         <table className="w-full min-w-[500px]">
           <thead>
-            <tr className="text-left text-[12px] text-gray-500 uppercase tracking-wider border-b">
+            <tr className="text-left text-[12px] text-[#2B2B2B] tracking-wider border-b">
               {showWalletColumn && (
                 <th className="pb-2 px-2 font-semibold">Dompet</th>
               )}
@@ -77,8 +76,8 @@ const RecentTransactions = ({
               transactions.map((transaction) => {
                 const isIncome = transaction.transaction_type === "Income";
                 // ... (logika ikon, warna, format) ...
-                const iconBg = isIncome ? "bg-green-100" : "bg-red-100";
-                const iconColor = isIncome ? "text-green-600" : "text-red-600";
+                const iconBg = isIncome ? "bg-[#2667FF]" : "bg-[#112E73]";
+                const iconColor = isIncome ? "text-white" : "text-white";
                 const iconName = isIncome
                   ? "solar:arrow-left-down-linear"
                   : "solar:arrow-right-up-outline";
@@ -91,10 +90,13 @@ const RecentTransactions = ({
                 );
 
                 return (
-                  <tr key={transaction.id} className="hover:bg-gray-50">
+                  <tr
+                    key={transaction.id}
+                    className="hover:bg-gray-5 text-black text-[14px] font-bold"
+                  >
                     {/* Tampilkan Nama Dompet secara kondisional */}
                     {showWalletColumn && (
-                      <td className="py-3 px-2 text-gray-700 truncate">
+                      <td className="py-3 px-2 text-black truncate">
                         {transaction.wallet?.wallet_name || "-"}
                       </td>
                     )}
@@ -112,7 +114,7 @@ const RecentTransactions = ({
                       </div>
                     </td>
                     {/* Tanggal */}
-                    <td className="py-3 px-2 text-gray-600 whitespace-nowrap">
+                    <td className="py-3 px-2 text-black whitespace-nowrap">
                       {formatDate(transaction.transaction_date)}
                     </td>
                     {/* Jumlah */}

@@ -23,7 +23,7 @@ const Dashboard = () => {
     totalExpense,
     barChartData,
     isLoading,
-    isError, 
+    isError,
     message,
   } = useSelector((state) => state.dashboard);
 
@@ -55,7 +55,7 @@ const Dashboard = () => {
     if (wallets.length > 0) {
       setDisplayWallet(wallets[0]);
     } else {
-      setDisplayWallet(null); 
+      setDisplayWallet(null);
     }
 
     const sortedGoals = [...goals].sort((a, b) => {
@@ -100,7 +100,7 @@ const Dashboard = () => {
         score: 90,
         text: "Sehat & Terkendali",
         emoji: "fluent-emoji-flat:smiling-face-with-smiling-eyes",
-      }, // Contoh status Sehat
+      },
       default: {
         score: 0,
         text: "Data Tidak Diketahui",
@@ -129,16 +129,10 @@ const Dashboard = () => {
     }
   }, [wallets, goals, financialHealthStatus]);
 
-  const formatCurrency = (value) => {
-    if (typeof value !== "number") return "Rp. -";
-    return `Rp. ${value.toLocaleString("id-ID")}`;
-  };
-
   const recentTransactions = useMemo(() => {
     const safeTransactions = Array.isArray(transactions) ? transactions : [];
-    return safeTransactions.slice(0, 5); // Ambil 5 transaksi terbaru
+    return safeTransactions.slice(0, 5);
   }, [transactions]);
-
 
   const chartDisplayData = barChartData;
 
@@ -157,21 +151,37 @@ const Dashboard = () => {
       </div>
     );
   }
+  
+  const formatCurrencyShort = (value) => {
+    if (typeof value !== "number") return "Rp. -";
+    if (value >= 1000000000) {
+      const num = value / 1000000000;
+      return `Rp. ${num.toLocaleString("id-ID", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1,
+      })} M`;
+    } else if (value >= 1000000) {
+      const num = value / 1000000;
+      return `Rp. ${num.toLocaleString("id-ID", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1,
+      })} jt`;
+    } else {
+      return `Rp. ${value.toLocaleString("id-ID")}`;
+    }
+  };
 
   return (
     <DashboardView
-      financialHealthScore={healthScore} // Kirim skor angka
-      financialHealthText={healthStatusText} // Kirim teks status
-      financialHealthEmoji={healthEmoji} // Kirim ikon emoji
-      totalPemasukan={totalIncome} // Kirim total income
-      totalPengeluaran={totalExpense} // Kirim total expense
-      // Data olahan
-      walletToShow={displayWallet} // Kirim wallet yg dipilih
-      savingsToShow={recentSavings} // Kirim savings yg dipilih
-      chartData={chartDisplayData} // Kirim data chart
-      // Fungsi format
-      formatCurrency={formatCurrency}
-      // Status lain jika perlu
+      financialHealthScore={healthScore}
+      financialHealthText={healthStatusText}
+      financialHealthEmoji={healthEmoji}
+      totalPemasukan={totalIncome}
+      totalPengeluaran={totalExpense}
+      walletToShow={displayWallet}
+      savingsToShow={recentSavings}
+      chartData={chartDisplayData}
+      formatCurrency={formatCurrencyShort}
       isLoading={isLoading}
       error={isError ? message : null}
       recentTransactions={recentTransactions}

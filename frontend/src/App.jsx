@@ -13,6 +13,7 @@ import GoalSaving from "./pages/GoalSaving/GoalSaving";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import Verification from "./pages/Verification/Verification";
 import ConfirmPassword from "./pages/ConfirmPassword/ConfirmPassword";
+import AppLayout from "./components/AppLayout";
 
 function App() {
   return (
@@ -21,14 +22,16 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<Beranda />} />
-        <Route path="/beranda" element={<Dashboard />} />
-        <Route path="/dompet" element={<MyWallet />} />
-        <Route path="/dompet/detail/:walletId" element={<WalletDetail />} />
-        <Route path="/anggaran" element={<SmartBudgeting />} />
-        <Route path="/transaksi" element={<ExpenseTracker />} />
-        <Route path="/goal" element={<GoalSaving />} />
-        <Route path="/kategori" element={<Kategori />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route element={<AppLayout />}>
+          <Route path="/beranda" element={<Dashboard />} />
+          <Route path="/dompet" element={<MyWallet />} />
+          <Route path="/dompet/detail/:walletId" element={<WalletDetail />} />
+          <Route path="/anggaran" element={<SmartBudgeting />} />
+          <Route path="/transaksi" element={<ExpenseTracker />} />
+          <Route path="/goal" element={<GoalSaving />} />
+          <Route path="/kategori" element={<Kategori />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verification" element={<Verification />} />
         <Route path="/confirm-password" element={<ConfirmPassword />} />
