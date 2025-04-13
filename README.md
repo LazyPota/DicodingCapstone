@@ -1,6 +1,6 @@
 # DicodingCapstone
 
-## 💰 MONEASY — Financial Planning Application
+## 💰 MONEASY — Financial Planning Application by CC25-SF006
 
 **MONEASY** adalah aplikasi perencanaan keuangan pintar untuk membantu pengguna mengelola keuangan pribadi dengan mudah. Fitur-fitur seperti prediksi kesehatan finansial, tabungan tujuan, dan manajemen transaksi memungkinkan pengguna untuk mengambil kendali atas keuangan mereka.
 
@@ -30,6 +30,9 @@
 **Machine Learning:**
 - TensorFlow (Python)
 - SciKit(Python)
+
+**Algorithm:**
+- Random Forest
 
 ---
 
@@ -87,3 +90,7 @@ python model.py
 ## 📘 Tentang Proyek
 
 Proyek ini dikembangkan oleh Tim Capstone sebagai bagian dari program **Dicoding x DBS Foundation**. Aplikasi ini menunjukkan integrasi full-stack dan machine learning untuk manajemen keuangan pribadi.
+
+## Our Team
+
+1. 
