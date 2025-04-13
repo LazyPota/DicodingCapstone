@@ -43,14 +43,12 @@ const MyWaletView = ({
 
   return (
     <div className="flex-1 bg-[#F3F4F7] p-7 overflow-auto">
-      <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row justify-between mb-5">
-        {/* Filter */}
-        <div className="flex space-x-4 items-center justify-between md:justify-normal">
-          <h1 className="font-extrabold text-[24px] text-[#121212]">Dompet</h1>
+      <div className="flex flex-col space-y-3 md:flex-row justify-between items-center mb-5">
+        <div className="flex space-x-4 items-center w-full md:justify-normal justify-between">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-3 py-2 border rounded-[16px] focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border rounded-[16px] focus:ring-2 focus:ring-blue-500 order-2 md:order-1"
             disabled={isLoading}
           >
             <option value="Semua">Semua</option>
@@ -61,10 +59,13 @@ const MyWaletView = ({
             <option value="Investment">Investasi</option>
             <option value="Other">Lainnya</option>
           </select>
+          <h1 className="font-extrabold text-[24px] text-[#121212] order-1 md:order-2">
+            Dompet
+          </h1>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className={`py-2 md:py-0 px-4 bg-blue-600 text-white rounded-[16px] font-semibold flex items-center space-x-2 hover:bg-blue-700 disabled:opacity-50 ${
+          className={`py-3 md:py-2  bg-blue-600 text-white rounded-[16px] font-semibold flex items-center space-x-2 hover:bg-blue-700 disabled:opacity-50 w-full md:w-52 justify-center ${
             isLoading ? "opacity-50 cursor-not-allowed" : ""
           }`}
           disabled={isLoading}

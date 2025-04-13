@@ -75,20 +75,6 @@ const CardWallet = ({
             </b>
           </p>
         </div>
-
-        {/* Lingkaran bawah kanan */}
-        {/* <div className="absolute bottom-3 right-2 flex">
-          <div
-            className={`${
-              isSmall ? "w-3 h-3" : "w-[30px] h-[30px]"
-            } bg-[#0D2459] opacity-50 rounded-full`}
-          ></div>
-          <div
-            className={`${
-              isSmall ? "w-3 h-3" : "w-[30px] h-[30px]"
-            } bg-[#0D2459] rounded-full`}
-          ></div>
-        </div> */}
       </div>
     </div>
   );
