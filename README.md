@@ -93,4 +93,9 @@ Proyek ini dikembangkan oleh Tim Capstone sebagai bagian dari program **Dicoding
 
 ## Our Team
 
-1. 
+1. FS058D5X0081 -- Reva Rahayu
+2. FS051D5Y0093 -- Habibunayka Miftah Al Rizqi
+3. FS101D5Y0404 -- Fahmi Nur Yudisyah
+4. FS058D5X0431 -- Trisha Aditra Perwitasari
+5. MS176D5Y0601 -- Muhammad Rafli Putra Persada
+6. MS176D5Y0602 -- Nurian Alyasa
