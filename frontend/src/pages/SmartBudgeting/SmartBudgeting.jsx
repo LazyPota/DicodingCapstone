@@ -32,7 +32,6 @@ const SmartBudgeting = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Ambil state dari Redux
   const { user } = useSelector((state) => state.auth);
   const {
     budgets = [],
@@ -45,23 +44,19 @@ const SmartBudgeting = () => {
     (state) => state.categories
   );
   const { wallets = [] } = useSelector(
-    // Ambil state wallets
     (state) => state.wallets
   );
 
-  // Fetch data awal
   useEffect(() => {
     if (!user?.id) {
       navigate("/login");
       return;
     }
     dispatch(getBudgets(user.id));
-    // Fetch data referensi jika belum ada
     if (availableCategories.length === 0) {
       dispatch(getCategories(user.id));
     }
     if (wallets.length === 0) {
-      // <-- Fetch wallets jika belum ada
       dispatch(getWallets(user.id));
     }
 
@@ -69,9 +64,7 @@ const SmartBudgeting = () => {
     return () => {
       dispatch(resetBudgetState());
     };
-  }, [dispatch, user?.id, navigate]); // Hanya jalankan saat user berubah
-
-  // Efek handle sukses/error CUD
+  }, [dispatch, user?.id, navigate]); 
   useEffect(() => {
     if (isError) {
       alert(`Error: ${message}`);
@@ -79,25 +72,24 @@ const SmartBudgeting = () => {
     }
     if (isSuccess && message) {
       setIsModalOpen(false);
-      setFormData(initialFormData); // Reset form ke state awal
+      setFormData(initialFormData); 
       setCurrentBudget(null);
       setModalMode("add");
       alert(message);
-      // Fetch ulang data budgets setelah CUD sukses
       if (user?.id) {
         dispatch(getBudgets(user.id));
       }
       dispatch(resetBudgetState());
     }
-  }, [isError, isSuccess, message, dispatch, user?.id, initialFormData]); // Dependensi
+  }, [isError, isSuccess, message, dispatch, user?.id, initialFormData]); 
 
-  // Kalkulasi data untuk view
+
   const safeBudgets = useMemo(
     () => (Array.isArray(budgets) ? budgets : []),
     [budgets]
   );
   const budgetSummary = useMemo(() => {
-    const safeBudgets = Array.isArray(budgets) ? budgets : []; // Hitung di sini jika belum
+    const safeBudgets = Array.isArray(budgets) ? budgets : []; 
 
     const totalTarget = safeBudgets.reduce(
       (sum, budget) => sum + (Number(budget.amount) || 0),
@@ -106,9 +98,7 @@ const SmartBudgeting = () => {
     const totalCurrent = safeBudgets.reduce(
       (sum, budget) => sum + (Number(budget.spent_amount) || 0),
       0
-    ); // Pastikan Number
-
-    // --- LOG DI SINI ---
+    ); 
     console.log("[Budget Summary Calc] safeBudgets:", safeBudgets);
     console.log(
       "[Budget Summary Calc] totalTarget:",
@@ -120,13 +110,10 @@ const SmartBudgeting = () => {
       totalCurrent,
       typeof totalCurrent
     );
-    // ---
 
     const sisa = totalTarget - totalCurrent;
-    // Perbaiki penanganan NaN eksplisit
     const percentage =
       totalTarget > 0 ? Math.round((totalCurrent / totalTarget) * 100) : 0;
-    // Jika hasilnya NaN (misal 0/0), default ke 0. Batasi juga maks 100.
     const finalPercentage = isNaN(percentage) ? 0 : Math.min(100, percentage);
 
     console.log("[Budget Summary Calc] Calculated Percentage:", percentage);
@@ -136,9 +123,8 @@ const SmartBudgeting = () => {
       totalAnggaran: totalTarget,
       totalTerpakai: totalCurrent,
       sisaAnggaran: sisa,
-      persentase: finalPercentage, // Kirim hasil yg sudah dicek NaN
+      persentase: finalPercentage, 
     };
-    // }, [safeBudgets]); // Dependensi cukup safeBudgets
   }, [budgets]);
 
   // Pagination
@@ -150,23 +136,22 @@ const SmartBudgeting = () => {
     setCurrentPage(page);
   };
 
-  // Modal & Form Handlers
   const openModal = () => {
     setModalMode("add");
     setCurrentBudget(null);
-    setFormData(initialFormData); // Reset form saat buka modal tambah
+    setFormData(initialFormData); 
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (budget) => {
     setModalMode("edit");
     setCurrentBudget(budget);
-    // Isi form termasuk wallet_id saat edit
+  
     setFormData({
       category_id: budget.category_id || "",
       amount: budget.amount || "",
       period: budget.period || "Monthly",
-      wallet_id: budget.wallet_id || "", // <-- Isi wallet_id
+      wallet_id: budget.wallet_id || "", 
     });
     setIsModalOpen(true);
   };
@@ -175,13 +160,11 @@ const SmartBudgeting = () => {
     setIsModalOpen(false);
     setCurrentBudget(null);
     setModalMode("add");
-    setFormData(initialFormData); // Reset form saat tutup
+    setFormData(initialFormData); 
   };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    // Konversi ke angka untuk amount dan ID, biarkan string kosong jika input kosong
-    // Atau null jika value kosong untuk ID (handleFormChange sebelumnya sudah benar)
     const processedValue =
       name === "amount" || name.includes("_id")
         ? value === ""
@@ -189,10 +172,9 @@ const SmartBudgeting = () => {
           : Number(value)
         : value;
     if (name === "amount" && isNaN(processedValue)) {
-      // Jika amount diisi teks, jangan update state numbernya
-      setFormData((prevState) => ({ ...prevState, [name]: value })); // Biarkan string di state sementara
+      setFormData((prevState) => ({ ...prevState, [name]: value })); 
     } else if (name.includes("_id") && value === "") {
-      setFormData((prevState) => ({ ...prevState, [name]: "" })); // Biarkan string kosong untuk ID
+      setFormData((prevState) => ({ ...prevState, [name]: "" }));
     } else {
       setFormData((prevState) => ({ ...prevState, [name]: processedValue }));
     }
@@ -203,7 +185,6 @@ const SmartBudgeting = () => {
     event.preventDefault();
     if (!user?.id) return;
 
-    // Validasi frontend
     if (
       !formData.category_id ||
       !formData.amount ||
@@ -235,20 +216,14 @@ const SmartBudgeting = () => {
         category_id: categoryIdNumber,
         amount: amountFloat,
         period: formData.period,
-        wallet_id: walletIdNumber, // <-- Kirim wallet_id dari formData
-        // start_date akan dihandle backend jika period bukan Daily
+        wallet_id: walletIdNumber, 
       };
       console.log("Submitting create budget data:", budgetData);
       dispatch(createBudget({ userId: user.id, budgetData }));
     } else if (modalMode === "edit" && currentBudget) {
-      // Saat edit, biasanya backend HANYA menerima amount dan period
-      // (Wallet & Kategori tidak bisa diubah untuk budget yg ada)
       budgetData = {
         amount: amountFloat,
         period: formData.period,
-        // Jika backend BISA update field lain, tambahkan di sini:
-        // category_id: categoryIdNumber, // Biasanya tidak diubah
-        // wallet_id: walletIdNumber,   // Biasanya tidak diubah
       };
       console.log(
         "Submitting update budget data:",
@@ -361,7 +336,7 @@ const SmartBudgeting = () => {
               onChange={handleFormChange}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               required
-              disabled={isLoading || wallets.length === 0}
+              disabled={isLoading || modalMode === "edit"}
             >
               <option value="" disabled>
                 {wallets.length === 0
