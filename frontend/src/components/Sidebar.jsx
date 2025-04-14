@@ -1,15 +1,15 @@
 // Sidebar.jsx
 import React from "react";
-import icon from "./../assets/whiteicon.png"; 
+import icon from "./../assets/icon-white.png";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { Link, useNavigate, useLocation } from "react-router-dom"; 
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { logout } from "../features/auth/authSlice"; 
+import { logout } from "../features/auth/authSlice";
 
 const Sidebar = ({ isMobileOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location = useLocation(); 
+  const location = useLocation();
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login");
@@ -42,7 +42,7 @@ const Sidebar = ({ isMobileOpen, toggleSidebar }) => {
       </button>
       <div>
         <div className="flex flex-row items-center space-x-2 mb-8 mt-4">
-          <img src={icon} alt="white-icon" className="w-[26px] h-[26px]" />
+          <img src={icon} alt="white-icon" className="w-[40px] h-[40px]" />
           <span className="font-inter text-[16px] font-semibold text-white">
             Moneasy
           </span>

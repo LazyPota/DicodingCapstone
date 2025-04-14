@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import logo from "./../assets/logoFIX.png"; // Pastikan path logo benar
+import logo from "./../assets/icon-blue.png"; // Pastikan path logo benar
 import React, { useState } from "react"; // Import useState
 import { Link } from "react-router-dom";
 
@@ -29,11 +29,14 @@ const Navbar = () => {
 
   return (
     <nav className="relative w-full flex justify-between items-center px-6 md:px-10 py-[18px] bg-white">
-      <div className="flex-shrink-0">
-        <Link to="/">
-          <img src={logo} alt="Moneasy Logo" className="h-8 md:h-10 w-auto" />
-        </Link>
-      </div>
+      <Link to="/">
+        <div className="flex flex-row items-center space-x-2 ">
+          <img src={logo} alt="white-icon" className="w-[40px] h-[40px]" />
+          <span className="font-inter text-[24px] font-semibold text-black">
+            Moneasy
+          </span>
+        </div>
+      </Link>
       <ul className="hidden md:flex space-x-6 lg:space-x-8 text-base md:text-[18px] items-center justify-center font-medium text-black">
         <li
           className="hover:text-blue-600 cursor-pointer"

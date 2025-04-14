@@ -5,7 +5,7 @@ import bgImage from "../../assets/background.jpg";
 import bgImage2 from "../../assets/background2.png";
 import bgImage3 from "../../assets/background3.png";
 import bgImage4 from "../../assets/CTA.png";
-import icon from "../../assets/icon.png";
+import icon from "../../assets/icon-white.png";
 import FeatureCard from "../../components/FeatureCard";
 import iphoneSavings from "../../assets/phone-mockup-tujuan.png";
 import iphoneExpenses from "../../assets/phone-mockup-transaksi.png";
@@ -79,7 +79,12 @@ const BerandaView = () => {
                 as={Link}
                 to="/login"
               />
-              <Button text="Baca Lengkap" variant="secondary" size="lg" onClick={() => handleScroll("features")}/>
+              <Button
+                text="Baca Lengkap"
+                variant="secondary"
+                size="lg"
+                onClick={() => handleScroll("features")}
+              />
             </div>
           </div>
 
@@ -278,7 +283,7 @@ const BerandaView = () => {
             data-aos="fade-down"
             data-aos-delay="200"
           >
-            <div className="w-14 h-14 md:w-[64px] md:h-[64px] bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-14 h-14 md:w-[64px] md:h-[64px] bg-blue-600 rounded-2xl flex items-center justify-center shadow-md shadow-blue-600">
               <img
                 src={icon}
                 alt="Ikon aplikasi Moneasy"

@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "./../assets/logoFIX.png";
+import logo from "./../assets/icon-blue.png";
 
 const Footer = () => {
   const handleScroll = (sectionId) => {
@@ -23,8 +23,11 @@ const Footer = () => {
     <footer className="bg-white border-t border-gray-200 px-6 py-12 md:px-10 md:py-16 lg:px-16">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-10 md:gap-6">
         <div className="flex flex-col space-y-6 md:space-y-[43px] w-full md:w-auto">
-          <div className="flex justify-start">
-            <img src={logo} alt="Moneasy Logo" className="h-8 md:h-10 w-auto" />
+          <div className="flex flex-row items-center space-x-2 mb-8 mt-4">
+            <img src={logo} alt="white-icon" className="w-[40px] h-[40px]" />
+            <span className="font-inter text-[24px] font-semibold text-black">
+              Moneasy
+            </span>
           </div>
           <nav>
             <ul className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:space-x-6 lg:space-x-[44px] text-[#8896AB] text-base md:text-[18px]">

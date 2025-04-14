@@ -20,6 +20,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/landing" element={<Beranda />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -34,7 +35,7 @@ function App() {
           <Route path="beranda" element={<Dashboard />} />
           <Route path="transaksi" element={<ExpenseTracker />} />
           <Route path="anggaran" element={<SmartBudgeting />} />
-          <Route path="rencana-tabungan" element={<GoalSaving />} />
+          <Route path="goal" element={<GoalSaving />} />
           <Route path="kategori" element={<Kategori />} />
           <Route path="dompet" element={<MyWallet />} />
           <Route path="dompet/detail/:walletId" element={<WalletDetail />} />
