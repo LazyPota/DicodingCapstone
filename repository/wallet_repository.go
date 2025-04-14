@@ -46,7 +46,14 @@ func (r *walletRepository) GetWalletByID(userID, walletID uint) (*models.Wallet,
 }
 
 func (r *walletRepository) UpdateWallet(userID, walletID uint, wallet *models.Wallet) error {
-	return r.db.Model(&models.Wallet{}).Where("id = ? AND user_id = ?", walletID, userID).Updates(wallet).Error
+    updateData := map[string]interface{}{
+        "wallet_name": wallet.WalletName,
+        "wallet_type": wallet.WalletType,
+        "amount":      wallet.Amount, 
+    }
+    return r.db.Model(&models.Wallet{}).
+        Where("id = ? AND user_id = ?", walletID, userID).
+        Updates(updateData).Error 
 }
 
 func (r *walletRepository) DeleteWallet(userID, walletID uint) error {

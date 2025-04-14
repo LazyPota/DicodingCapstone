@@ -134,12 +134,17 @@ func NewBaseController() IBaseController {
 }
 
 func (bc *BaseController) ResponseJSONError(ctx *gin.Context, code ResponseCode, detailMessage string) {
+	primaryMessage := detailMessage
+	if primaryMessage == "" {
+		primaryMessage = message[code]
+	}
+
 	ctx.JSON(httpStatus[code], ResponseError{
 		Result:        nil,
 		Success:       false,
 		Code:          code,
-		Message:       message[code],
-		DetailMessage: detailMessage,
+		Message:       primaryMessage, // <-- Gunakan pesan spesifik di sini
+		DetailMessage: detailMessage, // Biarkan DetailMessage tetap ada jika diperlukan untuk logging/debug
 	})
 }
 
