@@ -18,9 +18,12 @@ const MyWaletView = ({
   handleSubmit,
   filter,
   setFilter,
-  isSuccessPopupOpen,
-  closeSuccessPopup,
   isLoading,
+  showSuccessPopup,
+  onCloseSuccessPopup,
+  errors,
+  serverError,
+  successMessage,
 }) => {
   const displayWalletType = (type) => {
     switch (type) {
@@ -65,7 +68,7 @@ const MyWaletView = ({
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className={`py-3 md:py-2  bg-blue-600 text-white rounded-[16px] font-semibold flex items-center space-x-2 hover:bg-blue-700 disabled:opacity-50 w-full md:w-52 justify-center ${
+          className={`py-3 md:py-2 bg-blue-600 text-white rounded-[16px] font-semibold flex items-center space-x-2 hover:bg-blue-700 disabled:opacity-50 w-full md:w-52 justify-center ${
             isLoading ? "opacity-50 cursor-not-allowed" : ""
           }`}
           disabled={isLoading}
@@ -74,6 +77,14 @@ const MyWaletView = ({
           <span>Tambah Kartu</span>
         </button>
       </div>
+      {serverError && !isModalOpen && (
+        <div
+          className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm"
+          role="alert"
+        >
+          Gagal: {serverError}
+        </div>
+      )}
       {isLoading && wallets.length === 0 ? (
         <p className="text-center text-gray-500 mt-10">Memuat dompet...</p>
       ) : (
@@ -123,6 +134,9 @@ const MyWaletView = ({
         submitLabel="Tambah"
       >
         <>
+          {errors && errors.server && (
+            <p className="text-red-500 text-xs mb-3">{errors.server}</p>
+          )}
           <div className="mb-4">
             <label htmlFor="wallet_name" className="block text-sm font-medium">
               Nama Kartu
@@ -138,6 +152,11 @@ const MyWaletView = ({
               required
               disabled={isLoading}
             />
+            {errors && errors.wallet_name && (
+              <p id="wallet_name-error" className="text-red-500 text-xs mt-1">
+                {errors.wallet_name}
+              </p>
+            )}
           </div>
           <div className="mb-4">
             <label
@@ -163,6 +182,11 @@ const MyWaletView = ({
               <option value="Investment">Investasi</option>
               <option value="Other">Lainnya</option>
             </select>
+            {errors && errors.wallet_type && (
+              <p id="wallet_type-error" className="text-red-500 text-xs mt-1">
+                {errors.wallet_type}
+              </p>
+            )}
           </div>
           <div className="mb-4">
             <label htmlFor="amount" className="block text-sm font-medium">
@@ -180,10 +204,19 @@ const MyWaletView = ({
               min="0"
               disabled={isLoading}
             />
+            {errors && errors.amount && (
+              <p id="amount-error" className="text-red-500 text-xs mt-1">
+                {errors.amount}
+              </p>
+            )}
           </div>
         </>
       </Modal>
-      <SuccessPopup isOpen={isSuccessPopupOpen} onClose={closeSuccessPopup} />
+      <SuccessPopup
+        isOpen={showSuccessPopup}
+        onClose={onCloseSuccessPopup}
+        successMessage={successMessage}
+      />
     </div>
   );
 };

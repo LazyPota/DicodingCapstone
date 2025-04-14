@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Icon } from "@iconify/react";
 
 const FormTransaksi = ({
@@ -6,11 +6,18 @@ const FormTransaksi = ({
   handleFormChange,
   wallets = [],
   categories = [],
+  goals = [],
   isLoading,
   activeTab,
+  errors,
 }) => {
+  const relevantCategories = categories.filter(
+    (cat) =>
+      cat.category_type === (activeTab === "income" ? "Income" : "Expense")
+  );
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-auto max-h-[300px] no-scrollbar">
       <div className="mb-4">
         <label
           htmlFor="transaction_date"
@@ -27,9 +34,17 @@ const FormTransaksi = ({
           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           required
           disabled={isLoading}
+          aria-invalid={errors?.transaction_date ? "true" : "false"}
+          aria-describedby={
+            errors?.transaction_date ? "transaction_date-error" : undefined
+          }
         />
+        {errors?.transaction_date && (
+          <p id="transaction_date-error" className="text-red-500 text-xs mt-1">
+            {errors.transaction_date}
+          </p>
+        )}
       </div>
-      {/* Input Dompet */}
       <div className="mb-4">
         <label
           htmlFor="wallet_id"
@@ -45,18 +60,25 @@ const FormTransaksi = ({
           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           required
           disabled={isLoading || wallets.length === 0}
+          aria-invalid={errors?.wallet_id ? "true" : "false"}
+          aria-describedby={errors?.wallet_id ? "wallet_id-error" : undefined}
         >
           <option value="" disabled>
             {wallets.length === 0 ? "Tidak ada dompet" : "Pilih Dompet"}
           </option>
-          {wallets.map((wallet) => (
-            <option key={wallet.id} value={wallet.id}>
-              {wallet.wallet_name}
+          {wallets.map((w) => (
+            <option key={w.id} value={w.id}>
+              {w.wallet_name}
             </option>
           ))}
         </select>
+        {errors?.wallet_id && (
+          <p id="wallet_id-error" className="text-red-500 text-xs mt-1">
+            {errors.wallet_id}
+          </p>
+        )}
       </div>
-      {/* Input Kategori */}
+
       <div className="mb-4">
         <label
           htmlFor="category_id"
@@ -69,50 +91,94 @@ const FormTransaksi = ({
           name="category_id"
           value={formData.category_id || ""}
           onChange={(e) => handleFormChange(e, "transaction")}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" // <-- Style tidak diubah
           required
-          disabled={isLoading || categories.length === 0}
+          disabled={isLoading || relevantCategories.length === 0}
+          aria-invalid={errors?.category_id ? "true" : "false"}
+          aria-describedby={
+            errors?.category_id ? "category_id-error" : undefined
+          }
         >
           <option value="" disabled>
-            {categories.length === 0
-              ? "Memuat/Tidak ada kategori"
+            {relevantCategories.length === 0
+              ? `Tidak ada kategori ${activeTab}`
               : "Pilih Kategori"}
           </option>
-          {categories
-            .filter(
-              (cat) =>
-                cat.category_type ===
-                (activeTab === "income" ? "Income" : "Expense")
-            )
-            .map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.category_name}
-              </option>
-            ))}
+          {relevantCategories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.category_name}
+            </option>
+          ))}
         </select>
+        {/* Tampilkan Error */}
+        {errors?.category_id && (
+          <p id="category_id-error" className="text-red-500 text-xs mt-1">
+            {errors.category_id}
+          </p>
+        )}
       </div>
-      {/* Input Jumlah */}
+
+      {/* Jumlah */}
       <div className="mb-4">
         <label
           htmlFor="amount"
           className="block text-sm font-medium text-gray-700"
         >
-          Jumlah
+          Jumlah (Rp)
         </label>
         <input
           id="amount"
           name="amount"
           type="number"
-          placeholder="Rp 0"
+          placeholder="0"
           value={formData.amount || ""}
           onChange={(e) => handleFormChange(e, "transaction")}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" // <-- Style tidak diubah
           required
           min="0"
+          step="any"
           disabled={isLoading}
+          aria-invalid={errors?.amount ? "true" : "false"}
+          aria-describedby={errors?.amount ? "amount-error" : undefined}
         />
+        {/* Tampilkan Error */}
+        {errors?.amount && (
+          <p id="amount-error" className="text-red-500 text-xs mt-1">
+            {errors.amount}
+          </p>
+        )}
       </div>
-      {/* Input Catatan */}
+
+      {/* Tujuan Menabung (Hanya untuk Expense) */}
+      {activeTab === "expense" && (
+        <div className="mb-4">
+          <label
+            htmlFor="goal_id"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Tujuan Menabung (Opsional)
+          </label>
+          <select
+            id="goal_id"
+            name="goal_id"
+            value={formData.goal_id || ""}
+            onChange={(e) => handleFormChange(e, "transaction")}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" // <-- Style tidak diubah
+            disabled={isLoading || goals.length === 0}
+          >
+            <option value="">
+              {goals.length === 0 ? "Tidak ada rencana" : "Tidak ada"}
+            </option>
+            {goals.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.goal_name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Catatan */}
       <div className="mb-4">
         <label
           htmlFor="note"
@@ -127,7 +193,7 @@ const FormTransaksi = ({
           placeholder="Catatan"
           value={formData.note || ""}
           onChange={(e) => handleFormChange(e, "transaction")}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" // <-- Style tidak diubah
           disabled={isLoading}
         />
       </div>
@@ -135,18 +201,42 @@ const FormTransaksi = ({
   );
 };
 
+// --- Komponen Form Transfer ---
 const FormTransfer = ({
   formData,
   handleFormChange,
   wallets = [],
   goals = [],
   isLoading,
+  errors, // <-- Terima errors
 }) => {
   const [fromType, setFromType] = React.useState("wallet");
   const [toType, setToType] = React.useState("wallet");
+  useEffect(() => {
+    if (formData.from_wallet_id) setFromType("wallet");
+    else if (formData.from_goal_id) setFromType("goal");
+    else setFromType("wallet");
+
+    if (formData.to_wallet_id) setToType("wallet");
+    else if (formData.to_goal_id) setToType("goal");
+    else setToType("wallet");
+  }, [
+    formData.from_wallet_id,
+    formData.from_goal_id,
+    formData.to_wallet_id,
+    formData.to_goal_id,
+  ]);
+  const handleTypeChange = (typeSetter, idFieldToClear, event) => {
+    const { value } = event.target;
+    typeSetter(value);
+    handleFormChange(
+      { target: { name: idFieldToClear, value: "" } },
+      "transfer"
+    );
+  };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-h-[300px] no-scrollbar overflow-auto">
       <div className="mb-4">
         <label
           htmlFor="transfer_date"
@@ -160,15 +250,25 @@ const FormTransfer = ({
           type="date"
           value={formData.transfer_date || ""}
           onChange={(e) => handleFormChange(e, "transfer")}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" // <-- Style tidak diubah
           required
           disabled={isLoading}
+          aria-invalid={errors?.transfer_date ? "true" : "false"}
+          aria-describedby={
+            errors?.transfer_date ? "transfer_date-error" : undefined
+          }
         />
+        {/* Tampilkan Error */}
+        {errors?.transfer_date && (
+          <p id="transfer_date-error" className="text-red-500 text-xs mt-1">
+            {errors.transfer_date}
+          </p>
+        )}
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Sumber Dana
-        </label>
+
+      {/* Sumber Transfer */}
+      <fieldset className="mb-4 border p-3 rounded-md">
+        <legend className="text-sm font-medium px-1">Dari Sumber</legend>
         <div className="flex space-x-4 mb-2">
           <label className="inline-flex items-center">
             <input
@@ -177,7 +277,7 @@ const FormTransfer = ({
               name="fromTypeRadio"
               value="wallet"
               checked={fromType === "wallet"}
-              onChange={(e) => setFromType(e.target.value)}
+              onChange={(e) => handleTypeChange(setFromType, "from_goal_id", e)}
               disabled={isLoading}
             />
             <span className="ml-2">Dompet</span>
@@ -189,7 +289,9 @@ const FormTransfer = ({
               name="fromTypeRadio"
               value="goal"
               checked={fromType === "goal"}
-              onChange={(e) => setFromType(e.target.value)}
+              onChange={(e) =>
+                handleTypeChange(setFromType, "from_wallet_id", e)
+              }
               disabled={isLoading}
             />
             <span className="ml-2">Rencana Tabungan</span>
@@ -201,23 +303,19 @@ const FormTransfer = ({
           value={
             (fromType === "wallet"
               ? formData.from_wallet_id
-              : formData.from_goal_id) ?? ""
-          } // Value dinamis
-          onChange={(e) => {
-            const otherIdField =
-              fromType === "wallet" ? "from_goal_id" : "from_wallet_id";
-            handleFormChange(
-              { target: { name: otherIdField, value: null } },
-              "transfer"
-            );
-            handleFormChange(e, "transfer");
-          }}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              : formData.from_goal_id) || ""
+          }
+          onChange={(e) => handleFormChange(e, "transfer")}
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" // <-- Style tidak diubah
           required
           disabled={
             isLoading ||
             (fromType === "wallet" && wallets.length === 0) ||
             (fromType === "goal" && goals.length === 0)
+          }
+          aria-invalid={errors?.from_wallet_id ? "true" : "false"} // General source error
+          aria-describedby={
+            errors?.from_wallet_id ? "from_source-error" : undefined
           }
         >
           <option value="" disabled>
@@ -241,13 +339,17 @@ const FormTransfer = ({
                 </option>
               ))}
         </select>
-      </div>
+        {/* Tampilkan Error Sumber */}
+        {errors?.from_wallet_id && (
+          <p id="from_source-error" className="text-red-500 text-xs mt-1">
+            {errors.from_wallet_id}
+          </p>
+        )}
+      </fieldset>
 
       {/* Tujuan Transfer */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Tujuan Dana
-        </label>
+      <fieldset className="mb-4 border p-3 rounded-md">
+        <legend className="text-sm font-medium px-1">Ke Tujuan</legend>
         <div className="flex space-x-4 mb-2">
           <label className="inline-flex items-center">
             <input
@@ -256,7 +358,7 @@ const FormTransfer = ({
               name="toTypeRadio"
               value="wallet"
               checked={toType === "wallet"}
-              onChange={(e) => setToType(e.target.value)}
+              onChange={(e) => handleTypeChange(setToType, "to_goal_id", e)}
               disabled={isLoading}
             />
             <span className="ml-2">Dompet</span>
@@ -268,7 +370,7 @@ const FormTransfer = ({
               name="toTypeRadio"
               value="goal"
               checked={toType === "goal"}
-              onChange={(e) => setToType(e.target.value)}
+              onChange={(e) => handleTypeChange(setToType, "to_wallet_id", e)}
               disabled={isLoading}
             />
             <span className="ml-2">Rencana Tabungan</span>
@@ -280,23 +382,25 @@ const FormTransfer = ({
           value={
             (toType === "wallet"
               ? formData.to_wallet_id
-              : formData.to_goal_id) ?? ""
+              : formData.to_goal_id) || ""
           }
-          onChange={(e) => {
-            const otherIdField =
-              toType === "wallet" ? "to_goal_id" : "to_wallet_id";
-            handleFormChange(
-              { target: { name: otherIdField, value: null } },
-              "transfer"
-            );
-            handleFormChange(e, "transfer");
-          }}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          onChange={(e) => handleFormChange(e, "transfer")}
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" // <-- Style tidak diubah
           required
           disabled={
             isLoading ||
             (toType === "wallet" && wallets.length === 0) ||
             (toType === "goal" && goals.length === 0)
+          }
+          aria-invalid={
+            errors?.to_wallet_id || errors?.to_goal_id ? "true" : "false"
+          } // Cek kedua potensi error
+          aria-describedby={
+            errors?.to_wallet_id
+              ? "to_destination-error"
+              : errors?.to_goal_id
+              ? "to_destination-goal-error"
+              : undefined
           }
         >
           <option value="" disabled>
@@ -320,27 +424,56 @@ const FormTransfer = ({
                 </option>
               ))}
         </select>
-      </div>
+        {/* Tampilkan Error Tujuan */}
+        {errors?.to_wallet_id && (
+          <p id="to_destination-error" className="text-red-500 text-xs mt-1">
+            {errors.to_wallet_id}
+          </p>
+        )}
+        {errors?.to_goal_id && (
+          <p
+            id="to_destination-goal-error"
+            className="text-red-500 text-xs mt-1"
+          >
+            {errors.to_goal_id}
+          </p>
+        )}
+      </fieldset>
+
+      {/* Jumlah Transfer */}
       <div className="mb-4">
         <label
           htmlFor="amount"
           className="block text-sm font-medium text-gray-700"
         >
-          Jumlah Transfer
+          Jumlah Transfer (Rp)
         </label>
         <input
           id="amount"
           name="amount"
           type="number"
-          placeholder="Rp 0"
+          placeholder="0"
           value={formData.amount || ""}
           onChange={(e) => handleFormChange(e, "transfer")}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" // <-- Style tidak diubah
           required
           min="0"
+          step="any"
           disabled={isLoading}
+          aria-invalid={errors?.amount ? "true" : "false"}
+          aria-describedby={
+            errors?.amount ? "transfer_amount-error" : undefined
+          }
         />
+        {/* Tampilkan Error */}
+        {errors?.amount && (
+          <p id="transfer_amount-error" className="text-red-500 text-xs mt-1">
+            {errors.amount}
+          </p>
+        )}
       </div>
+
+      {/* Catatan Transfer */}
       <div className="mb-4">
         <label
           htmlFor="note"
@@ -355,13 +488,15 @@ const FormTransfer = ({
           placeholder="Catatan"
           value={formData.note || ""}
           onChange={(e) => handleFormChange(e, "transfer")}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" // <-- Style tidak diubah
           disabled={isLoading}
         />
       </div>
     </div>
   );
 };
+
+// --- Komponen Utama AddTransactionForm ---
 const AddTransactionForm = ({
   isOpen,
   onClose,
@@ -374,11 +509,27 @@ const AddTransactionForm = ({
   goals = [],
   categories = [],
   isLoading,
+  errors, // <-- Terima errors dari parent
 }) => {
   const handleInternalSubmit = (e) => {
     e.preventDefault();
-    handleSubmit();
+    handleSubmit(); // Panggil handler submit dari parent
   };
+
+  // Set transaction_type di parent saat tab berubah (jika bukan transfer)
+  useEffect(() => {
+    if (activeTab !== "transfer") {
+      handleFormChange(
+        {
+          target: {
+            name: "transaction_type",
+            value: activeTab === "income" ? "Income" : "Expense",
+          },
+        },
+        "transaction"
+      );
+    }
+  }, [activeTab]);
 
   return (
     isOpen && (
@@ -387,11 +538,11 @@ const AddTransactionForm = ({
         onClick={onClose}
       >
         <div
-          className="bg-white p-6 rounded-[16px] w-[500px]"
+          className="bg-white p-6 rounded-[16px] w-[500px] "
           onClick={(e) => e.stopPropagation()}
         >
-          <form onSubmit={handleInternalSubmit}>
-            <div className="flex justify-around border-b mb-4">
+          <form onSubmit={handleInternalSubmit} noValidate>
+            <div className="flex justify-around border-b mb-4 sticky top-0 bg-white z-10 py-2">
               {["income", "expense", "transfer"].map((tab) => (
                 <button
                   key={tab}
@@ -402,6 +553,7 @@ const AddTransactionForm = ({
                       ? "border-b-2 border-blue-600 text-blue-600"
                       : "text-gray-500 hover:text-gray-700"
                   }`}
+                  disabled={isLoading}
                 >
                   {tab === "income" && "Pemasukan"}
                   {tab === "expense" && "Pengeluaran"}
@@ -409,6 +561,11 @@ const AddTransactionForm = ({
                 </button>
               ))}
             </div>
+            {errors && errors.server && (
+              <p className="text-red-500 text-xs mb-3 text-center">
+                {errors.server}
+              </p>
+            )}
             {activeTab === "transfer" ? (
               <FormTransfer
                 formData={formData}
@@ -416,6 +573,7 @@ const AddTransactionForm = ({
                 wallets={wallets}
                 goals={goals}
                 isLoading={isLoading}
+                errors={errors}
               />
             ) : (
               <FormTransaksi
@@ -423,11 +581,13 @@ const AddTransactionForm = ({
                 handleFormChange={handleFormChange}
                 wallets={wallets}
                 categories={categories}
+                goals={goals}
                 isLoading={isLoading}
                 activeTab={activeTab}
+                errors={errors}
               />
             )}
-            <div className="flex justify-end space-x-3 mt-6">
+            <div className="flex justify-end space-x-3 mt-6 sticky bottom-0 bg-white z-10 py-4 border-t">
               <button
                 type="button"
                 onClick={onClose}
@@ -441,7 +601,11 @@ const AddTransactionForm = ({
                 disabled={isLoading}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
-                {isLoading ? "Menyimpan..." : "Tambah"}
+                {isLoading
+                  ? "Menyimpan..."
+                  : activeTab === "transfer"
+                  ? "Transfer Dana"
+                  : "Simpan Transaksi"}
               </button>
             </div>
           </form>

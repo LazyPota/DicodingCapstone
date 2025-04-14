@@ -4,28 +4,36 @@ import { useNavigate } from "react-router-dom";
 import {
   getBudgets,
   createBudget,
-  updateBudget, // Pastikan sudah diimport jika ada fitur edit
+  updateBudget,
   resetBudgetState,
+  resetBudgetsAndPagination, 
 } from "../../features/budgets/budgetSlice";
 import { getCategories } from "../../features/categories/categorySlice";
-import { getWallets } from "../../features/wallets/walletSlice"; // Pastikan import dan slice ada
+import { getWallets } from "../../features/wallets/walletSlice";
 import SmartBudgetingView from "./SmartBudgetingView";
 import Modal from "../../components/Modal";
+import SuccessPopup from "../../components/Popup/SuccessPopup"; 
+import UpdatePopup from "../../components/Popup/UpdatePopup"; 
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 const SmartBudgeting = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("add");
   const [currentBudget, setCurrentBudget] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const [currentPage, setCurrentPage] = useState(1); 
+  const itemsPerPage = 6; 
+  const [errors, setErrors] = useState({}); 
 
-  // Initial state form HARUS menyertakan wallet_id
+  const currentMonth = new Date().getMonth() + 1; 
+  const currentYear = new Date().getFullYear();
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+
   const initialFormData = {
     category_id: "",
     amount: "",
-    period: "Monthly", // Default periode
-    wallet_id: "", // <-- Tambahkan/Pastikan ada
+    period: "Monthly",
+    wallet_id: "",
   };
   const [formData, setFormData] = useState(initialFormData);
 
@@ -34,125 +42,133 @@ const SmartBudgeting = () => {
 
   const { user } = useSelector((state) => state.auth);
   const {
-    budgets = [],
-    isLoading,
-    isError,
-    isSuccess,
-    message,
+    budgets = [], paginationInfo, isLoading, isError, isSuccess, message,
   } = useSelector((state) => state.budgets);
-  const { categories: availableCategories = [] } = useSelector(
-    (state) => state.categories
-  );
-  const { wallets = [] } = useSelector(
-    (state) => state.wallets
-  );
+  const { categories: availableCategories = [] } = useSelector((state) => state.categories);
+  const { wallets = [] } = useSelector((state) => state.wallets);
 
   useEffect(() => {
     if (!user?.id) {
-      navigate("/login");
-      return;
+      console.log("useEffect Main Fetch: No user ID yet. Waiting or navigating.");
+      return; 
     }
-    dispatch(getBudgets(user.id));
+    console.log(`useEffect Main Fetch: Fetching budgets for user ${user.id}, page ${currentPage}, month ${selectedMonth}, year ${selectedYear}`);
+    dispatch(getBudgets({
+        userId: user.id,
+        page: currentPage,
+        perPage: itemsPerPage,
+        month: selectedMonth,
+        year: selectedYear,
+     }));
     if (availableCategories.length === 0) {
+      console.log("useEffect Main Fetch: Fetching categories.");
       dispatch(getCategories(user.id));
     }
     if (wallets.length === 0) {
+      console.log("useEffect Main Fetch: Fetching wallets.");
       dispatch(getWallets(user.id));
     }
-
-    dispatch(resetBudgetState());
     return () => {
-      dispatch(resetBudgetState());
+      console.log("SmartBudgeting unmounting or deps changed, resetting budgets and pagination.");
+      dispatch(resetBudgetsAndPagination());
     };
-  }, [dispatch, user?.id, navigate]); 
+  }, [dispatch, user?.id, navigate, currentPage, selectedMonth, selectedYear, itemsPerPage]); 
+
+  useEffect(() => { 
+     if (isError && message) {
+        console.error("Budget operation error:", message);
+        setErrors(prev => ({ ...prev, server: message }));
+     }
+   }, [isError, message, dispatch]);
+
   useEffect(() => {
-    if (isError) {
-      alert(`Error: ${message}`);
-      dispatch(resetBudgetState());
-    }
     if (isSuccess && message) {
+      console.log("Budget operation successful:", message);
       setIsModalOpen(false);
-      setFormData(initialFormData); 
+      setFormData(initialFormData);
       setCurrentBudget(null);
       setModalMode("add");
-      alert(message);
-      if (user?.id) {
-        dispatch(getBudgets(user.id));
-      }
-      dispatch(resetBudgetState());
-    }
-  }, [isError, isSuccess, message, dispatch, user?.id, initialFormData]); 
+      setErrors({});
 
+      const pageToFetchAfterSuccess = message.includes("ditambahkan") ? 1 : currentPage;
+
+      if (pageToFetchAfterSuccess !== currentPage) {
+        console.log("Success Effect: Setting page to trigger refetch:", pageToFetchAfterSuccess);
+        setCurrentPage(pageToFetchAfterSuccess);
+      } else {
+         if (user?.id) {
+             console.log("Success Effect: Refetching current page:", currentPage);
+             dispatch(getBudgets({
+                userId: user.id,
+                page: currentPage,
+                perPage: itemsPerPage,
+                month: selectedMonth,
+                year: selectedYear,
+             }));
+         }
+      }
+    }
+  }, [isSuccess, message, dispatch, user?.id, currentPage, selectedMonth, selectedYear, itemsPerPage]);
 
   const safeBudgets = useMemo(
     () => (Array.isArray(budgets) ? budgets : []),
     [budgets]
   );
   const budgetSummary = useMemo(() => {
-    const safeBudgets = Array.isArray(budgets) ? budgets : []; 
-
     const totalTarget = safeBudgets.reduce(
       (sum, budget) => sum + (Number(budget.amount) || 0),
       0
-    ); // Pastikan Number
+    );
     const totalCurrent = safeBudgets.reduce(
       (sum, budget) => sum + (Number(budget.spent_amount) || 0),
       0
-    ); 
-    console.log("[Budget Summary Calc] safeBudgets:", safeBudgets);
-    console.log(
-      "[Budget Summary Calc] totalTarget:",
-      totalTarget,
-      typeof totalTarget
     );
-    console.log(
-      "[Budget Summary Calc] totalCurrent (totalTerpakai):",
-      totalCurrent,
-      typeof totalCurrent
-    );
-
     const sisa = totalTarget - totalCurrent;
     const percentage =
       totalTarget > 0 ? Math.round((totalCurrent / totalTarget) * 100) : 0;
     const finalPercentage = isNaN(percentage) ? 0 : Math.min(100, percentage);
-
-    console.log("[Budget Summary Calc] Calculated Percentage:", percentage);
-    console.log("[Budget Summary Calc] Final Percentage:", finalPercentage);
-
     return {
       totalAnggaran: totalTarget,
       totalTerpakai: totalCurrent,
       sisaAnggaran: sisa,
-      persentase: finalPercentage, 
+      persentase: finalPercentage,
     };
-  }, [budgets]);
+  }, [safeBudgets]); 
 
-  // Pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = safeBudgets.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(safeBudgets.length / itemsPerPage);
+  const totalPages = paginationInfo?.total_pages || 1;
+
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (page !== currentPage) {
+      console.log("Changing page to:", page);
+      setCurrentPage(page);
+    }
+  };
+
+  const handleMonthChange = (month, year) => {
+    console.log(`Filter changed to: Month ${month}, Year ${year}`);
+    setSelectedMonth(month);
+    setSelectedYear(year);
+    setCurrentPage(1); 
   };
 
   const openModal = () => {
     setModalMode("add");
     setCurrentBudget(null);
-    setFormData(initialFormData); 
+    setFormData(initialFormData);
+    setErrors({}); 
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (budget) => {
     setModalMode("edit");
     setCurrentBudget(budget);
-  
     setFormData({
       category_id: budget.category_id || "",
       amount: budget.amount || "",
       period: budget.period || "Monthly",
-      wallet_id: budget.wallet_id || "", 
+      wallet_id: budget.wallet_id || "",
     });
+    setErrors({}); 
     setIsModalOpen(true);
   };
 
@@ -160,55 +176,77 @@ const SmartBudgeting = () => {
     setIsModalOpen(false);
     setCurrentBudget(null);
     setModalMode("add");
-    setFormData(initialFormData); 
+    setFormData(initialFormData);
+    setErrors({});
+    if (isError) {
+      dispatch(resetBudgetState());
+    }
   };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    const processedValue =
-      name === "amount" || name.includes("_id")
-        ? value === ""
-          ? ""
-          : Number(value)
-        : value;
-    if (name === "amount" && isNaN(processedValue)) {
-      setFormData((prevState) => ({ ...prevState, [name]: value })); 
-    } else if (name.includes("_id") && value === "") {
-      setFormData((prevState) => ({ ...prevState, [name]: "" }));
-    } else {
-      setFormData((prevState) => ({ ...prevState, [name]: processedValue }));
+
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: null }));
+    }
+    if (errors.server) {
+      setErrors((prevErrors) => ({ ...prevErrors, server: null }));
+      if (isError) dispatch(resetBudgetState());
     }
   };
 
-  // Handler Submit Form
+  const validateForm = () => {
+    let formIsValid = true;
+    let newErrors = {};
+
+    if (!formData.category_id) {
+      formIsValid = false;
+      newErrors.category_id = "Kategori wajib dipilih.";
+    }
+    if (!formData.wallet_id && modalMode === "add") {
+
+      formIsValid = false;
+      newErrors.wallet_id = "Dompet wajib dipilih.";
+    }
+    if (
+      formData.amount === "" ||
+      formData.amount === null ||
+      isNaN(Number(formData.amount))
+    ) {
+      formIsValid = false;
+      newErrors.amount = "Jumlah anggaran wajib diisi angka.";
+    } else if (Number(formData.amount) <= 0) {
+      formIsValid = false;
+      newErrors.amount = "Jumlah anggaran harus lebih dari 0.";
+    }
+    if (!formData.period) {
+      // Check period
+      formIsValid = false;
+      newErrors.period = "Periode wajib dipilih.";
+    }
+
+    setErrors(newErrors);
+    return formIsValid;
+  };
+
   const handleFormSubmit = (event) => {
     event.preventDefault();
     if (!user?.id) return;
 
-    if (
-      !formData.category_id ||
-      !formData.amount ||
-      !formData.wallet_id ||
-      !formData.period
-    ) {
-      alert("Dompet, Kategori, Jumlah Anggaran, dan Periode wajib diisi.");
+    // VALIDATE FIRST
+    if (!validateForm()) {
+      console.log("Form validation failed", errors);
       return;
     }
+
     const amountFloat = parseFloat(formData.amount);
-    if (isNaN(amountFloat) || amountFloat <= 0) {
-      alert("Jumlah anggaran harus angka positif.");
-      return;
-    }
     const walletIdNumber = Number(formData.wallet_id);
-    if (isNaN(walletIdNumber) || walletIdNumber <= 0) {
-      alert("Pilihan Dompet tidak valid.");
-      return;
-    }
     const categoryIdNumber = Number(formData.category_id);
-    if (isNaN(categoryIdNumber) || categoryIdNumber <= 0) {
-      alert("Pilihan Kategori tidak valid.");
-      return;
-    }
 
     let budgetData = {};
     if (modalMode === "add") {
@@ -216,7 +254,7 @@ const SmartBudgeting = () => {
         category_id: categoryIdNumber,
         amount: amountFloat,
         period: formData.period,
-        wallet_id: walletIdNumber, 
+        wallet_id: walletIdNumber,
       };
       console.log("Submitting create budget data:", budgetData);
       dispatch(createBudget({ userId: user.id, budgetData }));
@@ -242,27 +280,26 @@ const SmartBudgeting = () => {
   };
 
   const formatCurrencyShort = (value) => {
-    if (typeof value !== "number") return "Rp. -";
-    if (value >= 1000000000) {
+    /* ... */
+    if (typeof value !== "number" || isNaN(value)) return "Rp. 0"; // Handle NaN/non-number
+    if (value >= 1000000000)
       return `Rp. ${(value / 1000000000).toLocaleString("id-ID", {
         minimumFractionDigits: 0,
         maximumFractionDigits: 1,
       })} M`;
-    } else if (value >= 1000000) {
+    if (value >= 1000000)
       return `Rp. ${(value / 1000000).toLocaleString("id-ID", {
         minimumFractionDigits: 0,
         maximumFractionDigits: 1,
       })} jt`;
-    } else {
-      return `Rp. ${value.toLocaleString("id-ID")}`;
-    }
+    return `Rp. ${value.toLocaleString("id-ID")}`;
   };
 
   return (
     <>
       <SmartBudgetingView
         isLoading={isLoading}
-        currentItems={currentItems}
+        currentItems={budgets}
         formatCurrencyShort={formatCurrencyShort}
         currentPage={currentPage}
         totalPages={totalPages}
@@ -273,8 +310,12 @@ const SmartBudgeting = () => {
         totalTerpakai={budgetSummary.totalTerpakai}
         sisaAnggaran={budgetSummary.sisaAnggaran}
         persentaseTotal={budgetSummary.persentase}
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+        onMonthChange={handleMonthChange}
       />
 
+      {/* Modal now renders children with validation errors */}
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
@@ -285,33 +326,57 @@ const SmartBudgeting = () => {
         }
         onSubmit={handleFormSubmit}
         isLoading={isLoading}
-        submitLabel={modalMode === "add" ? "Tambah" : "Simpan Perubahan"} // <-- Label tombol dinamis
+        submitLabel={modalMode === "add" ? "Tambah" : "Simpan Perubahan"}
       >
+        {/* Form Content */}
         <>
+          {/* Display Server Error Inside Modal */}
+          {errors.server && (
+            <p className="text-red-500 text-xs mb-3 text-center">
+              {errors.server}
+            </p>
+          )}
+
+          {/* Kategori Input */}
           <div className="mb-4 relative">
-            <label htmlFor="category_id" className="block text-sm font-medium">
-              Kategori
+            <label
+              htmlFor="category_id"
+              className="block text-sm font-medium text-gray-700"
+            >
+              {" "}
+              Kategori{" "}
             </label>
             <select
               id="category_id"
               name="category_id"
               value={formData.category_id}
               onChange={handleFormChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 appearance-none pr-8 bg-white mt-2 ${
+              // Add error styling
+              className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 sm:text-sm appearance-none pr-8 bg-white ${
+                errors.category_id
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:border-blue-500"
+              } ${
                 formData.category_id === "" ? "text-gray-400" : "text-gray-900"
               }`}
               required
-              disabled={isLoading || modalMode === "edit"}
+              disabled={isLoading || modalMode === "edit"} // Disable edit category/wallet
+              aria-invalid={errors.category_id ? "true" : "false"}
+              aria-describedby={
+                errors.category_id ? "category_id-error" : undefined
+              }
             >
               <option value="" disabled>
-                Pilih Kategori...
+                {" "}
+                Pilih Kategori...{" "}
               </option>
               {availableCategories &&
                 availableCategories
                   .filter((cat) => cat.category_type === "Expense")
                   .map((cat) => (
                     <option key={cat.id} value={cat.id}>
-                      {cat.category_name}
+                      {" "}
+                      {cat.category_name}{" "}
                     </option>
                   ))}
             </select>
@@ -321,22 +386,40 @@ const SmartBudgeting = () => {
                 className="text-gray-500 h-4 w-4"
               />
             </div>
+            {/* Show validation error */}
+            {errors.category_id && (
+              <p id="category_id-error" className="text-red-500 text-xs mt-1">
+                {errors.category_id}
+              </p>
+            )}
           </div>
+
+          {/* Dompet Input */}
           <div className="mb-4">
             <label
               htmlFor="wallet_id"
               className="block text-sm font-medium text-gray-700"
             >
-              Anggaran untuk Dompet
+              {" "}
+              Anggaran untuk Dompet{" "}
             </label>
             <select
               id="wallet_id"
               name="wallet_id"
               value={formData.wallet_id || ""}
               onChange={handleFormChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              // Add error styling
+              className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 sm:text-sm ${
+                errors.wallet_id
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:border-blue-500"
+              }`}
               required
-              disabled={isLoading || modalMode === "edit"}
+              disabled={isLoading || modalMode === "edit"} // Disable edit category/wallet
+              aria-invalid={errors.wallet_id ? "true" : "false"}
+              aria-describedby={
+                errors.wallet_id ? "wallet_id-error" : undefined
+              }
             >
               <option value="" disabled>
                 {wallets.length === 0
@@ -350,26 +433,104 @@ const SmartBudgeting = () => {
                 </option>
               ))}
             </select>
+            {/* Show validation error */}
+            {errors.wallet_id && (
+              <p id="wallet_id-error" className="text-red-500 text-xs mt-1">
+                {errors.wallet_id}
+              </p>
+            )}
           </div>
+
+          {/* Jumlah Anggaran Input */}
           <div className="mb-4">
-            <label htmlFor="amount" className="block text-sm font-medium">
-              Jumlah Anggaran
+            <label
+              htmlFor="amount"
+              className="block text-sm font-medium text-gray-700"
+            >
+              {" "}
+              Jumlah Anggaran{" "}
             </label>
             <input
               id="amount"
               name="amount"
-              type="number"
-              value={formData.amount}
+              type="number" // Use number for better input handling on mobile/validation
+              value={formData.amount} // Controlled component
               onChange={handleFormChange}
-              placeholder="Rp 0.00"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
+              placeholder="0"
+              // Add error styling
+              className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 sm:text-sm ${
+                errors.amount
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:border-blue-500"
+              }`}
               required
-              min="0"
+              min="0" // Min value
+              step="any" // Allow decimals if needed
               disabled={isLoading}
+              aria-invalid={errors.amount ? "true" : "false"}
+              aria-describedby={errors.amount ? "amount-error" : undefined}
             />
+            {/* Show validation error */}
+            {errors.amount && (
+              <p id="amount-error" className="text-red-500 text-xs mt-1">
+                {errors.amount}
+              </p>
+            )}
+          </div>
+
+          {/* Periode Input */}
+          <div className="mb-4">
+            <label
+              htmlFor="period"
+              className="block text-sm font-medium text-gray-700"
+            >
+              {" "}
+              Periode{" "}
+            </label>
+            <select
+              id="period"
+              name="period"
+              value={formData.period}
+              onChange={handleFormChange}
+              className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 sm:text-sm ${
+                errors.period
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:border-blue-500"
+              }`}
+              required
+              disabled={isLoading}
+              aria-invalid={errors.period ? "true" : "false"}
+              aria-describedby={errors.period ? "period-error" : undefined}
+            >
+              <option value="Monthly">Bulanan</option>
+              <option value="Yearly">Tahunan</option>
+              {/* Add other periods if needed */}
+            </select>
+            {errors.period && (
+              <p id="period-error" className="text-red-500 text-xs mt-1">
+                {errors.period}
+              </p>
+            )}
           </div>
         </>
       </Modal>
+
+      {/* Render Popups Conditionally */}
+      {isSuccess && message?.includes("ditambahkan") && (
+        <SuccessPopup
+          isOpen={isSuccess}
+          onClose={() => dispatch(resetBudgetState())}
+          successMessage={message}
+        />
+      )}
+      {isSuccess && message?.includes("diperbarui") && (
+        <UpdatePopup
+          isOpen={isSuccess}
+          onClose={() => dispatch(resetBudgetState())}
+          // Pass message to UpdatePopup
+          updateMessage={message}
+        />
+      )}
     </>
   );
 };

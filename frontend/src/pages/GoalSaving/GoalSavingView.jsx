@@ -9,20 +9,24 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import SuccessPopup from "../../components/Popup/SuccessPopup";
 
 const GoalSavingView = ({
-  currentItems,
+  currentItems, // Ini adalah goals untuk halaman saat ini
   formatCurrencyShort,
   currentPage,
-  totalPages,
+  totalPages, // <-- Terima dari parent
   handlePageChange,
   openModal,
-  isSuccessPopupOpen,
-  closeSuccessPopup,
+  // isSuccessPopupOpen, // Hapus
+  // closeSuccessPopup, // Hapus
   isLoading,
-  onDeleteGoal,
-  targetTercapai,
-  onEditGoal,
+  onDeleteGoal, // <-- Handler untuk trigger delete confirmation
+  // targetTercapai, // Gunakan totalTerkumpulKeseluruhan dari parent saja?
+  totalTercapai, // <-- Nama prop disamakan dengan parent
   chartData,
-  totalTarget,
+  totalTarget, // <-- Total target keseluruhan
+  selectedMonth, // <-- Terima filter
+  selectedYear, // <-- Terima filter
+  onMonthChange, // <-- Terima handler filter
+  deleteError, // <-- Terima error delete
 }) => {
   const safeCurrentItems = Array.isArray(currentItems) ? currentItems : [];
 
@@ -51,7 +55,11 @@ const GoalSavingView = ({
     <div className="flex-1 bg-[#F3F4F7] p-5 md:p-7 overflow-auto">
       <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:justify-between md:items-center mb-5">
         <div className="flex space-x-4 items-center">
-          <MonthPicker />
+          <MonthPicker
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onChange={onMonthChange}
+          />
           <h1 className="font-extrabold text-[24px] text-[#121212]">
             Rencana Tabungan
           </h1>
@@ -64,6 +72,14 @@ const GoalSavingView = ({
           Tambah Rencana
         </button>
       </div>
+      {deleteError && (
+        <div
+          className="my-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm"
+          role="alert"
+        >
+          Gagal Menghapus: {deleteError}
+        </div>
+      )}
 
       {/* Statistik */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -75,7 +91,7 @@ const GoalSavingView = ({
             <div className="ml-4">
               <p className="text-[16px] text-[#6B6B6B]">Target Tercapai</p>
               <h3 className="text-[24px] font-bold">
-                {formatCurrencyShort(targetTercapai)}
+                {formatCurrencyShort(totalTercapai)}
               </h3>
             </div>
           </div>
@@ -145,28 +161,16 @@ const GoalSavingView = ({
                     >
                       <div className="flex justify-between items-center">
                         <h3 className="font-semibold">{goal.goal_name}</h3>
-                        <div className="flex space-x-2">
-                          {/* Tombol Edit */}
-                          <button
-                            className={`text-blue-500 px-2 py-2 flex space-x-1 border border-blue-500 rounded-[16px] items-center text-xs hover:bg-blue-100 disabled:opacity-50 ${
-                              isLoading ? "cursor-not-allowed" : ""
-                            }`}
-                            onClick={() => onEditGoal(goal)}
-                            disabled={isLoading}
-                          >
-                            <Icon icon="ph:pencil-simple-line-fill" />
-                          </button>
-                          {/* Tombol Hapus */}
-                          <button
-                            className={`text-red-500 px-2 py-2 flex space-x-1 border border-red-500 rounded-[16px] items-center text-xs hover:bg-red-100 disabled:opacity-50 ${
-                              isLoading ? "cursor-not-allowed" : ""
-                            }`}
-                            onClick={() => onDeleteGoal(goal.id)}
-                            disabled={isLoading}
-                          >
-                            <Icon icon="ph:trash-simple" />
-                          </button>
-                        </div>
+                        <button
+                          className={`text-red-500 px-2 py-2 flex space-x-1 border border-red-500 rounded-[16px] items-center text-xs hover:bg-red-100 disabled:opacity-50 ${
+                            isLoading ? "cursor-not-allowed" : ""
+                          }`}
+                          onClick={() => onDeleteGoal(goal.id)}
+                          disabled={isLoading}
+                        >
+                          <Icon icon="ph:trash-simple" />
+                          <span>Hapus</span>
+                        </button>
                       </div>
                       <div className="pt-3">
                         <p className="text-lg font-bold text-blue-500">
@@ -205,7 +209,6 @@ const GoalSavingView = ({
             )}
           </>
         )}
-        <SuccessPopup isOpen={isSuccessPopupOpen} onClose={closeSuccessPopup} />
       </div>
     </div>
   );

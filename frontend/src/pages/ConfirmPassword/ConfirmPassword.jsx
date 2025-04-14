@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+// Tambahkan useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  resetPassword, 
-  resetPasswordState, 
+  resetPassword,
+  resetPasswordState,
 } from "../../features/passwordReset/passwordResetSlice";
 import ConfirmPasswordView from "./ConfirmPasswordView";
 
@@ -11,8 +12,12 @@ const ConfirmPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({}); 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation(); 
+
+  const [verificationSuccessMessage, setVerificationSuccessMessage] = useState(null);
 
   const { isLoading, isError, message } = useSelector(
     (state) => state.passwordReset
@@ -21,31 +26,90 @@ const ConfirmPassword = () => {
   const [emailFromStorage, setEmailFromStorage] = useState(null);
   const [codeFromStorage, setCodeFromStorage] = useState(null);
 
+  // Effect untuk setup, cek storage, dan baca pesan sukses dari Verifikasi
   useEffect(() => {
+    if (location.state?.successMessage) {
+      console.log("ConfirmPassword page received success message:", location.state.successMessage);
+      setVerificationSuccessMessage(location.state.successMessage);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+
     const storedEmail = localStorage.getItem("reset_email");
     const storedCode = localStorage.getItem("verification_code");
     console.log("[ConfirmPassword Mount] Checking localStorage - Email:", storedEmail, "Code:", storedCode);
     if (!storedEmail || !storedCode) {
-      console.error("Data sesi reset (email/kode) tidak ditemukan di localStorage saat halaman ConfirmPassword dimuat.");
-      alert("Sesi reset password tidak valid atau sudah kedaluwarsa.");
-      navigate("/forgot-password");
+      console.error("Data sesi reset (email/kode) tidak ditemukan di localStorage.");
+      navigate("/forgot-password", { state: { errorMessage: "Sesi reset password tidak valid atau kedaluwarsa." } });
     } else {
       setEmailFromStorage(storedEmail);
       setCodeFromStorage(storedCode);
       dispatch(resetPasswordState()); 
     }
+
     return () => {
+      console.log("ConfirmPassword component unmounting, resetting state.");
       dispatch(resetPasswordState());
     }
-  }, [navigate, dispatch]);
+  }, [navigate, dispatch, location]);
+
+  const validateForm = () => {
+    let formIsValid = true;
+    let newErrors = {};
+
+    if (!password) {
+      formIsValid = false;
+      newErrors.password = "Password baru wajib diisi.";
+    } else if (password.length < 8) { 
+      formIsValid = false;
+      newErrors.password = "Password minimal 8 karakter.";
+    }
+
+    if (!confirmPassword) {
+      formIsValid = false;
+      newErrors.confirmPassword = "Konfirmasi password wajib diisi.";
+    } else if (password && password !== confirmPassword) { 
+      formIsValid = false;
+      newErrors.confirmPassword = "Konfirmasi password tidak cocok.";
+    }
+
+    setErrors(newErrors);
+    return formIsValid;
+  };
+
+  const handleInputChange = (setter, fieldName) => (e) => {
+    setter(e.target.value);
+    if (errors[fieldName]) {
+      setErrors((prev) => ({ ...prev, [fieldName]: null }));
+    }
+     if (fieldName === 'password' && errors.confirmPassword === 'Konfirmasi password tidak cocok.') {
+         setErrors((prev) => ({ ...prev, confirmPassword: null }));
+     }
+     if (fieldName === 'confirmPassword' && errors.confirmPassword === 'Konfirmasi password tidak cocok.') {
+         setErrors((prev) => ({ ...prev, confirmPassword: null }));
+     }
+    if (isError) {
+      dispatch(resetPasswordState());
+    }
+     if (verificationSuccessMessage) {
+         setVerificationSuccessMessage(null);
+     }
+  };
 
   const handleChangePassword = async (event) => {
     event.preventDefault();
 
-    if (!password || !confirmPassword) 
-    if (password !== confirmPassword) 
+    if(verificationSuccessMessage) setVerificationSuccessMessage(null);
 
-    if (!emailFromStorage || !codeFromStorage) 
+    if (!validateForm()) {
+      console.log("Form konfirmasi password tidak valid (client-side)");
+      return;
+    }
+
+    if (!emailFromStorage || !codeFromStorage) {
+        console.error("Mencoba submit tanpa email/kode dari storage.");
+        setErrors({ general: "Sesi tidak valid. Ulangi proses lupa password." }); 
+        return;
+    }
 
     dispatch(resetPasswordState()); 
     const resetData = {
@@ -60,17 +124,22 @@ const ConfirmPassword = () => {
     console.log("Result action from resetPassword:", resultAction);
 
     if (resetPassword.fulfilled.match(resultAction)) {
-      console.log("Reset password SUKSES (fulfilled), membersihkan storage dan navigasi ke login...");
+      console.log("Reset password SUKSES (fulfilled), membersihkan storage...");
       localStorage.removeItem("reset_email");
       localStorage.removeItem("verification_code");
-      alert(resultAction.payload?.message || "Password berhasil diperbarui!");
-      navigate("/login"); 
+      const successMsg = resultAction.payload?.message || "Password berhasil diperbarui! Silakan login.";
+      // Navigasi ke login DENGAN PESAN SUKSES
+      navigate("/login", { replace: true, state: { successMessage: successMsg } });
     } else if (resetPassword.rejected.match(resultAction)) {
-      alert(
-        `Gagal mereset password: ${
-          resultAction.payload || "Terjadi kesalahan"
-        }`
-      );
+      // Error server akan otomatis ditampilkan oleh view
+      console.error("Reset password GAGAL (rejected):", resultAction.payload);
+      // Anda bisa menambahkan logika spesifik di sini jika perlu,
+      // misal jika error adalah "Invalid code", arahkan kembali ke verifikasi
+      if (resultAction.payload?.toLowerCase().includes('invalid verification code')) {
+          alert("Kode verifikasi tidak valid atau sudah kedaluwarsa. Anda akan diarahkan kembali.");
+          navigate('/verification'); // Atau /forgot-password
+      }
+      // Jika tidak, biarkan pesan error server tampil di halaman ini
     }
   };
 
@@ -79,12 +148,14 @@ const ConfirmPassword = () => {
       showPassword={showPassword}
       setShowPassword={setShowPassword}
       password={password}
-      setPassword={setPassword}
+      onChangePassword={handleInputChange(setPassword, 'password')} 
       confirmPassword={confirmPassword}
-      setConfirmPassword={setConfirmPassword}
-      handleChangePassword={handleChangePassword}
-      isLoading={isLoading} 
+      onChangeConfirmPassword={handleInputChange(setConfirmPassword, 'confirmPassword')}
+      handleChangePassword={handleChangePassword} 
+      isLoading={isLoading}
       error={isError ? message : null} 
+      errors={errors} 
+      verificationSuccessMessage={verificationSuccessMessage} 
     />
   );
 };

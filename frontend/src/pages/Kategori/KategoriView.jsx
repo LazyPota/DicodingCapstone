@@ -13,8 +13,6 @@ const KategoriView = ({
   onEditClick,
   onDeleteClick,
   displayCategoryType,
-  isSuccessPopupOpen,
-  closeSuccessPopup,
 }) => {
   return (
     <div className="flex-1 bg-[#F3F4F7] p-5 md:p-7 overflow-auto">
@@ -27,8 +25,8 @@ const KategoriView = ({
             disabled={isLoading}
           >
             <option value="Semua">Semua</option>
-            <option value="Pemasukan">Pemasukan</option>
-            <option value="Pengeluaran">Pengeluaran</option>
+            <option value="Income">Pemasukan</option>
+            <option value="Expense">Pengeluaran</option>
           </select>
           <h1 className="font-extrabold text-[24px] text-[#121212]">
             Kategori
@@ -120,7 +118,6 @@ const KategoriView = ({
             </tbody>
           </table>
         )}
-        <SuccessPopup isOpen={isSuccessPopupOpen} onClose={closeSuccessPopup} />
       </div>
     </div>
   );

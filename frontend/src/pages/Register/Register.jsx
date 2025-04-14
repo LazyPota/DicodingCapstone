@@ -12,6 +12,7 @@ const Register = () => {
     password: "",
   });
   const { username, email, password } = formData;
+  const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -25,27 +26,69 @@ const Register = () => {
       ...prevState,
       [e.target.name]: e.target.value,
     }));
+
+    if (errors[name]) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: null,
+      }));
+    }
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
-    const userData = { username, email, password };
-    dispatch(registerUser(userData));
+    if (validateForm()) {
+      const userData = { username, email, password };
+      dispatch(registerUser(userData));
+    } else {
+      console.log("Form registrasi tidak valid (client-side)");
+    }
+  };
+
+  const validateForm = () => {
+    let formIsValid = true;
+    let newErrors = {};
+
+    if (!username.trim()) {
+      formIsValid = false;
+      newErrors.username = "Nama Lengkap wajib diisi";
+    }
+
+    if (!email) {
+      formIsValid = false;
+      newErrors.email = "Email wajib diisi";
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
+    ) {
+      formIsValid = false;
+      newErrors.email = "Format email tidak valid";
+    }
+
+    if (!password) {
+      formIsValid = false;
+      newErrors.password = "Password wajib diisi";
+    } else if (password.length < 8) {
+      formIsValid = false;
+      newErrors.password = "Password minimal 8 karakter";
+    }
+
+    setErrors(newErrors);
+    return formIsValid;
   };
 
   useEffect(() => {
-    if (isError) {
-      alert(`Registrasi Gagal: ${message}`);
-    }
-
     if (isSuccess) {
-      alert(message || "Registrasi berhasil! Silakan login.");
-      navigate("/login");
+      const successMsg = message || "Registrasi berhasil! Silakan masuk.";
+      console.log("Registrasi sukses, navigasi ke login dengan pesan:", successMsg);
+      navigate("/login", {
+          replace: true, 
+          state: { successMessage: successMsg }
+      });
     }
     return () => {
       dispatch(reset());
     };
-  }, [isError, isSuccess, message, navigate, dispatch]);
+  }, [isSuccess, message, navigate, dispatch]);
 
   return (
     <div>
@@ -58,6 +101,9 @@ const Register = () => {
         password={password}
         onChange={onChange}
         handleRegister={handleRegister}
+        isLoading={isLoading}
+        errors={errors}
+        serverError={isError ? message : null}
       />
     </div>
   );

@@ -1,8 +1,10 @@
 import { XMarkIcon } from "@heroicons/react/16/solid";
 import React from "react";
 
-function UpdatePopup({ isOpen, onClose }) {
+// Terima prop updateMessage
+function UpdatePopup({ isOpen, onClose, updateMessage }) {
   if (!isOpen) return null;
+  console.log("UpdatePopup RENDERING with message:", updateMessage); // Log untuk debug
 
   const handleContentClick = (e) => {
     e.stopPropagation();
@@ -28,7 +30,7 @@ function UpdatePopup({ isOpen, onClose }) {
           Berhasil Diperbarui
         </h2>
         <p className="mb-6 text-sm text-gray-600">
-          Kartu Dompet berhasil ditambahkan di daftar dompet anda.
+          {updateMessage || "Anggaran berhasil diperbarui."}
         </p>
         <button
           onClick={onClose}

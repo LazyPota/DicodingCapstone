@@ -3,19 +3,35 @@ import api from "../../instance/api";
 
 export const getTransactions = createAsyncThunk(
   "transactions/getAll",
-  async (userId, { getState, rejectWithValue }) => {
+  async ({ userId, month, year }, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
       if (!token) return rejectWithValue("User tidak terautentikasi");
 
-      const response = await api.get(`/capstone/user/${userId}/transactions/`);
+      const params = new URLSearchParams();
+      let urlPath = `/capstone/user/${userId}/transactions/`;
+
+      if (month && year) {
+        params.append('month', month.toString());
+        params.append('year', year.toString());
+        console.log(`Fetching transactions for user ${userId} with filter: month=${month}, year=${year}`);
+         urlPath += `?${params.toString()}`;
+      } else {
+          console.log(`Fetching all transactions for user ${userId}`);
+      }
+
+      const response = await api.get(urlPath);
       if (response.data && Array.isArray(response.data.result)) {
         return response.data.result;
-      } else {
-        console.warn(
-          "Format respons getTransactions tidak sesuai:",
-          response.data
-        );
+      }
+      else if (response.data && Array.isArray(response.data.data)) {
+          return response.data.data;
+      }
+      else if (Array.isArray(response.data)) {
+           return response.data;
+      }
+      else {
+        console.warn("Format respons getTransactions tidak sesuai:", response.data);
         return [];
       }
     } catch (error) {

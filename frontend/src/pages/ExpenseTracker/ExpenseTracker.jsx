@@ -13,24 +13,40 @@ import ExpenseTrackerView from "./ExpenseTrackerView";
 import AddTransactionForm from "../../components/AddTransactionForm";
 import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
+import SuccessPopup from "../../components/Popup/SuccessPopup";
 import { getGoalSavings } from "../../features/goal-saving/goalSavingSlice";
-import { store } from "../../app/store";
-import { initialState } from "../../features/transactions/transactionSlice";
 
 const ExpenseTracker = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("income");
+  const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth || { user: null });
+  const currentMonth = new Date().getMonth() + 1;
+  const currentYear = new Date().getFullYear();
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+
+  const { user, isLoading: authIsLoading } = useSelector(
+    (state) => state.auth || { user: null, isLoading: true }
+  );
   const {
     transactions = [],
     isLoading,
     isError,
     isSuccess,
     message,
-  } = useSelector((state) => state.transactions || initialState);
+  } = useSelector(
+    (state) =>
+      state.transactions || {
+        transactions: [],
+        isLoading: false,
+        isError: false,
+        isSuccess: false,
+        message: "",
+      }
+  );
   const { categories = [] } = useSelector(
     (state) => state.categories || { categories: [] }
   );
@@ -42,12 +58,11 @@ const ExpenseTracker = () => {
   );
 
   const date = new Date();
-  const transactionDate = `${date.getDate().toString().padStart(2, "0")}-${(
-    date.getMonth() + 1
-  )
+  const transactionDate = `${date.getFullYear()}-${(date.getMonth() + 1)
     .toString()
-    .padStart(2, "0")}-${date.getFullYear()}`;
-  const [formTransactionData, setFormTransactionData] = useState({
+    .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
+
+  const initialTransactionData = {
     wallet_id: "",
     category_id: "",
     goal_id: "",
@@ -55,106 +70,102 @@ const ExpenseTracker = () => {
     transaction_date: transactionDate,
     note: "",
     transaction_type: "Income",
-  });
+  };
+  const [formTransactionData, setFormTransactionData] = useState(
+    initialTransactionData
+  );
 
-  const [formTransferData, setFormTransferData] = useState({
-    from_wallet_id: null,
-    from_goal_id: null,
-    to_wallet_id: null,
-    to_goal_id: null,
+  const initialTransferData = {
+    from_wallet_id: "",
+    from_goal_id: "",
+    to_wallet_id: "",
+    to_goal_id: "",
     amount: "",
     transfer_date: transactionDate,
     note: "",
-  });
+  };
+  const [formTransferData, setFormTransferData] = useState(initialTransferData);
+
   useEffect(() => {
     if (user?.id) {
-      console.log("User ID found, dispatching initial fetches...");
-      dispatch(getTransactions(user.id));
-      const currentState = store.getState();
-
-      if (
-        !currentState.categories?.categories ||
-        currentState.categories.categories.length === 0
-      ) {
-        console.log("Dispatching getCategories...");
-        dispatch(getCategories(user.id));
-      }
-      if (
-        !currentState.wallets?.wallets ||
-        currentState.wallets.wallets.length === 0
-      ) {
-        console.log("Dispatching getWallets...");
-        dispatch(getWallets(user.id));
-      }
-      if (
-        !currentState.goalSavings?.goals ||
-        currentState.goalSavings.goals.length === 0
-      ) {
-        console.log("Dispatching getGoalSavings...");
-        dispatch(getGoalSavings(user.id));
-      }
-    } else {
-      console.log("User ID not found on mount/update, redirecting...");
+      console.log(
+        `ExpenseTracker: Fetching initial/filtered data for user ${user.id}, month: ${selectedMonth}, year: ${selectedYear}`
+      );
+      dispatch(
+        getTransactions({
+          userId: user.id,
+          month: selectedMonth,
+          year: selectedYear,
+        })
+      );
+      if (categories.length === 0) dispatch(getCategories(user.id));
+      if (wallets.length === 0) dispatch(getWallets(user.id));
+      if (goals.length === 0) dispatch(getGoalSavings({ userId: user.id }));
+    } else if (!authIsLoading && !user) {
       navigate("/login");
     }
+  }, [
+    dispatch,
+    user?.id,
+    navigate,
+    authIsLoading,
+    selectedMonth,
+    selectedYear,
+  ]);
 
+  useEffect(() => {
     return () => {
       console.log("ExpenseTracker unmounting, resetting transaction state.");
       dispatch(resetTransactionState());
     };
-  }, [dispatch, user?.id, navigate]);
+  }, [dispatch]);
+
   useEffect(() => {
     if (isSuccess && message) {
+      console.log("Transaction/Transfer successful:", message);
       setIsModalOpen(false);
-      alert(message);
-      if (activeTab === "transfer") {
-        setFormTransferData({
-          from_wallet_id: null,
-          from_goal_id: null,
-          to_wallet_id: null,
-          to_goal_id: null,
-          amount: "",
-          transfer_date: transactionDate,
-          note: "",
-        });
+      if (message.toLowerCase().includes("transfer")) {
+        setFormTransferData(initialTransferData);
       } else {
-        setFormTransactionData({
-          wallet_id: "",
-          category_id: "",
-          amount: "",
-          transaction_date: transactionDate,
-          note: "",
-          transaction_type: activeTab === "income" ? "Income" : "Expense",
-        });
+        setFormTransactionData(initialTransactionData);
       }
+      setErrors({});
       if (user?.id) {
-        dispatch(getTransactions(user.id));
+        console.log("Refetching transactions after success with filter...");
+        dispatch(
+          getTransactions({
+            userId: user.id,
+            month: selectedMonth,
+            year: selectedYear,
+          })
+        );
+        if (message.toLowerCase().includes("transfer")) {
+          dispatch(getWallets(user.id));
+          dispatch(getGoalSavings({ userId: user.id }));
+        }
       }
-      dispatch(resetTransactionState());
     }
+  }, [isSuccess, message, dispatch, user?.id, selectedMonth, selectedYear]);
 
+  useEffect(() => {
     if (isError && message) {
-      alert(`Error: ${message}`);
+      console.error("Transaction/Transfer error:", message);
+      setErrors((prev) => ({ ...prev, server: message }));
       dispatch(resetTransactionState());
     }
-  }, [
-    isSuccess,
-    isError,
-    message,
-    dispatch,
-    user?.id,
-    activeTab,
-    transactionDate,
-  ]);
+  }, [isError, message, dispatch]);
 
   const handleFormChange = (e, formType) => {
     const { name, value } = e.target;
     let processedValue = value;
 
     if (name === "amount") {
-      processedValue = value === "" ? "" : parseFloat(value) || "";
-    } else if (name.includes("_id")) {
-      processedValue = value === "" ? null : Number(value);
+      processedValue = value === "" ? "" : value;
+    } else if (name.includes("_id") && value !== "") {
+      processedValue = Number(value);
+      if (isNaN(processedValue)) processedValue = "";
+    } else if (name.includes("_id") && value === "") {
+      processedValue = "";
     }
 
     if (formType === "transfer") {
@@ -166,44 +177,103 @@ const ExpenseTracker = () => {
         transaction_type: activeTab === "income" ? "Income" : "Expense",
       }));
     }
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: null }));
+    }
+    if (errors.server) {
+      setErrors((prevErrors) => ({ ...prevErrors, server: null }));
+    }
   };
-  const handleSubmit = async () => {
-    if (!user?.id) return;
 
-    let payload = null;
-    let actionToDispatch = null;
+  const validateForm = () => {
     let isValid = true;
+    let newErrors = {};
 
     if (activeTab === "transfer") {
+      const data = formTransferData;
+      const amountNumber = parseFloat(data.amount);
+
       if (
-        (!formTransferData.from_wallet_id && !formTransferData.from_goal_id) ||
-        (!formTransferData.to_wallet_id && !formTransferData.to_goal_id)
+        (!data.from_wallet_id && !data.from_goal_id) ||
+        (data.from_wallet_id && data.from_goal_id)
       ) {
-        alert("Pilih sumber dan tujuan transfer.");
         isValid = false;
-      } else if (
-        (formTransferData.from_wallet_id && formTransferData.from_goal_id) ||
-        (formTransferData.to_wallet_id && formTransferData.to_goal_id)
+        newErrors.from_wallet_id =
+          "Pilih satu sumber (Dompet atau Tujuan Menabung).";
+        newErrors.from_goal_id = " ";
+      }
+      if (
+        (!data.to_wallet_id && !data.to_goal_id) ||
+        (data.to_wallet_id && data.to_goal_id)
       ) {
-        alert("Pilih hanya satu (Wallet atau Goal) sebagai sumber/tujuan.");
         isValid = false;
-      } else if (
-        formTransferData.from_wallet_id &&
-        formTransferData.to_wallet_id &&
-        formTransferData.from_wallet_id === formTransferData.to_wallet_id
-      ) {
-        alert("Tidak bisa transfer ke dompet yang sama.");
-        isValid = false;
-      } else if (
-        !formTransferData.amount ||
-        parseFloat(formTransferData.amount) <= 0
-      ) {
-        alert("Jumlah transfer harus diisi dan lebih dari 0.");
-        isValid = false;
+        newErrors.to_wallet_id =
+          "Pilih satu tujuan (Dompet atau Tujuan Menabung).";
+        newErrors.to_goal_id = " ";
       }
 
-      if (!isValid) return;
+      if (
+        data.from_wallet_id &&
+        data.to_wallet_id &&
+        data.from_wallet_id === data.to_wallet_id
+      ) {
+        isValid = false;
+        newErrors.to_wallet_id = "Tidak bisa transfer ke dompet yang sama.";
+      }
+      if (
+        data.from_goal_id &&
+        data.to_goal_id &&
+        data.from_goal_id === data.to_goal_id
+      ) {
+        isValid = false;
+        newErrors.to_goal_id =
+          "Tidak bisa transfer ke tujuan menabung yang sama.";
+      }
 
+      if (data.amount === "" || isNaN(amountNumber) || amountNumber <= 0) {
+        isValid = false;
+        newErrors.amount = "Jumlah transfer harus angka positif.";
+      }
+    } else {
+      const data = formTransactionData;
+      const amountNumber = parseFloat(data.amount);
+
+      if (!data.wallet_id) {
+        isValid = false;
+        newErrors.wallet_id = "Dompet wajib dipilih.";
+      }
+      if (!data.category_id) {
+        isValid = false;
+        newErrors.category_id = "Kategori wajib dipilih.";
+      }
+      if (data.amount === "" || isNaN(amountNumber) || amountNumber <= 0) {
+        isValid = false;
+        newErrors.amount = "Jumlah transaksi harus angka positif.";
+      }
+
+      if (!data.transaction_date) {
+        isValid = false;
+        newErrors.transaction_date = "Tanggal transaksi wajib diisi.";
+      }
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async () => {
+    if (!user?.id) return;
+    setErrors({});
+
+    if (!validateForm()) {
+      console.log("Form validation failed.");
+      return;
+    }
+
+    let payload = {};
+    let actionToDispatch = null;
+
+    if (activeTab === "transfer") {
       payload = {
         from_wallet_id: formTransferData.from_wallet_id || null,
         from_goal_id: formTransferData.from_goal_id || null,
@@ -219,21 +289,10 @@ const ExpenseTracker = () => {
       });
       console.log("Dispatching createTransfer:", payload);
     } else {
-      if (
-        !formTransactionData.wallet_id ||
-        !formTransactionData.category_id ||
-        !formTransactionData.amount ||
-        parseFloat(formTransactionData.amount) <= 0
-      ) {
-        alert("Dompet, Kategori, dan Jumlah wajib diisi dan lebih dari 0.");
-        isValid = false;
-      }
-
-      if (!isValid) return;
-
       payload = {
         wallet_id: Number(formTransactionData.wallet_id),
         category_id: Number(formTransactionData.category_id),
+        goal_id: Number(formTransactionData.goal_id) || null,
         amount: parseFloat(formTransactionData.amount),
         transaction_date: formTransactionData.transaction_date,
         note: formTransactionData.note || null,
@@ -247,47 +306,61 @@ const ExpenseTracker = () => {
     }
 
     dispatch(resetTransactionState());
-    await dispatch(actionToDispatch);
+    dispatch(actionToDispatch);
+  };
+
+  const handleMonthChange = (month, year) => {
+    console.log(`Filter changed to: Month ${month}, Year ${year}`);
+    setSelectedMonth(month);
+    setSelectedYear(year);
   };
 
   const safeTransactions = useMemo(
     () => (Array.isArray(transactions) ? transactions : []),
     [transactions]
   );
-  const filteredTransactions = useMemo(
-    () =>
-      safeTransactions
-        .map((tx, index) => ({ ...tx, no: index + 1 }))
-        .filter((tx) => {
-          const walletName = tx.wallet?.wallet_name?.toLowerCase() || "";
-          const categoryName = tx.category?.category_name?.toLowerCase() || "";
-          const date = tx.transaction_date?.toLowerCase() || "";
-          const note = tx.note?.toLowerCase() || "";
-          const search = searchTerm.toLowerCase();
-          return (
-            walletName.includes(search) ||
-            categoryName.includes(search) ||
-            date.includes(search) ||
-            note.includes(search)
-          );
-        }),
-    [safeTransactions, searchTerm]
-  );
+  const filteredTransactions = useMemo(() => {
+    return safeTransactions
+      .map((tx, index) => ({ ...tx, no: index + 1 }))
+      .filter((tx) => {
+        const search = searchTerm.toLowerCase();
+        if (!search) return true;
+        const walletName = tx.wallet?.wallet_name?.toLowerCase() || "";
+        const categoryName = tx.category?.category_name?.toLowerCase() || "";
+        const date = tx.transaction_date?.toLowerCase() || "";
+        const note = tx.note?.toLowerCase() || "";
+        const amountStr = tx.amount?.toString().toLowerCase() || "";
+        return (
+          walletName.includes(search) ||
+          categoryName.includes(search) ||
+          date.includes(search) ||
+          note.includes(search) ||
+          amountStr.includes(search)
+        );
+      });
+  }, [safeTransactions, searchTerm]);
 
   return (
-    <div className="">
-      <div className="flex-1 flex flex-col">
-        <ExpenseTrackerView
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          setIsModalOpen={setIsModalOpen}
-          transactionsToDisplay={filteredTransactions}
-          isLoading={isLoading && transactions.length === 0}
-        />
-      </div>
+    <>
+      <ExpenseTrackerView
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        setIsModalOpen={setIsModalOpen}
+        transactionsToDisplay={filteredTransactions}
+        isLoading={isLoading && transactions.length === 0 && !isError}
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+        onMonthChange={handleMonthChange}
+      />
       <AddTransactionForm
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setErrors({});
+          setFormTransactionData(initialTransactionData);
+          setFormTransferData(initialTransferData);
+          if (isError) dispatch(resetTransactionState());
+        }}
         formData={
           activeTab === "transfer" ? formTransferData : formTransactionData
         }
@@ -299,8 +372,16 @@ const ExpenseTracker = () => {
         goals={goals || []}
         categories={categories || []}
         isLoading={isLoading}
+        errors={errors}
       />
-    </div>
+      {isSuccess && message && (
+        <SuccessPopup
+          isOpen={isSuccess}
+          onClose={() => dispatch(resetTransactionState())}
+          successMessage={message}
+        />
+      )}
+    </>
   );
 };
 

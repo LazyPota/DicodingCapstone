@@ -10,6 +10,7 @@ import VerificationView from "./VerificationView";
 const Verification = () => {
   const [otp, setOtp] = useState(Array(6).fill(""));
   const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const inputsRef = useRef([]);
@@ -31,11 +32,21 @@ const Verification = () => {
     }
 
     return () => {
-        dispatch(resetPasswordState());
-    }
+      dispatch(resetPasswordState());
+    };
   }, [navigate, dispatch]);
 
+  const clearErrors = () => {
+    if (errors.otp) {
+      setErrors({});
+    }
+    if (isError) {
+      dispatch(resetPasswordState());
+    }
+  };
+
   const handleChange = (e, index) => {
+    clearErrors();
     const { value } = e.target;
     if (/^[0-9]$/.test(value)) {
       const newOtp = [...otp];
@@ -45,64 +56,91 @@ const Verification = () => {
         inputsRef.current[index + 1]?.focus();
       }
     } else if (value === "" && index >= 0) {
-        const newOtp = [...otp];
-        newOtp[index] = '';
-        setOtp(newOtp);
+      const newOtp = [...otp];
+      newOtp[index] = "";
+      setOtp(newOtp);
     }
   };
 
   const handleKeyDown = (e, index) => {
-      if (e.key === 'Backspace') {
-          const newOtp = [...otp];
-          if(newOtp[index]){
-              newOtp[index] = '';
-              setOtp(newOtp);
-          } else if (index > 0) {
-              inputsRef.current[index - 1]?.focus();
-          }
+    if (e.key === "Backspace") {
+      const newOtp = [...otp];
+      if (newOtp[index]) {
+        newOtp[index] = "";
+        setOtp(newOtp);
+      } else if (index > 0) {
+        inputsRef.current[index - 1]?.focus();
       }
-  }
+    }
+  };
+
+  const validateForm = () => {
+    let formIsValid = true;
+    let newErrors = {};
+    const verificationCode = otp.join("");
+
+    if (verificationCode.length !== 6) {
+      formIsValid = false;
+      newErrors.otp = "Kode verifikasi harus lengkap (6 digit).";
+    }
+
+    setErrors(newErrors);
+    return formIsValid;
+  };
 
   const handleVerifyCode = async (event) => {
     event.preventDefault();
-    const verificationCode = otp.join('');
 
-    if (verificationCode.length !== 6) {
-      alert('Kode verifikasi harus 6 digit.');
+    if (!validateForm()) {
+      console.log("Form verifikasi tidak valid (client-side)");
       return;
     }
+
     if (!email) {
-      alert('Email tidak ditemukan. Silakan ulangi proses lupa password.');
+      setErrors({ otp: "Email tidak ditemukan. Ulangi proses lupa password." });
       return;
     }
 
     dispatch(resetPasswordState());
-    console.log('Dispatching checkCode with:', { email, code: verificationCode });
-    const resultAction = await dispatch(checkCode({ email, code: verificationCode }));
-    console.log('Result action from checkCode:', resultAction);
+    const verificationCode = otp.join("");
+    console.log("Dispatching checkCode with:", {
+      email,
+      code: verificationCode,
+    });
+    const resultAction = await dispatch(
+      checkCode({ email, code: verificationCode })
+    );
+    console.log("Result action from checkCode:", resultAction);
+
     if (checkCode.fulfilled.match(resultAction)) {
-        console.log("checkCode fulfilled. Payload:", resultAction.payload);
-        try {
-            localStorage.setItem('verification_code', verificationCode);
-            console.log(`localStorage 'verification_code' SET to: ${localStorage.getItem('verification_code')}`);
-            alert(resultAction.payload?.message || 'Kode valid!');
-            navigate('/confirm-password'); 
-        } catch (storageError) {
-             console.error("Gagal menyimpan kode verifikasi ke localStorage:", storageError);
-             alert("Terjadi kesalahan saat menyimpan sesi verifikasi. Coba lagi.");
-             localStorage.removeItem('verification_code');
-        }
-    }
-    else if (checkCode.rejected.match(resultAction)) {
-        console.error('checkCode rejected:', resultAction.payload);
-        localStorage.removeItem('verification_code');
-        let errorMessage = resultAction.payload || 'Terjadi kesalahan verifikasi.';
-        if (errorMessage.toLowerCase().includes('invalid code')) {
-            errorMessage = 'Kode verifikasi salah.';
-        }
-        alert(`Gagal: ${errorMessage}`);
-        setOtp(Array(6).fill(""));
-        inputsRef.current[0]?.focus();
+      console.log("checkCode fulfilled. Payload:", resultAction.payload);
+      try {
+        localStorage.setItem("verification_code", verificationCode);
+        console.log(
+          `localStorage 'verification_code' SET to: ${localStorage.getItem(
+            "verification_code"
+          )}`
+        );
+        const successMsg =
+          resultAction.payload?.message || "Kode verifikasi valid!";
+        navigate("/confirm-password", {
+          state: { successMessage: successMsg },
+        });
+      } catch (storageError) {
+        console.error(
+          "Gagal menyimpan kode verifikasi ke localStorage:",
+          storageError
+        );
+        setErrors({
+          otp: "Terjadi kesalahan saat menyimpan sesi verifikasi. Coba lagi.",
+        });
+        localStorage.removeItem("verification_code");
+      }
+    } else if (checkCode.rejected.match(resultAction)) {
+      console.error("checkCode rejected:", resultAction.payload);
+      localStorage.removeItem("verification_code");
+      setOtp(Array(6).fill(""));
+      inputsRef.current[0]?.focus();
     }
   };
 
@@ -116,6 +154,7 @@ const Verification = () => {
       handleVerifyCode={handleVerifyCode}
       isLoading={isLoading}
       error={isError ? message : null}
+      errors={errors}
     />
   );
 };

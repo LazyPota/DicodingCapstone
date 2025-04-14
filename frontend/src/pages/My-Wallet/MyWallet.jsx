@@ -11,12 +11,12 @@ import MyWaletView from "./MyWaletView";
 const MyWallet = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filter, setFilter] = useState("Semua");
-  const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
   const [formData, setFormData] = useState({
     wallet_name: "",
     wallet_type: "",
     amount: "",
   });
+  const [errors, setErrors] = useState({});
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -38,19 +38,24 @@ const MyWallet = () => {
   }, [dispatch, user?.id, navigate]);
 
   useEffect(() => {
-    if (isSuccess && message.includes("berhasil ditambahkan")) {
+    if (
+      isSuccess &&
+      message &&
+      (message.includes("berhasil ditambahkan") ||
+        message.includes("created successfully"))
+    ) {
+      console.log(
+        "Wallet creation successful, closing modal and resetting form."
+      );
       setIsModalOpen(false);
       setFormData({ wallet_name: "", wallet_type: "", amount: "" });
-      setIsSuccessPopupOpen(true);
-      dispatch(resetWalletState());
+      setErrors({});
     }
     if (isError && message) {
-      alert(`Error: ${message}`);
-      dispatch(resetWalletState());
+      setErrors((prev) => ({ ...prev, server: message }));
     }
   }, [isSuccess, isError, message, dispatch]);
 
-  // Filtering di frontend
   const filteredWallets = React.useMemo(() => {
     const safeWallets = Array.isArray(wallets) ? wallets : [];
     if (filter === "Semua") return safeWallets;
@@ -59,26 +64,87 @@ const MyWallet = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setFormData({ wallet_name: "", wallet_type: "", amount: "" });
+    setErrors({});
+    if (isError) dispatch(resetWalletState());
   };
 
-  const closeSuccessPopup = () => {
-    setIsSuccessPopupOpen(false);
+  const validateForm = () => {
+    let formIsValid = true;
+    let newErrors = {};
+
+    if (!formData.wallet_name.trim()) {
+      formIsValid = false;
+      newErrors.wallet_name = "Nama dompet wajib diisi.";
+    }
+    if (!formData.wallet_type) {
+      formIsValid = false;
+      newErrors.wallet_type = "Jenis dompet wajib dipilih.";
+    }
+    if (
+      formData.amount === "" ||
+      formData.amount === null ||
+      isNaN(formData.amount)
+    ) {
+      formIsValid = false;
+      newErrors.amount = "Saldo awal wajib diisi dan harus berupa angka.";
+    } else if (parseFloat(formData.amount) < 0) {
+      formIsValid = false;
+      newErrors.amount = "Saldo awal tidak boleh negatif.";
+    }
+
+    setErrors(newErrors);
+    return formIsValid;
   };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: name === "amount" ? parseFloat(value) || "" : value,
-    }));
+    if (name === "amount") {
+      const numericValue = value
+        .replace(/[^0-9.]/g, "")
+        .replace(/(\..*)\./g, "$1");
+      const floatValue = parseFloat(numericValue);
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]:
+          isNaN(floatValue) && numericValue !== ""
+            ? numericValue
+            : isNaN(floatValue)
+            ? ""
+            : floatValue,
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+
+    if (errors[name]) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: null,
+      }));
+    }
+    if (errors.server) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        server: null,
+      }));
+      if (isError) dispatch(resetWalletState());
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user?.id) return;
+    if (!user?.id) {
+      console.error("Tidak bisa submit, User ID tidak ada.");
+      setErrors({ server: "User tidak dikenali. Silakan login ulang." });
+      return;
+    }
 
-    if (!formData.wallet_name || !formData.wallet_type || !formData.amount) {
-      alert("Nama, Jenis, dan Saldo Dompet wajib diisi.");
+    if (!validateForm()) {
+      console.log("Form tambah dompet tidak valid (client-side)");
       return;
     }
 
@@ -88,8 +154,14 @@ const MyWallet = () => {
       amount: parseFloat(formData.amount),
     };
 
+    const amountValue = parseFloat(formData.amount);
+    if (isNaN(amountValue)) {
+      setErrors((prev) => ({ ...prev, amount: "Saldo awal tidak valid." }));
+      return;
+    }
+
     console.log("Dispatching createWallet:", walletData);
-    dispatch(resetWalletState());
+    setErrors({});
     await dispatch(createWallet({ userId: user.id, walletData }));
   };
 
@@ -104,9 +176,12 @@ const MyWallet = () => {
       handleSubmit={handleSubmit}
       filter={filter}
       setFilter={setFilter}
-      isSuccessPopupOpen={isSuccessPopupOpen}
-      closeSuccessPopup={closeSuccessPopup}
       isLoading={isLoading}
+      showSuccessPopup={isSuccess}
+      onCloseSuccessPopup={() => dispatch(resetWalletState())}
+      errors={errors}
+      successMessage={message} 
+      serverError={isError && !errors.server ? message : errors.server || null}
     />
   );
 };

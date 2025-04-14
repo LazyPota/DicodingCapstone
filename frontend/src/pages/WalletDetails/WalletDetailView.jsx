@@ -4,12 +4,14 @@ import Sidebar from "../../components/Sidebar";
 import CardWallet from "../../components/CardWallet";
 import RecentTransactions from "../../components/RecentTransactions";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { Link } from "react-router-dom";
 const WalletDetailView = ({
   wallet,
   onDelete,
   isDeleting,
   transactions,
   isLoadingTransactions,
+  deleteError,
 }) => {
   const displayWalletType = (type) => {
     switch (type) {
@@ -30,7 +32,14 @@ const WalletDetailView = ({
     }
   };
 
-  if (!wallet) {
+  if (!wallet && !isLoadingTransactions) {
+    return (
+      <div className="flex-1 bg-gray-50 p-7 text-center">
+        Data dompet tidak ditemukan.
+      </div>
+    );
+  }
+  if (!wallet && isLoadingTransactions) {
     return (
       <div className="flex-1 bg-gray-50 p-7 text-center">Memuat data...</div>
     );
@@ -38,21 +47,40 @@ const WalletDetailView = ({
 
   return (
     <div className="flex-1 bg-gray-50 p-7 overflow-auto">
-      <h1 className="text-3xl font-bold">Dompet</h1>
-      <p className="text-gray-600">Pantau rencana keuangan Anda</p>
-      {/* Wallet Details */}
-      <div className="grid grid-cols-[2fr_4fr] gap-6 mt-6">
-        {/* Card Information */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Dompet</h1>
+          <p className="text-gray-600">Pantau rencana keuangan Anda</p>
+        </div>
+        <Link
+          to="/dompet"
+          className="inline-flex items-center px-5 h-[50px] border border-gray-300 rounded-full text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          <Icon icon="ic:baseline-arrow-back" className="mr-2 h-5 w-5" />
+          Kembali
+        </Link>
+      </div>
+      {deleteError && (
+        <div
+          className="my-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm"
+          role="alert"
+        >
+          Gagal Menghapus: {deleteError}
+        </div>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-[2fr_4fr] gap-6 mt-6">
         <div className="bg-white p-5 rounded-lg ">
           <h2 className="text-xl font-bold mb-4">
             {displayWalletType(wallet.wallet_type)}
           </h2>
-          <CardWallet
-            size="small"
-            amount={wallet.amount}
-            name={wallet.wallet_name}
-            type={displayWalletType(wallet.wallet_type)}
-          />
+          {wallet && (
+            <CardWallet
+              size="small"
+              amount={wallet.amount}
+              name={wallet.wallet_name}
+              type={wallet.wallet_type}
+            />
+          )}
           <div className="flex flex-col space-y-[20px] mt-5">
             <p className="font-bold font-inter text-[20px]">Card Wallet</p>
             <div className="flex flex-row space-x-7 items-center">
@@ -94,17 +122,15 @@ const WalletDetailView = ({
               <span className="text-xl">
                 <Icon icon="radix-icons:trash" />
               </span>
-              <span>Hapus Kartu</span>
+              <span>{isDeleting ? "Menghapus..." : "Hapus Kartu"}</span>
             </button>
           </div>
         </div>
-
-        {/* Recent Transactions */}
         <RecentTransactions
-          title={`Histori Transaksi (${wallet.wallet_name})`} // Judul spesifik
-          transactions={transactions} // Data terfilter dari props
+          title={`Histori Transaksi (${wallet.wallet_name})`}
+          transactions={transactions}
           isLoading={isLoadingTransactions}
-          showWalletColumn={false} // <-- Sembunyikan kolom dompet
+          showWalletColumn={false}
           showSeeAllLink={false}
         />
       </div>

@@ -5,16 +5,16 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 
 const VerificationView = ({
-  email, 
-  otp, 
+  email,
+  otp,
   handleChange,
-  handleKeyDown, 
-  inputsRef, 
-  handleVerifyCode, 
-  isLoading, 
-  error, 
+  handleKeyDown,
+  inputsRef,
+  handleVerifyCode,
+  isLoading,
+  error,
+  errors,
 }) => {
-
   return (
     <main className="relative flex min-h-[140vh] md:p-2">
       <header className="absolute top-4 left-4">
@@ -38,8 +38,22 @@ const VerificationView = ({
           <p className="text-[18px] font-normal font-inter text-[#969696] mt-2 text-center lg:text-left">
             Kode Autentikasi Sudah Dikirim Ke {email || "Email Anda"}.
           </p>
-          {error && <p className="text-red-500 text-center mt-2 mb-2">{error}</p>}
-          <form className="mt-3 flex flex-col space-y-[20px]" noValidate onSubmit={handleVerifyCode}>
+          {error && (
+            <div
+              className="my-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm"
+              role="alert"
+            >
+              {error === "Invalid code" ||
+              error.toLowerCase().includes("invalid code")
+                ? "Kode verifikasi salah."
+                : `Gagal: ${error}`}
+            </div>
+          )}
+          <form
+            className="mt-3 flex flex-col space-y-[20px]"
+            noValidate
+            onSubmit={handleVerifyCode}
+          >
             <div className="flex justify-between gap-2">
               {Array.from({ length: 6 }).map((_, idx) => (
                 <input
@@ -57,13 +71,24 @@ const VerificationView = ({
                 />
               ))}
             </div>
+            {errors && errors.otp && (
+              <p
+                id="otp-error"
+                className="text-red-500 text-xs mt-2 text-center"
+                role="alert"
+              >
+                {errors.otp}
+              </p>
+            )}
             <div className="flex flex-col items-center space-y-4 w-full pt-4">
               <button
                 type="submit"
-                className={`w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                 disabled={isLoading}
+                className={`w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isLoading}
               >
-                 {isLoading ? 'Memverifikasi...' : 'Verifikasi Kode'}
+                {isLoading ? "Memverifikasi..." : "Verifikasi Kode"}
               </button>
               <div className="flex items-center w-full">
                 <hr className="flex-grow border-t border-gray-300" />
@@ -86,7 +111,7 @@ const VerificationView = ({
             </div>
           </form>
           <p className="text-gray-500 text-[16px] font-medium font-inter text-center mt-[32px]">
-            Sudah Punya Akun? {" "}
+            Sudah Punya Akun?{" "}
             <Link
               to="/login"
               className="text-blue-600 font-semibold font-inter underline hover:text-blue-800"

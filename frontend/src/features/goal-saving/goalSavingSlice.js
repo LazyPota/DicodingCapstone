@@ -3,27 +3,55 @@ import api from "../../instance/api";
 
 export const getGoalSavings = createAsyncThunk(
   "goalSavings/getAll",
-  async (userId, { getState, rejectWithValue }) => {
+  async (
+    { userId, page = 1, perPage = 6, month, year },
+    { getState, rejectWithValue }
+  ) => {
+    // Terima page, perPage, month, year
     try {
       const { token } = getState().auth;
       if (!token) {
         return rejectWithValue("User tidak terautentikasi");
       }
-      const response = await api.get(`/capstone/user/${userId}/goal-savings/`);
-      if (response.data && Array.isArray(response.data.result)) {
-        return response.data.result;
+      // Bangun query params
+      const params = new URLSearchParams({
+        page: page.toString(),
+        per_page: perPage.toString(),
+      });
+      if (month && year) {
+        params.append("month", month.toString());
+        params.append("year", year.toString());
+      }
+
+      console.log(`Fetching goal savings with params: ${params.toString()}`);
+      const response = await api.get(
+        `/capstone/user/${userId}/goal-savings/?${params.toString()}`
+      );
+
+      // Harapkan struktur { ..., result: { data: [], pagination: {} } }
+      if (
+        response.data &&
+        response.data.result &&
+        Array.isArray(response.data.result.data) &&
+        response.data.result.pagination
+      ) {
+        return {
+          data: response.data.result.data,
+          pagination: response.data.result.pagination,
+        };
       } else {
         console.warn(
-          "Format respons getGoalSavings tidak sesuai:",
+          "Format respons getGoalSavings (dengan pagination) tidak sesuai:",
           response.data
         );
-        return [];
+        return { data: [], pagination: null }; // Kembalikan struktur default
       }
     } catch (error) {
       const message =
         error.response?.data?.message ||
         error.response?.statusText ||
         error.message;
+      console.error("Error fetching goal savings:", error);
       return rejectWithValue(message);
     }
   }
@@ -60,7 +88,7 @@ export const updateGoalSaving = createAsyncThunk(
         `/capstone/user/${userId}/goal-savings/${goalId}`,
         goalData
       );
-      return response.data.result; 
+      return response.data.result;
     } catch (error) {
       const message =
         error.response?.data?.message ||
@@ -91,6 +119,7 @@ export const deleteGoalSaving = createAsyncThunk(
 
 const initialState = {
   goals: [],
+  paginationInfo: null, // <-- State baru
   isLoading: false,
   isError: false,
   isSuccess: false,
@@ -107,6 +136,14 @@ export const goalSavingSlice = createSlice({
       state.isSuccess = false;
       state.message = "";
     },
+    resetGoalsAndPagination: (state) => {
+      state.goals = [];
+      state.paginationInfo = null;
+      state.isLoading = false;
+      state.isError = false;
+      state.isSuccess = false;
+      state.message = "";
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -115,13 +152,16 @@ export const goalSavingSlice = createSlice({
       })
       .addCase(getGoalSavings.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.goals = action.payload;
+        state.goals = action.payload.data;
+        state.paginationInfo = action.payload.pagination;
+        state.isError = false;
       })
       .addCase(getGoalSavings.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
         state.goals = [];
+        state.paginationInfo = null;
       })
       .addCase(createGoalSaving.pending, (state) => {
         state.isLoading = true;
@@ -141,19 +181,21 @@ export const goalSavingSlice = createSlice({
         state.message = action.payload;
       })
       .addCase(updateGoalSaving.pending, (state) => {
-        state.isLoading = true; 
+        state.isLoading = true;
         state.isSuccess = false;
       })
       .addCase(updateGoalSaving.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        if(action.payload){
-            const index = state.goals.findIndex((goal) => goal.id === action.payload.id);
-            if (index !== -1) {
-                state.goals[index] = action.payload; 
-            }
+        if (action.payload) {
+          const index = state.goals.findIndex(
+            (goal) => goal.id === action.payload.id
+          );
+          if (index !== -1) {
+            state.goals[index] = action.payload;
+          }
         }
-        state.message = 'Rencana tabungan berhasil diperbarui!';
+        state.message = "Rencana tabungan berhasil diperbarui!";
       })
       .addCase(updateGoalSaving.rejected, (state, action) => {
         state.isLoading = false;
@@ -178,5 +220,5 @@ export const goalSavingSlice = createSlice({
   },
 });
 
-export const { resetGoalSavingState } = goalSavingSlice.actions;
+export const { resetGoalSavingState, resetGoalsAndPagination } = goalSavingSlice.actions;
 export default goalSavingSlice.reducer;

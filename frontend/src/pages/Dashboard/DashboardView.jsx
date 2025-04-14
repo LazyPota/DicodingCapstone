@@ -50,9 +50,6 @@ const DashboardView = ({
 
   return (
     <div className=" bg-[#F3F4F7] p-5">
-      <div className="">
-        <MonthPicker />
-      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[minmax(300px,_380px)_1fr_1.5fr] xl:grid-cols-[380px_1.5fr_2fr] gap-4 mb-4 mt-5">
         <div className="flex flex-col bg-white p-5 rounded-lg space-y-4 md:col-span-1 lg:col-span-1">
           <div className="flex justify-between items-center">
@@ -149,14 +146,28 @@ const DashboardView = ({
           <div className="bg-white rounded-[16px] p-[17px]">
             <h2 className="text-[22px] font-bold">Analitik</h2>
             <div className="w-full overflow-x-auto">
-              <div style={{ minWidth: '600px' }}>
+              <div style={{ minWidth: "600px" }}>
                 {chartData && chartData.length > 0 ? (
                   <BarChart
                     dataset={chartData}
-                    xAxis={[{ scaleType: "band", dataKey: "minggu", tickLabelStyle: { fontSize: 10 } }]}
+                    xAxis={[
+                      {
+                        scaleType: "band",
+                        dataKey: "minggu",
+                        tickLabelStyle: { fontSize: 10 },
+                      },
+                    ]}
                     series={[
-                      { dataKey: "pemasukan", label: "Pemasukan", color: "#2667FF" },
-                      { dataKey: "pengeluaran", label: "Pengeluaran", color: "#112E73" },
+                      {
+                        dataKey: "pemasukan",
+                        label: "Pemasukan",
+                        color: "#2667FF",
+                      },
+                      {
+                        dataKey: "pengeluaran",
+                        label: "Pengeluaran",
+                        color: "#112E73",
+                      },
                     ]}
                     height={350}
                   />

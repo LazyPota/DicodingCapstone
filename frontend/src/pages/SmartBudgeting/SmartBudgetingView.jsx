@@ -9,7 +9,7 @@ import Pagination from "../../components/Pagination";
 const SmartBudgetingView = ({
   isLoading,
   openModal,
-  currentItems,
+  currentItems, // <-- Nama prop ini masih bisa currentItems, tapi isinya budgets
   formatCurrencyShort,
   currentPage,
   totalPages,
@@ -19,6 +19,9 @@ const SmartBudgetingView = ({
   sisaAnggaran,
   persentaseTotal,
   onEditBudget,
+  selectedMonth,
+  selectedYear,
+  onMonthChange,
 }) => {
   const getBudgetProgressBarColor = (spent, amount) => {
     if (amount <= 0) return "bg-gray-300";
@@ -40,7 +43,11 @@ const SmartBudgetingView = ({
     <div className="flex-1 bg-[#F3F4F7] p-5 md:p-7 overflow-auto">
       <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:justify-between md:items-center mb-5">
         <div className="flex space-x-4 items-center">
-          <MonthPicker />
+          <MonthPicker
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onChange={onMonthChange}
+          />
           <h1 className="font-extrabold text-xl md:text-[24px] text-[#121212]">
             Anggaran
           </h1>

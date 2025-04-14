@@ -1,8 +1,9 @@
 import { XMarkIcon } from "@heroicons/react/16/solid";
 import React from "react";
 
-function SuccessPopup({ isOpen, onClose }) {
+function SuccessPopup({ isOpen, onClose, successMessage }) {
   if (!isOpen) return null;
+  console.log("SuccessPopup RENDERING with message:", successMessage);
 
   const handleContentClick = (e) => {
     e.stopPropagation();
@@ -24,14 +25,12 @@ function SuccessPopup({ isOpen, onClose }) {
         >
           <XMarkIcon className="h-6 w-6" />
         </button>
-        <h2 className="mb-2 text-xl font-semibold text-gray-900">
-          Berhasil Ditambah
-        </h2>
+        <h2 className="mb-2 text-xl font-semibold text-gray-900">Berhasil!</h2>
         <p className="mb-6 text-sm text-gray-600">
-          Kartu Dompet berhasil ditambahkan di daftar dompet anda.
+          {successMessage || "Operasi berhasil diselesaikan."}
         </p>
         <button
-          onClick={onClose} 
+          onClick={onClose}
           className="w-full rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           Selesai

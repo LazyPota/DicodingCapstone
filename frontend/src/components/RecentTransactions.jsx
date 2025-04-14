@@ -3,15 +3,15 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const RecentTransactions = ({
-  title = "Transaksi Terbaru", 
+  title = "Transaksi Terbaru",
   transactions = [],
   isLoading = false,
-  showWalletColumn = true, 
+  showWalletColumn = true,
   showSeeAllLink = true,
 }) => {
   const formatCurrency = (value) => {
     if (typeof value !== "number") return "Rp. -";
-    return value.toLocaleString("id-ID"); 
+    return value.toLocaleString("id-ID");
   };
 
   const formatDate = (dateString) => {
@@ -37,8 +37,8 @@ const RecentTransactions = ({
           </Link>
         )}
       </div>
-      <div className="overflow-auto mt-4">
-        <table className="w-full min-w-[500px]">
+      <div className="overflow-x-auto mt-4 no-scrollbar">
+        <table className="w-full min-w-[600px]">
           <thead>
             <tr className="text-left text-[12px] text-[#2B2B2B] tracking-wider border-b">
               {showWalletColumn && (
@@ -86,7 +86,7 @@ const RecentTransactions = ({
                 return (
                   <tr
                     key={transaction.id}
-                    className="hover:bg-gray-5 text-black text-[14px] font-bold"
+                    className="hover:bg-gray-5 text-black text-[14px] font-bold overflow-auto"
                   >
                     {/* Tampilkan Nama Dompet secara kondisional */}
                     {showWalletColumn && (

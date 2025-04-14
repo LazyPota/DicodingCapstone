@@ -38,6 +38,17 @@ const CardWallet = ({
 
   const gradientClass = gradientMap[type] || gradientMap.Other;
 
+  let displayAmount = amount;
+  let amountLabel = "Total Saldo";
+  let amountPrefix = "Rp. ";
+
+  if (type === "Loan") {
+    amountLabel = "Sisa Pinjaman";
+    displayAmount = Math.abs(amount);
+  }
+
+  const formattedDisplayAmount = displayAmount.toLocaleString("id-ID");
+
   return (
     <div
       className={`${
@@ -45,14 +56,14 @@ const CardWallet = ({
       } bg-gradient-to-br ${gradientClass} rounded-xl text-white relative shadow-md hover:shadow-lg transition-shadow`}
     >
       <p className={`${isSmall ? "text-sm" : "text-[20px] "} font-medium`}>
-        Total Saldo
+       {amountLabel}
       </p>
       <h2
         className={`${
           isSmall ? "text-[25px] mt-[13px]" : "text-[35px]"
         } font-semibold`}
       >
-        Rp. {amount.toLocaleString("id-ID")}
+        {amountPrefix}{formattedDisplayAmount}
       </h2>
       <div className="flex flex-row justify-between">
         <div

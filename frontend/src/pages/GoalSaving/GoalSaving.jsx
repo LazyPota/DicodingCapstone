@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -7,59 +7,152 @@ import {
   deleteGoalSaving,
   resetGoalSavingState,
   updateGoalSaving,
+  resetGoalsAndPagination,
 } from "../../features/goal-saving/goalSavingSlice";
 import GoalSavingView from "./GoalSavingView";
 import Modal from "../../components/Modal";
+import SuccessPopup from "../../components/Popup/SuccessPopup";
+import UpdatePopup from "../../components/Popup/UpdatePopup";
+import DeleteConfirmationPopup from "../../components/Popup/DeletePopup";
 
 const GoalSaving = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [modalMode, setModalMode] = useState("add");
   const [currentGoal, setCurrentGoal] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
-  const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  const [errors, setErrors] = useState({});
+
+  const [goalToDelete, setGoalToDelete] = useState(null);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
+  const [deleteSuccessMessage, setDeleteSuccessMessage] = useState("");
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState(null);
+  const initialFormData = {
     goal_name: "",
     target_amount: "",
-    current_amount: "",
-  });
+  };
+  const [formData, setFormData] = useState(initialFormData);
+  const currentMonth = new Date().getMonth() + 1;
+  const currentYear = new Date().getFullYear();
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { user } = useSelector((state) => state.auth);
-  const { goals, isLoading, isError, isSuccess, message } = useSelector(
-    (state) => state.goalSavings
+  const { user, isLoading: authIsLoading } = useSelector(
+    (state) => state.auth || { user: null, isLoading: true }
+  );
+  const {
+    goals = [],
+    paginationInfo,
+    isLoading,
+    isError,
+    isSuccess,
+    message,
+  } = useSelector((state) => state.goalSavings);
+  const fetchGoalSavings = useCallback(
+    (pageToFetch) => {
+      if (!user?.id) {
+        console.log("fetchGoalSavings skipped: No user ID");
+        return;
+      }
+      console.log(
+        `Fetching goal savings for user ${user.id}, page ${pageToFetch}, month: ${selectedMonth}, year: ${selectedYear}`
+      );
+      dispatch(
+        getGoalSavings({
+          userId: user.id,
+          page: pageToFetch,
+          perPage: itemsPerPage,
+          month: selectedMonth,
+          year: selectedYear,
+        })
+      );
+    },
+    [user?.id, selectedMonth, selectedYear, itemsPerPage, dispatch]
   );
 
   useEffect(() => {
-    if (!user?.id) {
-      console.log("User ID tidak ditemukan, tidak bisa fetch goal savings.");
+    if (user?.id) {
+      fetchGoalSavings(currentPage);
+    } else if (!authIsLoading && !user) {
       navigate("/login");
-      return;
     }
-    dispatch(getGoalSavings(user.id));
-    return () => {
-      dispatch(resetGoalSavingState());
-    };
-  }, [dispatch, user?.id, navigate]);
+  }, [
+    user?.id,
+    currentPage,
+    selectedMonth,
+    selectedYear,
+    fetchGoalSavings,
+    navigate,
+    authIsLoading,
+  ]);
 
   useEffect(() => {
-    if (isError) {
-      alert(`Error: ${message}`);
-      dispatch(resetGoalSavingState());
-    }
+    return () => {
+      console.log("GoalSaving UNMOUNTING, performing final reset.");
+      dispatch(resetGoalsAndPagination());
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
     if (isSuccess && message) {
+      console.log("Goal Saving operation successful:", message);
       setIsModalOpen(false);
-      setFormData({ goal_name: "", target_amount: "", current_amount: "" });
+      setFormData(initialFormData);
       setCurrentGoal(null);
       setModalMode("add");
-      setIsSuccessPopupOpen(true);
+      setErrors({});
+      if (message.includes("dihapus")) {
+        setDeleteSuccessMessage(message);
+        setIsDeleteSuccess(true);
+      } else {
+        if (user?.id) {
+          const pageToFetchAfterSuccess = message.includes("ditambahkan")
+            ? 1
+            : currentPage;
+
+          // Logika untuk memicu fetch ulang:
+          if (pageToFetchAfterSuccess !== currentPage) {
+            console.log(
+              "Success Effect (C/U): Setting page to trigger refetch:",
+              pageToFetchAfterSuccess
+            );
+            setCurrentPage(pageToFetchAfterSuccess);
+          } else {
+            console.log(
+              "Success Effect (C/U): Manually refetching current page:",
+              pageToFetchAfterSuccess
+            );
+            fetchGoalSavings(pageToFetchAfterSuccess);
+          }
+        } else {
+          console.warn("Cannot refetch after C/U success: User ID is missing.");
+        }
+      }
     }
-  }, [isError, isSuccess, message, dispatch]);
+  }, [isSuccess, message, dispatch, user?.id, currentPage, fetchGoalSavings]);
+
+  useEffect(() => {
+    if (isError && message) {
+      console.error("Goal Saving operation error:", message);
+      if (isModalOpen) {
+        setErrors((prev) => ({ ...prev, server: message }));
+      } else if (
+        message.toLowerCase().includes("delete") ||
+        message.toLowerCase().includes("hapus")
+      ) {
+        setDeleteErrorMessage(message);
+      } else {
+        console.error("General fetch error:", message);
+      }
+      dispatch(resetGoalSavingState());
+    }
+  }, [isError, message, dispatch, isModalOpen]);
 
   const safeGoals = useMemo(() => (Array.isArray(goals) ? goals : []), [goals]);
-
   const chartData = useMemo(() => {
     const goalsForChart = safeGoals.slice(0, 5);
     return goalsForChart.map((goal) => {
@@ -92,74 +185,85 @@ const GoalSaving = () => {
     return Math.max(0, totalTargetKeseluruhan - totalTerkumpulKeseluruhan);
   }, [totalTargetKeseluruhan, totalTerkumpulKeseluruhan]);
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = Array.isArray(goals)
-    ? goals.slice(indexOfFirstItem, indexOfLastItem)
-    : [];
-  const totalPages = Array.isArray(goals)
-    ? Math.ceil(goals.length / itemsPerPage)
-    : 0;
-
+  const totalPages = paginationInfo?.total_pages || 1;
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (page !== currentPage) {
+      setCurrentPage(page);
+    }
+  };
+  const handleMonthChange = (month, year) => {
+    console.log(`Filter changed to: Month ${month}, Year ${year}`);
+    setSelectedMonth(month);
+    setSelectedYear(year);
+    setCurrentPage(1);
   };
 
   const openModal = () => {
     setModalMode("add");
     setCurrentGoal(null);
-    setFormData({ goal_name: "", target_amount: "", current_amount: "" });
+    setFormData(initialFormData);
+    setErrors({});
     setIsModalOpen(true);
   };
-
-  const handleOpenEditModal = (goal) => {
-    setModalMode("edit");
-    setCurrentGoal(goal);
-    setFormData({
-      goal_name: goal.goal_name || "",
-      target_amount: goal.target_amount || "",
-      current_amount: goal.current_amount || "",
-    });
-    setIsModalOpen(true);
-  };
-
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentGoal(null);
     setModalMode("add");
-  };
-
-  const closeSuccessPopup = () => {
-    setIsSuccessPopupOpen(false);
+    setFormData(initialFormData);
+    setErrors({});
+    if (isError) dispatch(resetGoalSavingState());
   };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: name === "target_amount" ? parseFloat(value) || "" : value,
-    }));
+    setFormData((prevState) => ({ ...prevState, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+    if (errors.server) {
+      setErrors((prev) => ({ ...prev, server: null }));
+    }
+    if (
+      (name === "current_amount" || name === "target_amount") &&
+      errors.current_amount_vs_target
+    ) {
+      setErrors((prev) => ({ ...prev, current_amount_vs_target: null }));
+    }
+  };
+
+  const validateForm = () => {
+    let formIsValid = true;
+    let newErrors = {};
+    const target = parseFloat(formData.target_amount);
+
+    if (!formData.goal_name.trim()) {
+      formIsValid = false;
+      newErrors.goal_name = "Nama tabungan wajib diisi.";
+    }
+    if (formData.target_amount === "" || isNaN(target) || target <= 0) {
+      formIsValid = false;
+      newErrors.target_amount = "Jumlah target harus angka positif.";
+    }
+
+    setErrors(newErrors);
+    return formIsValid;
   };
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
     if (!user?.id) return;
+    setErrors({});
 
-    if (!formData.goal_name.trim() || !formData.target_amount) {
-      alert("Nama tabungan dan jumlah target wajib diisi.");
+    if (!validateForm()) {
+      console.log("Goal form validation failed");
       return;
     }
-    const target = parseFloat(formData.target_amount) || 0;
-    const current = parseFloat(formData.current_amount) || 0;
-    if (current > target) {
-      alert("Jumlah terkumpul tidak boleh lebih besar dari jumlah target.");
-      return;
-    }
+
+    const targetAmount = parseFloat(formData.target_amount);
 
     const goalData = {
-      goal_name: formData.goal_name,
-      target_amount: target,
-      current_amount: current,
+      goal_name: formData.goal_name.trim(),
+      target_amount: targetAmount,
     };
 
     if (modalMode === "add") {
@@ -179,10 +283,43 @@ const GoalSaving = () => {
   };
 
   const handleDelete = (goalId) => {
-    if (window.confirm("Yakin ingin menghapus rencana tabungan ini?")) {
-      if (!user?.id) return;
-      dispatch(deleteGoalSaving({ userId: user.id, goalId }));
+    setGoalToDelete(goalId);
+    setDeleteErrorMessage(null);
+    setIsConfirmDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!user?.id || !goalToDelete) return;
+
+    setIsConfirmDeleteOpen(false);
+    console.log(
+      `Dispatching deleteGoalSaving for user: ${user.id}, goal: ${goalToDelete}`
+    );
+    await dispatch(deleteGoalSaving({ userId: user.id, goalId: goalToDelete }));
+
+    setGoalToDelete(null);
+  };
+
+  const closeDeleteConfirmation = () => {
+    setIsConfirmDeleteOpen(false);
+    setGoalToDelete(null);
+  };
+
+  const closeDeleteSuccessPopup = () => {
+    setIsDeleteSuccess(false);
+    setDeleteSuccessMessage("");
+    if (user?.id) {
+      if (
+        currentPage !== 1 &&
+        goals.length === 0 &&
+        paginationInfo?.total_items >= itemsPerPage
+      ) {
+        setCurrentPage(currentPage - 1);
+      } else {
+        fetchGoalSavings(currentPage);
+      }
     }
+    dispatch(resetGoalSavingState());
   };
 
   const formatCurrencyShort = (value) => {
@@ -208,41 +345,50 @@ const GoalSaving = () => {
     <>
       <GoalSavingView
         isLoading={isLoading}
-        isModalOpen={isModalOpen}
-        currentItems={currentItems}
+        currentItems={goals}
         chartData={chartData}
         formatCurrencyShort={formatCurrencyShort}
         currentPage={currentPage}
         totalPages={totalPages}
         handlePageChange={handlePageChange}
         openModal={openModal}
-        closeModal={closeModal}
-        onEditGoal={handleOpenEditModal}
         onDeleteGoal={handleDelete}
-        isSuccessPopupOpen={isSuccessPopupOpen}
-        closeSuccessPopup={closeSuccessPopup}
         totalTarget={totalTargetKeseluruhan}
         totalTercapai={totalTerkumpulKeseluruhan}
-        targetTercapai={totalTerkumpulKeseluruhan}
         sisaTargetTotal={sisaKeseluruhan}
         persentaseTotal={persentaseKeseluruhan}
+        deleteError={deleteErrorMessage}
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+        onMonthChange={handleMonthChange}
       />
 
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={
-          modalMode === "add"
-            ? "Tambah Rencana Tabungan"
-            : "Edit Rencana Tabungan"
-        }
         onSubmit={handleFormSubmit}
         isLoading={isLoading}
-        submitLabel={modalMode === "add" ? "Tambah" : "Simpan"}
       >
         <>
+          {/* Server Error in Modal */}
+          {errors.server && (
+            <p className="text-red-500 text-xs mb-3 text-center">
+              {errors.server}
+            </p>
+          )}
+          {/* Specific comparison error */}
+          {errors.current_amount_vs_target && (
+            <p className="text-red-500 text-xs mb-3 text-center">
+              {errors.current_amount_vs_target}
+            </p>
+          )}
+
+          {/* Goal Name */}
           <div className="mb-3">
-            <label htmlFor="goal_name" className="block text-sm font-medium">
+            <label
+              htmlFor="goal_name"
+              className="block text-sm font-medium text-gray-700"
+            >
               Nama Tabungan
             </label>
             <input
@@ -251,18 +397,33 @@ const GoalSaving = () => {
               type="text"
               value={formData.goal_name}
               onChange={handleFormChange}
-              className="w-full border p-2 rounded-md mt-2"
-              placeholder="Nama Tabungan"
+              className={`w-full border p-2 rounded-md mt-1 ${
+                errors.goal_name
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:border-blue-500"
+              }`}
+              placeholder="Contoh: Dana Darurat, DP Rumah"
               required
               disabled={isLoading}
+              aria-invalid={errors.goal_name ? "true" : "false"}
+              aria-describedby={
+                errors.goal_name ? "goal_name-error" : undefined
+              }
             />
+            {errors.goal_name && (
+              <p id="goal_name-error" className="text-red-500 text-xs mt-1">
+                {errors.goal_name}
+              </p>
+            )}
           </div>
+
+          {/* Target Amount */}
           <div className="mb-3">
             <label
               htmlFor="target_amount"
-              className="block text-sm font-medium"
+              className="block text-sm font-medium text-gray-700"
             >
-              Jumlah Target
+              Jumlah Target (Rp)
             </label>
             <input
               id="target_amount"
@@ -270,33 +431,51 @@ const GoalSaving = () => {
               type="number"
               value={formData.target_amount}
               onChange={handleFormChange}
-              placeholder="Rp 0.00"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
+              placeholder="0"
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none mt-1 ${
+                errors.target_amount
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:border-blue-500"
+              }`}
               required
               min="0"
               step="any"
               disabled={isLoading}
+              aria-invalid={errors.target_amount ? "true" : "false"}
+              aria-describedby={
+                errors.target_amount ? "target_amount-error" : undefined
+              }
             />
+            {errors.target_amount && (
+              <p id="target_amount-error" className="text-red-500 text-xs mt-1">
+                {errors.target_amount}
+              </p>
+            )}
           </div>
-          {modalMode === "edit" && (
-            <div className="mb-2">
-              <label htmlFor="current_amount">Jumlah Terkumpul Saat Ini</label>
-              <input
-                id="current_amount"
-                name="current_amount"
-                type="number"
-                value={formData.current_amount}
-                onChange={handleFormChange}
-                placeholder="Rp 0"
-                min="0"
-                step="any"
-                disabled={isLoading}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
-              />
-            </div>
-          )}
         </>
       </Modal>
+
+      {/* --- POPUPS --- */}
+      <DeleteConfirmationPopup
+        isOpen={isConfirmDeleteOpen}
+        onClose={closeDeleteConfirmation}
+        onConfirm={handleConfirmDelete}
+        isLoading={isLoading}
+      />
+      {isSuccess && message?.includes("ditambahkan") && (
+        <SuccessPopup
+          isOpen={isSuccess}
+          onClose={() => dispatch(resetGoalSavingState())}
+          successMessage={message}
+        />
+      )}
+      {isDeleteSuccess && (
+        <SuccessPopup
+          isOpen={isDeleteSuccess}
+          onClose={closeDeleteSuccessPopup}
+          successMessage={deleteSuccessMessage}
+        />
+      )}
     </>
   );
 };

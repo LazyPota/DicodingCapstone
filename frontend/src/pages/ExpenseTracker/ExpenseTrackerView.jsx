@@ -10,12 +10,19 @@ const ExpenseTrackerView = ({
   setIsModalOpen,
   transactionsToDisplay,
   isLoading,
+  selectedMonth,
+  selectedYear,
+  onMonthChange,
 }) => {
   return (
     <div className="flex-1 bg-[#F3F4F7] p-7 overflow-auto">
       <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:justify-between md:items-center mb-5">
         <div className="flex space-x-4 items-center">
-          <MonthPicker />
+          <MonthPicker
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onChange={onMonthChange}
+          />
           <h1 className="font-extrabold text-xl md:text-[24px] text-[#121212]">
             Histori Transaksi
           </h1>

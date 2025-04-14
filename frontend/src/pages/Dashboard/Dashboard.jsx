@@ -10,8 +10,6 @@ import {
 import { getWallets } from "../../features/wallets/walletSlice";
 import { getGoalSavings } from "../../features/goal-saving/goalSavingSlice";
 import { getTransactions } from "../../features/transactions/transactionSlice";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import RecentTransactions from "../../components/RecentTransactions";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -41,8 +39,14 @@ const Dashboard = () => {
     if (user?.id) {
       dispatch(getDashboardData(user.id));
       if (wallets.length === 0) dispatch(getWallets(user.id));
-      if (goals.length === 0) dispatch(getGoalSavings(user.id));
-      if (transactions.length === 0) dispatch(getTransactions(user.id));
+      if (goals.length === 0) dispatch(getGoalSavings({ userId: user.id }));
+      if (transactions.length === 0) {
+        dispatch(
+          getTransactions({
+            userId: user.id,
+          })
+        );
+      }
     } else {
       navigate("/login");
     }
@@ -151,7 +155,7 @@ const Dashboard = () => {
       </div>
     );
   }
-  
+
   const formatCurrencyShort = (value) => {
     if (typeof value !== "number") return "Rp. -";
     if (value >= 1000000000) {

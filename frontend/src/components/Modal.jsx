@@ -18,7 +18,7 @@ const Modal = ({ isOpen, onClose, title, children, onSubmit }) => {
       >
         <h2 className="text-xl font-bold mb-4">{title}</h2>
 
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} noValidate>
           {children}
           <div className="flex justify-center mt-4 space-x-[39px]">
             <button

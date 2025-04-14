@@ -6,10 +6,11 @@ import { Link } from "react-router-dom";
 
 const ForgotPasswordView = ({
   handleSendEmail,
-  setEmail,
   email,
+  onChange,
   isLoading,
   error,
+  errors,
 }) => {
   return (
     <main className="relative flex min-h-[140vh] md:p-2">
@@ -34,33 +35,66 @@ const ForgotPasswordView = ({
           <p className="text-[18px] font-normal font-inter text-[#969696] mt-2 text-center lg:text-left">
             Masukkan alamat email untuk mengatur ulang kata sandi.
           </p>
-          {error && <p className="text-red-500 text-center mt-2 mb-2">{error}</p>}
-          <form className="mt-3 flex flex-col space-y-[20px]" noValidate onSubmit={handleSendEmail}>
+          {error && (
+            <div
+              className="my-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm"
+              role="alert"
+            >
+              Gagal: {error}
+            </div>
+          )}
+          <form
+            className="mt-3 flex flex-col space-y-[20px]"
+            noValidate
+            onSubmit={handleSendEmail}
+          >
             <div className="relative">
               <input
                 type="email"
                 id="email"
                 name="email"
-                className="block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border border-[#D9D9D9] appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10"
+                className={`block px-2.5 pb-2.5 pt-4 w-full h-[59px] text-sm text-gray-900 bg-transparent rounded-[10px] border ${
+                  errors && errors.email ? "border-red-500" : "border-[#D9D9D9]"
+                } appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer pr-10`}
                 placeholder=" "
                 required
                 aria-required="true"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)} 
-                disabled={isLoading} 
-                autoComplete="email" 
+                onChange={onChange}
+                disabled={isLoading}
+                autoComplete="email"
+                aria-invalid={errors && errors.email ? "true" : "false"}
+                aria-describedby={
+                  errors && errors.email ? "email-error" : undefined
+                }
               />
-              <label htmlFor="email" className="absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] text-gray-500 peer-focus:text-blue-600">
+              <label
+                htmlFor="email"
+                className={`absolute text-[18px] font-medium font-inter duration-300 transform z-10 origin-[0] bg-white px-2 start-1 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 -translate-y-4 scale-75 top-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:px-2 peer-focus:text-[14px] ${
+                  errors && errors.email ? "text-red-600" : "text-gray-500"
+                } peer-focus:text-blue-600`}
+              >
                 Email
               </label>
+              {errors && errors.email && (
+                <div
+                  id="email-error"
+                  role="alert"
+                  className="absolute z-10 bottom-0 left-1 translate-y-full mt-1 px-2 py-1 bg-red-100 text-red-700 text-xs rounded shadow-md"
+                >
+                  {errors.email}
+                </div>
+              )}
             </div>
             <div className="flex flex-col items-center space-y-4 w-full pt-4">
               <button
                 type="submit"
-                className={`w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={isLoading} 
+                className={`w-full font-inter h-[54px] bg-[#367AFF] text-white text-[18px] font-semibold rounded-[10px] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isLoading}
               >
-                {isLoading ? 'Mengirim...' : 'Selanjutnya'} 
+                {isLoading ? "Mengirim..." : "Selanjutnya"}
               </button>
               <div className="flex items-center w-full">
                 <hr className="flex-grow border-t border-gray-300" />
