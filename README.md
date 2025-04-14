@@ -33,6 +33,7 @@
 
 **Algorithm:**
 - Random Forest
+- XGBoost
 
 ---
 
