@@ -19,8 +19,6 @@ type FinancialHealthController struct {
 type FinancialHealthResponse struct {
 	TotalIncome            float64 `json:"total_income"`
 	TotalExpense           float64 `json:"total_expense"`
-	TotalBudget            float64 `json:"total_budget"`
-	TotalSavings           float64 `json:"total_savings"`
 	FinancialHealthStatus  string  `json:"financial_health_status"`
 }
 
@@ -32,34 +30,33 @@ func NewFinancialHealthController(db *gorm.DB, bc IBaseController) *FinancialHea
 }
 
 func (fc *FinancialHealthController) GetFinancialHealth(c *gin.Context) {
-	var totalIncome, totalExpense, totalBudget, totalSavings float64
+	var totalIncome, totalExpense float64
+	userIDStr := c.Param("id")
 
+	if userIDStr == "" {
+		fc.BaseController.ResponseJSONError(c, Error_BadRequest, "User ID is required")
+		return
+	}
 	errIncome := fc.DB.Model(&models.Transaction{}).
-    	Where("transaction_type = ?", models.Income).
-    	Select("COALESCE(SUM(amount), 0)").Scan(&totalIncome).Error
+		Where("user_id = ? AND transaction_type = ?", userIDStr, models.Income).
+		Select("COALESCE(SUM(amount), 0)").Scan(&totalIncome).Error
 
 	errExpense := fc.DB.Model(&models.Transaction{}).
-	    Where("transaction_type = ?", models.Expense).
-	    Select("COALESCE(SUM(amount), 0)").Scan(&totalExpense).Error
+		Where("user_id = ? AND transaction_type = ?", userIDStr, models.Expense).
+		Select("COALESCE(SUM(amount), 0)").Scan(&totalExpense).Error
 
-	errBudget := fc.DB.Model(&models.Budget{}).
-		Select("COALESCE(SUM(amount), 0)").Scan(&totalBudget).Error
-
-	errSaving := fc.DB.Model(&models.GoalSaving{}).
-		Select("COALESCE(SUM(current_amount), 0)").Scan(&totalSavings).Error
-
-	if errIncome != nil || errExpense != nil || errBudget != nil || errSaving != nil {
+	if errIncome != nil || errExpense != nil {
 		fc.BaseController.ResponseJSONError(c, Error_FailedToRetrieve, "Failed to retrieve financial data")
 		return
 	}
 
-	if totalIncome == 0 && totalExpense == 0 && totalBudget == 0 && totalSavings == 0 {
+	if totalIncome == 0 && totalExpense == 0 {
 		fc.BaseController.ResponseJSONError(c, Error_FailedToRetrieve, "No financial data found")
 		return
 	}
 
 	inputData := map[string]interface{}{
-		"input_data": []float64{totalIncome, totalExpense, totalBudget, totalSavings},
+		"input_data": []float64{totalIncome, totalExpense},
 	}
 
 	jsonData, _ := json.Marshal(inputData)
@@ -90,6 +87,14 @@ func (fc *FinancialHealthController) GetFinancialHealth(c *gin.Context) {
 		return
 	}
 
+	if len(prediction.Result) == 0 {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":         "Prediction result is empty",
+			"total_income":  totalIncome,
+			"total_expense": totalExpense,
+		})
+		return
+	}
 
 	status := prediction.Result[0]
 
@@ -97,8 +102,7 @@ func (fc *FinancialHealthController) GetFinancialHealth(c *gin.Context) {
 		"financial_health_status": status,
 		"total_income":            totalIncome,
 		"total_expense":           totalExpense,
-		"total_budget":            totalBudget,
-		"total_savings":           totalSavings,
 	})
 }
+
 
