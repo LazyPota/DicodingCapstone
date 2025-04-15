@@ -64,7 +64,7 @@ func (fc *FinancialHealthController) GetFinancialHealth(c *gin.Context) {
 
 	jsonData, _ := json.Marshal(inputData)
 
-	resp, err := http.Post("http://127.0.0.1:8000/predict", "application/json", bytes.NewBuffer(jsonData))
+	resp, err := http.Post("http://127.0.0.1:8001/predict", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		fc.BaseController.ResponseJSONError(c, Error_FailedToRetrieve, "Failed to request ML model")
 		return
