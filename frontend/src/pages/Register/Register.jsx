@@ -1,109 +1,68 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { registerUser, reset } from "../../features/auth/authSlice";
+import React, { useState } from "react";
 import RegisterView from "./RegisterView";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
-  const { username, email, password } = formData;
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [errors, setErrors] = useState({});
 
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const { isLoading, isError, isSuccess, message } = useSelector(
-    (state) => state.auth
-  );
-
-  const onChange = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
-
-    if (errors[name]) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [name]: null,
-      }));
-    }
-  };
-
-  const handleRegister = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      const userData = { username, email, password };
-      dispatch(registerUser(userData));
-    } else {
-      console.log("Form registrasi tidak valid (client-side)");
-    }
-  };
-
   const validateForm = () => {
-    let formIsValid = true;
-    let newErrors = {};
+    const newErrors = {};
+    const emailRegex =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    if (!username.trim()) {
-      formIsValid = false;
-      newErrors.username = "Nama Lengkap wajib diisi";
+    if (!name) {
+      newErrors.name = "Nama wajib diisi";
     }
 
     if (!email) {
-      formIsValid = false;
       newErrors.email = "Email wajib diisi";
-    } else if (
-      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
-    ) {
-      formIsValid = false;
-      newErrors.email = "Format email tidak valid";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "Format Email tidak valid";
     }
 
     if (!password) {
-      formIsValid = false;
       newErrors.password = "Password wajib diisi";
-    } else if (password.length < 8) {
-      formIsValid = false;
-      newErrors.password = "Password minimal 8 karakter";
+    } else if (!password.length < 8) {
+      newErrors.password = "Password minimal harus 8 karakter";
     }
 
-    setErrors(newErrors);
-    return formIsValid;
+    return newErrors;
   };
 
-  useEffect(() => {
-    if (isSuccess) {
-      const successMsg = message || "Registrasi berhasil! Silakan masuk.";
-      console.log("Registrasi sukses, navigasi ke login dengan pesan:", successMsg);
-      navigate("/login", {
-          replace: true, 
-          state: { successMessage: successMsg }
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+    } else {
+      setErrors({});
+      console.log("Form registrasi valid, data siap dikirim:", {
+        name,
+        email,
+        password,
       });
+      alert("Registrasi Telah Berhasil");
     }
-    return () => {
-      dispatch(reset());
-    };
-  }, [isSuccess, message, navigate, dispatch]);
+  };
 
   return (
     <div>
-      {isLoading && <p>Loading...</p>}
       <RegisterView
         showPassword={showPassword}
         setShowPassword={setShowPassword}
-        username={username}
-        email={email}
         password={password}
-        onChange={onChange}
-        handleRegister={handleRegister}
-        isLoading={isLoading}
+        setPassword={setPassword}
+        email={email}
+        setEmail={setEmail}
+        name={name}
+        setName={setName}
         errors={errors}
-        serverError={isError ? message : null}
+        handleSubmit={handleSubmit}
+        validateForm={validateForm}
       />
     </div>
   );

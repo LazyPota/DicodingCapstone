@@ -1,77 +1,49 @@
-// Header.js
-import React from "react";
-import { useSelector } from "react-redux";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import defaultAvatarPlaceholder from "./../assets/default-avatar.jpeg"; // Pastikan path asset benar
+import { useState } from "react";
 
-const BACKEND_URL = "http://localhost:8000"; // Sesuaikan jika perlu
-
-// Terima prop toggleSidebar
-const Header = ({ toggleSidebar }) => {
-  const { user } = useSelector((state) => state.auth);
-
-  // Logika gambar profil dan nama pengguna tetap sama
-  let profileImageUrl = defaultAvatarPlaceholder;
-  if (user && user.profile_image_path) {
-    // ... logika path gambar ...
-    const imagePath = user.profile_image_path.startsWith("/")
-      ? user.profile_image_path.substring(1)
-      : user.profile_image_path;
-    profileImageUrl = `${BACKEND_URL}/${imagePath}`;
-  }
-  const userName = user?.username || "Pengguna";
+const Header = () => {
+  const [notifications] = useState(5);
 
   return (
-    // Sesuaikan padding untuk mobile dan desktop
-    <div className="flex justify-between items-center px-4 md:px-6 lg:px-10 h-[70px] md:h-[80px] bg-white shadow-md border-b border-[#DCDCDC] flex-shrink-0">
-      {" "}
-      {/* Tinggi header sedikit dikurangi di mobile */}
-      {/* Kiri: Tombol Hamburger (Mobile) & Teks Sambutan */}
-      <div className="flex items-center gap-3">
-        {/* Tombol Hamburger - Hanya muncul di bawah lg */}
-        <button
-          onClick={toggleSidebar}
-          className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 lg:hidden" // Sembunyikan di lg ke atas
-          aria-label="Open sidebar"
-        >
-          <Icon icon="ci:menu-alt-01" width="24" height="24" />{" "}
-          {/* Ganti ikon hamburger jika perlu */}
-        </button>
-
-        {/* Teks Sambutan */}
-        {/* Ukuran teks disesuaikan */}
-        <div className="flex flex-col">
-          <h1 className="text-black font-bold text-sm sm:text-lg lg:text-xl">
-            {" "}
-            {/* Ukuran font responsif */}
-            Selamat Datang, {userName}👋 {/* Emoji bisa ditaruh di sini */}
-          </h1>
-          <p className="font-semibold text-[#6B6B6B] text-[10px] sm:text-xs lg:text-sm">
-            {" "}
-            {/* Ukuran font responsif */}
-            Inilah yang terjadi dengan keuangan Anda hari ini.
-          </p>
-        </div>
+    <div className="flex justify-between items-center px-8 h-[80px] bg-white shadow-md border-b border-[#DCDCDC]">
+      <div className="flex flex-col">
+        <h1 className="text-black font-bold text-[20px]">
+          Selamat Datang, Fahmi
+        </h1>
+        <p className="font-semibold text-[#6B6B6B] text-[12px]">
+          Inilah yang terjadi dengan keuangan Anda hari ini.
+        </p>
       </div>
-      {/* Kanan: Info Pengguna */}
-      {/* Ukuran avatar dan teks disesuaikan */}
-      {user && (
-        <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer">
+
+      <div className="flex items-center space-x-12">
+        <div className="relative">
+          <span className="text-[25px] cursor-pointer">
+            <Icon icon="mingcute:notification-line" />
+          </span>
+          {notifications > 0 && (
+            <span className="absolute -top-1 -right-1 bg-[#1570EF] text-white text-xs px-1.5 py-0.5 rounded-full">
+              {notifications}
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center space-x-5 cursor-pointer">
           <img
-            src={profileImageUrl}
+            src="https://randomuser.me/api/portraits/men/1.jpg"
             alt="User"
-            className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full object-cover border border-gray-200" // Tambah border halus
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = defaultAvatarPlaceholder;
-            }}
+            className="w-10 h-10 rounded-full"
           />
-          {/* Sembunyikan nama di layar sangat kecil jika perlu */}
-          <span className="hidden sm:inline text-sm lg:text-base font-semibold">
-            {userName}
+          <div className="flex flex-col">
+            <span className="text-[18px] font-semibold">Fahmi</span>
+            <span className="text-[12px] font-semibold text-[#6B6B6B]">
+              @fahminur11
+            </span>
+          </div>
+          <span className="text-2xl">
+            <Icon icon="iconamoon:arrow-down-2-light" />
           </span>
         </div>
-      )}
+      </div>
     </div>
   );
 };

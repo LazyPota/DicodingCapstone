@@ -1,222 +1,158 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import CardWallet from "../../components/CardWallet";
 import Button from "../../components/Button";
 import Modal from "../../components/Modal";
+import DatePicker from "react-datepicker";
+import { FaCalendarAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import SuccessPopup from "../../components/Popup/SuccessPopup";
 
 const MyWaletView = ({
+  selectedDate,
+  setSelectedDate,
+  closeModal,
   isModalOpen,
   setIsModalOpen,
-  closeModal,
-  wallets,
-  formData,
-  handleFormChange,
-  handleSubmit,
-  filter,
-  setFilter,
-  isLoading,
-  showSuccessPopup,
-  onCloseSuccessPopup,
-  errors,
-  serverError,
-  successMessage,
 }) => {
-  const displayWalletType = (type) => {
-    switch (type) {
-      case "Cash":
-        return "Tunai";
-      case "Debit":
-        return "Debit";
-      case "Loan":
-        return "Pinjaman";
-      case "E-Money":
-        return "Dompet Digital";
-      case "Investment":
-        return "Investasi";
-      case "Other":
-        return "Lainnya";
-      default:
-        return type;
-    }
-  };
+  const [filter, setFilter] = useState("Semua");
 
   return (
-    <div className="flex-1 bg-[#F3F4F7] p-7 overflow-auto">
-      <div className="flex flex-col space-y-3 md:flex-row justify-between items-center mb-5">
-        <div className="flex space-x-4 items-center w-full md:justify-normal justify-between">
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="px-3 py-2 border rounded-[16px] focus:ring-2 focus:ring-blue-500 order-2 md:order-1"
-            disabled={isLoading}
-          >
-            <option value="Semua">Semua</option>
-            <option value="Debit">Debit</option>
-            <option value="Cash">Tunai</option>
-            <option value="Loan">Pinjaman</option>
-            <option value="E-Money">Dompet Digital</option>
-            <option value="Investment">Investasi</option>
-            <option value="Other">Lainnya</option>
-          </select>
-          <h1 className="font-extrabold text-[24px] text-[#121212] order-1 md:order-2">
-            Dompet
-          </h1>
-        </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className={`py-3 md:py-2 bg-blue-600 text-white rounded-[16px] font-semibold flex items-center space-x-2 hover:bg-blue-700 disabled:opacity-50 w-full md:w-52 justify-center ${
-            isLoading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={isLoading}
-        >
-          <Icon icon="ic:outline-plus" />
-          <span>Tambah Kartu</span>
-        </button>
-      </div>
-      {serverError && !isModalOpen && (
-        <div
-          className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm"
-          role="alert"
-        >
-          Gagal: {serverError}
-        </div>
-      )}
-      {isLoading && wallets.length === 0 ? (
-        <p className="text-center text-gray-500 mt-10">Memuat dompet...</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {wallets.length === 0 && !isLoading ? (
-            <p className="col-span-full text-center text-gray-500">
-              Belum ada dompet.
-            </p>
-          ) : (
-            wallets.map((wallet) => (
-              <div
-                key={wallet.id}
-                className="flex flex-col justify-between bg-white p-5 rounded-[16px] shadow-lg min-h-[250px]"
+    <div className="flex h-screen">
+      <Sidebar />
+      <div className="flex-1 flex flex-col">
+        <Header />
+        <div className="flex-1 bg-[#F3F4F7] p-7 overflow-auto">
+          {/* Ganti Header Dompet & Deskripsi */}
+          <div className="flex flex-row justify-between mb-5">
+            <div className="flex space-x-4 items-center">
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="px-3 py-2 border rounded-[16px] focus:ring-2 focus:ring-blue-500"
               >
-                <div>
-                  <h2 className="text-[16px] font-inter font-bold mb-[20px] text-[#878787]">
-                    Uang {displayWalletType(wallet.wallet_type)}
-                  </h2>
-                  <CardWallet
-                    size="small"
-                    amount={wallet.amount}
-                    name={wallet.wallet_name}
-                    type={wallet.wallet_type}
-                  />
-                </div>
-                <div className="mt-4 flex justify-end">
-                  <Button
-                    as={Link}
-                    to={`/dompet/detail/${wallet.id}`}
-                    text="Rincian"
-                    size="ms"
-                    icon="basil:caret-right-solid"
-                    variant="primary"
-                  />
-                </div>
+                <option value="Semua">Semua</option>
+                <option value="Debit">Pemasukan</option>
+                <option value="Tunai">Pengeluaran</option>
+                <option value="Pinjaman">Pengeluaran</option>
+                <option value="Pengeluaran">Pengeluaran</option>
+                <option value="Dompet Digital">Pengeluaran</option>
+              </select>
+              <h1 className="font-extrabold text-[24px] text-[#121212]">Dompet</h1>
+            </div>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="px-4 bg-blue-600 text-white rounded-[16px] font-semibold flex items-center space-x-2"
+            >
+              <Icon icon="ic:outline-plus" />
+              <span>Tambah Kartu</span>
+            </button>
+          </div>
+
+          {/* Wallet Cards */}
+          <div className="grid grid-cols-[1fr_1fr_1fr] h-[313px] gap-6 mt-6">
+            {/* Card Tunai */}
+            <div className="flex flex-col justify-center bg-white p-5 rounded-[16px] shadow-lg">
+              <h2 className="text-[16px] font-inter font-bold mb-[20px] text-[#878787]">
+                Kartu Tunai
+              </h2>
+              <CardWallet size="small" />
+              <div className="mt-4 flex justify-end">
+                <Button
+                  as={Link}
+                  to={"/dompet/detail"}
+                  text="Rincian"
+                  size="ms"
+                  icon="basil:caret-right-solid"
+                  variant="primary"
+                />
               </div>
-            ))
-          )}
+            </div>
+
+            {/* Card Debit */}
+            <div className="flex flex-col justify-center bg-white p-5 rounded-[16px] shadow-lg">
+              <h2 className="text-[16px] font-inter font-bold mb-[20px] text-[#878787]">
+                Kartu Debit
+              </h2>
+              <CardWallet size="small" />
+              <div className="mt-4 flex justify-end">
+                <Button
+                  as={Link}
+                  to={"/dompet/detail"}
+                  text="Rincian"
+                  size="ms"
+                  icon="basil:caret-right-solid"
+                  variant="primary"
+                />
+              </div>
+            </div>
+
+            {/* HAPUS CARD TAMBAH DOMPET */}
+            {/* <div className="bg-white p-5 rounded-xl shadow-lg flex items-center justify-center">
+              <button
+                className="bg-blue-600 text-white px-6 py-3 rounded-[16px]"
+                onClick={openModal}
+              >
+                Tambah Kartu
+              </button>
+            </div> */}
+          </div>
         </div>
-      )}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        title="Tambah Kartu"
-        onSubmit={handleSubmit}
-        isLoading={isLoading}
-        submitLabel="Tambah"
-      >
-        <>
-          {errors && errors.server && (
-            <p className="text-red-500 text-xs mb-3">{errors.server}</p>
-          )}
-          <div className="mb-4">
-            <label htmlFor="wallet_name" className="block text-sm font-medium">
-              Nama Kartu
-            </label>
+      </div>
+
+      {/* Modal */}
+      <Modal isOpen={isModalOpen} onClose={closeModal} title="Tambah Kartu">
+        <form className="flex flex-col space-y-[20px]">
+          <div className="mb-2 relative border rounded-md focus-within:border-blue-500 flex items-center px-3 py-2">
+            <FaCalendarAlt className="text-gray-500 mr-2" />
+            <DatePicker
+              selected={selectedDate}
+              onChange={(date) => setSelectedDate(date)}
+              dateFormat="dd/MM/yyyy"
+              className="w-full focus:outline-none"
+              placeholderText="00/00/0000"
+            />
+          </div>
+          <div className="mb-2">
             <input
               type="text"
-              id="wallet_name"
-              name="wallet_name"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
+              id="namaKartu"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
               placeholder="Nama Kartu"
-              value={formData.wallet_name || ""}
-              onChange={handleFormChange}
-              required
-              disabled={isLoading}
             />
-            {errors && errors.wallet_name && (
-              <p id="wallet_name-error" className="text-red-500 text-xs mt-1">
-                {errors.wallet_name}
-              </p>
-            )}
           </div>
-          <div className="mb-4">
-            <label
-              htmlFor="wallet_type"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            ></label>
+          <div className="mb-2">
+            <label htmlFor="jenisKartu" className="block text-sm font-medium text-gray-700 mb-1">
+              Jenis Kartu
+            </label>
             <select
-              id="wallet_type"
-              name="wallet_type"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
-              value={formData.wallet_type || ""}
-              onChange={handleFormChange}
-              required
-              disabled={isLoading}
+              id="jenisKartu"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+              defaultValue=""
             >
-              <option value="" disabled>
-                Pilih Jenis Kartu
-              </option>
-              <option value="Cash">Tunai</option>
+              <option value="" disabled>Pilih Jenis Kartu</option>
+              <option value="Tunai">Tunai</option>
               <option value="Debit">Debit</option>
-              <option value="Loan">Pinjaman</option>
-              <option value="E-Money">Dompet Digital</option>
-              <option value="Investment">Investasi</option>
-              <option value="Other">Lainnya</option>
+              <option value="pinjaman">Pinjaman</option>
+              <option value="Dompet Digital">Dompet Digital</option>
+              <option value="Dompet Digital">Investasi</option>
+              <option value="Lainnya">Lainnya</option>
             </select>
-            {errors && errors.wallet_type && (
-              <p id="wallet_type-error" className="text-red-500 text-xs mt-1">
-                {errors.wallet_type}
-              </p>
-            )}
           </div>
-          <div className="mb-4">
-            <label htmlFor="amount" className="block text-sm font-medium">
-              Saldo Awal
+          <div className="mb-2">
+            <label htmlFor="saldo" className="block text-sm font-medium">
+              Saldo
             </label>
             <input
               type="number"
-              id="amount"
-              name="amount"
+              id="saldo"
               placeholder="Rp 0.00"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500 mt-2"
-              value={formData.amount || ""}
-              onChange={handleFormChange}
-              required
-              min="0"
-              disabled={isLoading}
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
             />
-            {errors && errors.amount && (
-              <p id="amount-error" className="text-red-500 text-xs mt-1">
-                {errors.amount}
-              </p>
-            )}
           </div>
-        </>
+        </form>
       </Modal>
-      <SuccessPopup
-        isOpen={showSuccessPopup}
-        onClose={onCloseSuccessPopup}
-        successMessage={successMessage}
-      />
     </div>
   );
 };
