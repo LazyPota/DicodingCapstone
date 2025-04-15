@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { useState } from "react";
 
 const Header = () => {
-  const [notifications, setNotifications] = useState(5);
+  const [notifications] = useState(5);
 
   return (
     <div className="flex justify-between items-center px-8 h-[80px] bg-white shadow-md border-b border-[#DCDCDC]">
