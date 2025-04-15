@@ -57,26 +57,39 @@ Akses frontend di: [http://localhost:5173](http://localhost:5173)
 
 #### 3. Backend Setup
 
-Pastikan MySQL aktif.
+2. Install dependencies:
+   ```
+   go mod tidy
+   ```
 
-Buat file `.env` di direktori `/backend` dengan isi seperti berikut:
+3. Create MySQL database:
+   ```sql
+   CREATE DATABASE my_golang_app;
+   ```
 
-```ini
-DB_USER=your_user
-DB_PASS=your_password
-DB_NAME=moneasy_db
-DB_PORT=3306
+4. Create user and grant privileges:
+   ```sql
+   CREATE USER 'golang_user'@'localhost' IDENTIFIED BY 'your_password';
+   GRANT ALL PRIVILEGES ON my_golang_app.* TO 'golang_user'@'localhost';
+   FLUSH PRIVILEGES;
+   ```
+
+5. Create `.env` file in the root folder with the following content:
+   ```
+   DB_DSN="username:password@tcp(localhost:3306)/urdbname?charset=utf8mb4&parseTime=True&loc=Asia%2FJakarta"
+   JWT_SECRET_KEY="URSECREATKEYYASH"
+   EMAIL_SENDER=your_email
+   EMAIL_PASSWORD=xxxx xxxx xxxx xxxx
+   ```
+   
+   Replace `username`, `password`, and `urdbname` with values that match your database configuration.
+
+## Running the Application
+
+Run the application with the command:
 ```
-
-Jalankan perintah berikut:
-
-```bash
-cd backend
-go mod tidy
 go run main.go
 ```
-
-Backend berjalan di: [http://localhost:8080](http://localhost:8080)
 
 #### 4. Machine Learning Setup
 
