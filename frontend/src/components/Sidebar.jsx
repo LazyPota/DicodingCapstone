@@ -93,7 +93,7 @@ const Sidebar = ({ isMobileOpen, toggleSidebar }) => {
         <ul className="space-y-2 text-xs">
           <li>
             <Link
-              to="/settings"
+              to="/pengaturan"
               onClick={handleLinkClick}
               className={`flex items-center space-x-2 p-2 rounded cursor-pointer transition duration-150 ease-in-out
                          ${
