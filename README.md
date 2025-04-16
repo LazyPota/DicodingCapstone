@@ -93,14 +93,26 @@ go run main.go
 
 #### 4. Machine Learning Setup
 
-```bash
-cd ml
-pip install -r requirements.txt
-python model.py
-```
+1. Make virtual environment:
+   ```
+   python -m venv env
+   ```
+   
+2. Using virtual environment:
+   ```
+   venv\Scripts\Activate.ps1
+   ```
 
----
+3. Install depedencies:
+   ```
+   pip install -r requirements.txt
+   ```
 
+4. Running the application:
+   ```
+   uvicorn main:app --host 127.0.0.1 --port 8001 --reload
+   ```
+   
 ## 📘 Tentang Proyek
 
 Proyek ini dikembangkan oleh Tim Capstone sebagai bagian dari program **Dicoding x DBS Foundation**. Aplikasi ini menunjukkan integrasi full-stack dan machine learning untuk manajemen keuangan pribadi.
