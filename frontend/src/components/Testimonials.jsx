@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+// import { FaChevronLeft, FaChevronRight } from "react-icons/fa"; // Tidak dibutuhkan lagi
 
 const Testimonials = () => {
   const testimonials = [
+    // ... (data testimonials tetap sama) ...
     {
       id: 1,
       text: "Aplikasi ini benar-benar membantu saya mengatur keuangan! Sekarang saya lebih tahu ke mana uang saya pergi dan dapat menabung dengan lebih efektif!",
@@ -49,20 +50,14 @@ const Testimonials = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // const prevTestimonial = () => {
-  //   setCurrentIndex((prevIndex) =>
-  //     prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
-  //   );
-  // };
-
   const nextTestimonial = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1
     );
   };
 
-  const cardWidth = 586;
-  const gap = 24;
+  const cardWidth = 555;
+  const gap = 50;
   const containerWidth = cardWidth + gap;
 
   const getTranslateX = () => {
@@ -70,66 +65,54 @@ const Testimonials = () => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center mt-[60px]">
-      <div className="relative w-[600px]">
+    <div className="w-full flex flex-col items-center mt-12 md:mt-[60px]">
+      <div className="relative w-full max-w-full overflow-visible px-[5vw] sm:px-[10vw] md:px-[15vw] lg:max-w-[595px] lg:px-0">
         <div
-          className="flex transition-transform duration-500 ease-in-out"
+          className="flex items-center transition-transform duration-500 ease-in-out"
           style={{
             transform: getTranslateX(),
-            gap: `${gap}px`,
           }}
         >
-          <div className="w-[600px]"></div>
           {testimonials.map((testimonial, index) => (
             <div
-              key={index}
-              className={`p-6 flex flex-col justify-center w-[586px] h-[311px] rounded-[40px] text-center transition-all duration-500 ${
-                index === currentIndex
-                  ? "bg-[#DEE8FF] opacity-100 scale-105"
-                  : "bg-[#DEE8FF] opacity-50 scale-95"
-              }`}
+              key={testimonial.id}
+              className={`p-6 flex flex-col justify-center items-center
+                          w-[80vw]    sm:w-[70vw]    md:w-[60vw]    lg:w-[586px]
+                          min-h-[280px] md:min-h-[311px]
+                          mx-[10px]    sm:mx-[12px]    md:mx-[12px]  lg:mx-[12px]  // Margin = gap/2
+                          rounded-[40px] text-center transition-all duration-500
+                          ${
+                            index === currentIndex
+                              ? "bg-[#DEE8FF] opacity-100 scale-100"
+                              : "bg-gray-200 opacity-70 scale-90"
+                          }`}
               style={{
                 flexShrink: 0,
-                transition: "opacity 0.5s ease, transform 0.5s ease",
               }}
             >
-              <p className="text-black font-inter text-[18px] font-medium">
+              <p className="text-black font-inter text-sm sm:text-base md:text-[18px] font-medium">
                 {testimonial.text}
               </p>
-              <div className="flex items-center justify-center mt-[25px]">
+              <div className="flex items-center justify-center mt-4 md:mt-[25px]">
                 <img
                   src={testimonial.img}
-                  alt={testimonial.name}
+                  alt={`Foto ${testimonial.name}`}
                   className="w-10 h-10 rounded-full mr-3"
+                  loading="lazy"
                 />
                 <div>
-                  <h4 className="font-bold font-inter text-[16px] text-black">
+                  <h4 className="font-bold font-inter text-sm md:text-[16px] text-black">
                     {testimonial.name}
                   </h4>
-                  <p className="text-gray-500 font-inter text-[16px]">
+                  <p className="text-gray-500 font-inter text-sm md:text-[16px]">
                     {testimonial.role}
                   </p>
                 </div>
               </div>
             </div>
           ))}
-          <div className="w-[600px]"></div>
         </div>
       </div>
-      {/* <div className="flex justify-around w-full max-w-xs mt-4">
-        <button
-          onClick={prevTestimonial}
-          className="p-2 bg-gray-300 rounded-full hover:bg-gray-400 transition"
-        >
-          <FaChevronLeft />
-        </button>
-        <button
-          onClick={nextTestimonial}
-          className="p-2 bg-gray-300 rounded-full hover:bg-gray-400 transition"
-        >
-          <FaChevronRight />
-        </button>
-      </div> */}
     </div>
   );
 };

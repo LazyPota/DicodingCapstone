@@ -22,7 +22,7 @@ const Button = ({
     <Component
       to={Component === "button" ? undefined : to} // Kirim props 'to' hanya jika Component adalah Link
       onClick={onClick}
-      className={`rounded-full font-semibold flex items-center gap-2 transition-all duration-300 shadow-xl
+      className={`rounded-full font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-xl
         ${sizeClasses[size]}
         ${
           variant === "primary"

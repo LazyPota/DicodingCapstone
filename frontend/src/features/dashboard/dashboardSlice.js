@@ -6,9 +6,13 @@ export const getDashboardData = createAsyncThunk(
   async (userId, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
+      const user = getState().auth.user;
+      const id = userId || user?.id;
+      if (!id) return rejectWithValue("User tidak ditemukan");
+      
       if (!token) return rejectWithValue("User tidak terautentikasi");
 
-      const healthResponse = await api.post(`/capstone/ml/financial-health`);
+      const healthResponse = await api.post(`/capstone/ml/${id}/financial-health`);
 
       if (healthResponse.data) {
         return healthResponse.data;

@@ -1,60 +1,111 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { loginUser, reset } from "../../features/auth/authSlice";
 import LoginView from "./LoginView";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
+  const { email, password } = formData;
+  const [registrationSuccessMessage, setRegistrationSuccessMessage] =
+    useState(null);
+  const location = useLocation();
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
+
+  useEffect(() => {
+    if (location.state?.successMessage) {
+      console.log(
+        "Login page received success message:",
+        location.state.successMessage
+      );
+      setRegistrationSuccessMessage(location.state.successMessage);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
+
+  const onChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+
+    if (errors[name]) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: null,
+      }));
+    }
+  };
 
   const validateForm = () => {
-    const newErrors = {};
-    const emailRegex =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    let formIsValid = true;
+    let newErrors = {};
 
     if (!email) {
+      formIsValid = false;
       newErrors.email = "Email wajib diisi";
-    } else if (!emailRegex.test(email)) {
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
+    ) {
+      formIsValid = false;
       newErrors.email = "Format email tidak valid";
     }
 
     if (!password) {
+      formIsValid = false;
       newErrors.password = "Password wajib diisi";
     } else if (password.length < 8) {
-      newErrors.password = "Password minimal harus 8 karakter";
+      formIsValid = false;
+      newErrors.password = "Password minimal 6 karakter";
     }
 
-    return newErrors;
+    setErrors(newErrors);
+    return formIsValid;
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const validationErrors = validateForm();
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      if (registrationSuccessMessage) setRegistrationSuccessMessage(null);
+      const userData = { email, password };
+      dispatch(loginUser(userData));
     } else {
-      setErrors({});
-      console.log("Form valid, data siap dikirim", {
-        email,
-        password,
-      });
-      alert("Login Berhasil");
+      console.log("Form login tidak valid (client-side)");
     }
   };
+
+  useEffect(() => {
+    if (isSuccess || user) {
+      navigate("/beranda");
+    }
+
+    return () => {
+      dispatch(reset());
+    };
+  }, [user, isSuccess, navigate, dispatch]);
 
   return (
     <div>
+      {isLoading && <p>Loading...</p>}
       <LoginView
         showPassword={showPassword}
         setShowPassword={setShowPassword}
         email={email}
-        setEmail={setEmail}
         password={password}
-        setPassword={setPassword}
-        handleSubmit={handleSubmit}
-        validateForm={validateForm}
+        onChange={onChange}
+        handleLogin={handleLogin}
+        isLoading={isLoading}
         errors={errors}
+        serverError={isError ? message : null}
+        registrationSuccessMessage={registrationSuccessMessage}
       />
     </div>
   );

@@ -10,7 +10,7 @@ import (
 func InitFinancialHealthRoutes(r *gin.RouterGroup, ctrl *controller.AllController) {
 	authMiddleware := middleware.NewMiddleware()
 
-	mlGroup := r.Group("/ml",  authMiddleware.AuthMiddleware())
+	mlGroup := r.Group("/ml/:id",  authMiddleware.AuthMiddleware())
 	{
 		mlGroup.POST("/financial-health", ctrl.FinancialHealthController.GetFinancialHealth)
 	}

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "https://api.moneasy.habibunayka.com/",
+    baseURL: "http://localhost:8000/",
 });
 
 api.interceptors.request.use(
