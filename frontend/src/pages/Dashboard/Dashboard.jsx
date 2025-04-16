@@ -134,6 +134,7 @@ const Dashboard = () => {
   }, [transactions]);
 
   const chartDisplayData = barChartData;
+  console.log("Chart Data:", barChartData);
 
   if (isError && !financialHealthStatus) {
     return (

@@ -57,6 +57,11 @@ Akses frontend di: [http://localhost:5173](http://localhost:5173)
 
 #### 3. Backend Setup
 
+1. Go to backend directory
+   ```
+   cd backend
+   ```
+
 2. Install dependencies:
    ```
    go mod tidy
@@ -84,34 +89,38 @@ Akses frontend di: [http://localhost:5173](http://localhost:5173)
    
    Replace `username`, `password`, and `urdbname` with values that match your database configuration.
 
+#### 4. Machine Learning Setup
+1. Go to ml-service directory
+   ```
+   cd backend/ml-service
+   ```
+
+2. Make virtual environment:
+   ```
+   python -m venv env
+   ```
+   
+3. Using virtual environment:
+   ```
+   venv\Scripts\Activate.ps1
+   ```
+
+4. Install depedencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+5. Running the application:
+   ```
+   uvicorn main:app --host 127.0.0.1 --port 8001 --reload
+   ```
+
 ## Running the Application
 
 Run the application with the command:
 ```
 go run main.go
 ```
-
-#### 4. Machine Learning Setup
-
-1. Make virtual environment:
-   ```
-   python -m venv env
-   ```
-   
-2. Using virtual environment:
-   ```
-   venv\Scripts\Activate.ps1
-   ```
-
-3. Install depedencies:
-   ```
-   pip install -r requirements.txt
-   ```
-
-4. Running the application:
-   ```
-   uvicorn main:app --host 127.0.0.1 --port 8001 --reload
-   ```
    
 ## 📘 Tentang Proyek
 

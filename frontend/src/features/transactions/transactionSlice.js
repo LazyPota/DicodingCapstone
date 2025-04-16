@@ -10,6 +10,7 @@ export const getTransactions = createAsyncThunk(
 
       const params = new URLSearchParams();
       let urlPath = `/capstone/user/${userId}/transactions/`;
+      
 
       if (month && year) {
         params.append('month', month.toString());
